@@ -27,17 +27,22 @@ const submit = () => {
         onFinish: () => form.reset('password'),
     });
 };
-</script>
+</script>po
 
 <template>
     <GuestLayout>
         <Head title="Log in" />
-
+        <div class="flex flex-col w-full items-center gap-3">
+            <h1 class="text-5xl text-gray-800 font-subh font-black">LOGIN</h1>
+            <span class="flex w-16 h-2 bg-gray-800 rounded-md"></span>
+        </div>
         <div v-if="status" class="mb-4 text-sm font-medium text-green-600">
             {{ status }}
         </div>
 
-        <form @submit.prevent="submit">
+
+
+        <form @submit.prevent="submit" class="mt-8">
             <div>
                 <InputLabel for="email" value="Email" />
 
@@ -69,31 +74,43 @@ const submit = () => {
                 <InputError class="mt-2" :message="form.errors.password" />
             </div>
 
-            <div class="mt-4 block">
+            <div class="mt-4 flex justify-between">
                 <label class="flex items-center">
                     <Checkbox name="remember" v-model:checked="form.remember" />
-                    <span class="ms-2 text-sm text-gray-600"
+                    <span class="ms-2 text-gray-600"
                         >Remember me</span
                     >
                 </label>
-            </div>
 
-            <div class="mt-4 flex items-center justify-end">
                 <Link
                     v-if="canResetPassword"
                     :href="route('password.request')"
-                    class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                    class="rounded-md text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                 >
                     Forgot your password?
                 </Link>
+            </div>
 
+            <div class="mt-4 flex flex-col gap-2 flex-grow-1 items-center justify-end">
                 <PrimaryButton
-                    class="ms-4"
+                    class="w-full"
                     :class="{ 'opacity-25': form.processing }"
                     :disabled="form.processing"
                 >
-                    Log in
+                    Login
                 </PrimaryButton>
+
+                
+            </div>
+            <div class="flex w-full justify-center mt-6">
+                <span> Don't have an account, 
+                <Link
+                    :href="route('register')"
+                    class="rounded-md text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                >
+                    Sign Up
+                </Link>
+                </span>
             </div>
         </form>
     </GuestLayout>

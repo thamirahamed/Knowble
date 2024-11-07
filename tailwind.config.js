@@ -14,6 +14,8 @@ export default {
         extend: {
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                mainh: ['clash display', 'sans-serif'],
+                subh: ['Satoshi', 'sans-serif'],
             },
         },
     },

@@ -1,3 +1,12 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Custom CSS for landing page gradient */
+.gradient-bg {
+    --gradient-color-1: #00172d; 
+    --gradient-color-2: #00264d; 
+    --gradient-color-3: #02386e;  
+    --gradient-color-4: #000b18;
+}
+  

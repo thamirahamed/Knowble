@@ -1,7 +1,9 @@
 <template>
     <button
-        class="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 shadow-lg shadow-blue-500/50 dark:shadow-lg dark:shadow-blue-800/80 font-medium rounded-lg text-xl px-5 py-2.5 text-center me-2 mb-2"
+        class="transition-all duration-200 ease-in-out text-white tracking-wide hover:tracking-wider font-semibold bg-accent hover:bg-accentdark focus:ring-2 focus:outline-none focus:ring-accent rounded-lg px-5 py-2.5 text-center me-2 mb-2 hover:shadow-[5px_5px_rgba(0,_98,_90,_0.4),_10px_10px_rgba(0,_98,_90,_0.3),_15px_15px_rgba(0,_98,_90,_0.2)]"
     >
         <slot />
     </button>
+
+
 </template>

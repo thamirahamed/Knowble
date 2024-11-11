@@ -25,7 +25,7 @@ const submit = () => {
     <GuestLayout>
         <Head title="Forgot Password" />
 
-        <div class="mb-4 text-sm text-gray-600">
+        <div class="mb-4 text-xl text-gray-600">
             Forgot your password? No problem. Just let us know your email
             address and we will email you a password reset link that will allow
             you to choose a new one.
@@ -38,7 +38,7 @@ const submit = () => {
             {{ status }}
         </div>
 
-        <form @submit.prevent="submit">
+        <form @submit.prevent="submit" class="text-xl">
             <div>
                 <InputLabel for="email" value="Email" />
 
@@ -50,6 +50,7 @@ const submit = () => {
                     required
                     autofocus
                     autocomplete="username"
+                    placeholder="Enter email here"
                 />
 
                 <InputError class="mt-2" :message="form.errors.email" />

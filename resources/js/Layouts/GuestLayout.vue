@@ -23,7 +23,7 @@ onMounted(() => {
                 </div>
                 <div class="flex flex-col justify-center flex-grow -mt-8 bg-gradient-to-b from-white via-gray-100 to-gray-400 bg-clip-text text-transparent">
                     <h1 class="h-fit text-5xl tracking-wide md:text-7xl 2xl:text-8xl font-normal font-mainh">Welcome to,</h1>
-                    <h1 class="h-fit text-6xl tracking-wider md:text-8xl xl:text-9xl font-bold font-mainh">Knowble</h1>
+                    <h1 class="h-fit text-6xl tracking-wider md:text-8xl xl:text-9xl 2xl:text-[9rem] font-bold font-mainh">Knowble</h1>
                     <h3 class="text-xl md:text-1xl xl:text-2xl font-subh tracking-wide font-light">Empowering APIIT students through peer-led support, sharing knowledge, and fostering community</h3>
                 </div>
             </div>
@@ -31,7 +31,7 @@ onMounted(() => {
         </div>
         
         <div
-            class="flex flex-col justify-center w-full h-screen overflow-hidden bg-white px-20 py-4 lg:w-2/5"
+            class="flex flex-col justify-center w-full h-screen overflow-hidden bg-white px-24 py-4 lg:w-2/5"
         >
             <slot />
         </div>

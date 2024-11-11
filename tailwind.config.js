@@ -13,9 +13,15 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                sans: ['Author', ...defaultTheme.fontFamily.sans],
                 mainh: ['clash display', 'sans-serif'],
                 subh: ['Satoshi', 'sans-serif'],
+            },
+            colors: {
+                primary: '#032031', 
+                secondary: '#042f47', 
+                accent: '#1b8f67', 
+                accentdark: '#136b4d', 
             },
         },
     },

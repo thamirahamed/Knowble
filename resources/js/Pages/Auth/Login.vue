@@ -27,14 +27,13 @@ const submit = () => {
         onFinish: () => form.reset('password'),
     });
 };
-</script>po
+</script>
 
 <template>
     <GuestLayout>
         <Head title="Log in" />
-        <div class="flex flex-col w-full items-center gap-3">
-            <h1 class="text-5xl text-gray-800 font-subh font-black">LOGIN</h1>
-            <span class="flex w-16 h-2 bg-gray-800 rounded-md"></span>
+        <div class="flex flex-col w-full gap-3">
+            <h1 class="text-7xl tracking-wide text-gray-900 font-semibold ">Login</h1>
         </div>
         <div v-if="status" class="mb-4 text-sm font-medium text-green-600">
             {{ status }}
@@ -42,8 +41,8 @@ const submit = () => {
 
 
 
-        <form @submit.prevent="submit" class="mt-8">
-            <div>
+        <form @submit.prevent="submit" class=" text-xl text-primary">
+            <div class="my-6">
                 <InputLabel for="email" value="Email" />
 
                 <TextInput
@@ -54,12 +53,13 @@ const submit = () => {
                     required
                     autofocus
                     autocomplete="username"
+                    placeholder="Enter email here"
                 />
 
                 <InputError class="mt-2" :message="form.errors.email" />
             </div>
 
-            <div class="mt-4">
+            <div class="my-6">
                 <InputLabel for="password" value="Password" />
 
                 <TextInput
@@ -69,15 +69,16 @@ const submit = () => {
                     v-model="form.password"
                     required
                     autocomplete="current-password"
+                    placeholder="Enter password here"
                 />
 
                 <InputError class="mt-2" :message="form.errors.password" />
             </div>
 
-            <div class="mt-4 flex justify-between">
+            <div class="-mt-2 flex justify-between">
                 <label class="flex items-center">
                     <Checkbox name="remember" v-model:checked="form.remember" />
-                    <span class="ms-2 text-gray-600"
+                    <span class="ms-2 text-gray-700"
                         >Remember me</span
                     >
                 </label>
@@ -85,28 +86,25 @@ const submit = () => {
                 <Link
                     v-if="canResetPassword"
                     :href="route('password.request')"
-                    class="rounded-md text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                    class="text-gray-700 underline hover:text-accentdark"
                 >
                     Forgot your password?
                 </Link>
             </div>
 
-            <div class="mt-4 flex flex-col gap-2 flex-grow-1 items-center justify-end">
+            <div class="mt-8 flex flex-col flex-grow-1 items-center gap-6">
                 <PrimaryButton
-                    class="w-full"
+                    class="w-full text-2xl"
                     :class="{ 'opacity-25': form.processing }"
                     :disabled="form.processing"
                 >
                     Login
                 </PrimaryButton>
 
-                
-            </div>
-            <div class="flex w-full justify-center mt-6">
-                <span> Don't have an account, 
+                <span class="text-gray-900"> Don't have an account, 
                 <Link
                     :href="route('register')"
-                    class="rounded-md text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                    class="text-gray-700 underline hover:text-accentdark"
                 >
                     Sign Up
                 </Link>

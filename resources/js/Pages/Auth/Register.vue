@@ -24,8 +24,12 @@ const submit = () => {
     <GuestLayout>
         <Head title="Register" />
 
-        <form @submit.prevent="submit">
-            <div>
+        <div class="flex flex-col w-full gap-3">
+            <h1 class="text-7xl tracking-wide text-gray-900 font-semibold ">Register</h1>
+        </div>
+
+        <form @submit.prevent="submit" class="text-xl">
+            <div class="my-6">
                 <InputLabel for="name" value="Name" />
 
                 <TextInput
@@ -36,12 +40,13 @@ const submit = () => {
                     required
                     autofocus
                     autocomplete="name"
+                    placeholder="John Doe"
                 />
 
                 <InputError class="mt-2" :message="form.errors.name" />
             </div>
 
-            <div class="mt-4">
+            <div class="my-6">
                 <InputLabel for="email" value="Email" />
 
                 <TextInput
@@ -51,12 +56,13 @@ const submit = () => {
                     v-model="form.email"
                     required
                     autocomplete="username"
+                    placeholder="Enter email here"
                 />
 
                 <InputError class="mt-2" :message="form.errors.email" />
             </div>
 
-            <div class="mt-4">
+            <div class="my-6">
                 <InputLabel for="password" value="Password" />
 
                 <TextInput
@@ -66,12 +72,13 @@ const submit = () => {
                     v-model="form.password"
                     required
                     autocomplete="new-password"
+                    placeholder="Enter password Here"
                 />
 
                 <InputError class="mt-2" :message="form.errors.password" />
             </div>
 
-            <div class="mt-4">
+            <div class="my-6">
                 <InputLabel
                     for="password_confirmation"
                     value="Confirm Password"
@@ -84,6 +91,7 @@ const submit = () => {
                     v-model="form.password_confirmation"
                     required
                     autocomplete="new-password"
+                    placeholder="Confirm password here"
                 />
 
                 <InputError
@@ -92,21 +100,21 @@ const submit = () => {
                 />
             </div>
 
-            <div class="mt-4 flex items-center justify-end">
-                <Link
-                    :href="route('login')"
-                    class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                >
-                    Already registered?
-                </Link>
-
+            <div class="mt-8 flex flex-col flex-grow-1 items-center gap-6">
                 <PrimaryButton
-                    class="ms-4"
+                    class="w-full text-2xl"
                     :class="{ 'opacity-25': form.processing }"
                     :disabled="form.processing"
                 >
                     Register
                 </PrimaryButton>
+
+                <Link
+                    :href="route('login')"
+                    class="text-gray-700 underline hover:text-accentdark"
+                >
+                    Already registered?
+                </Link>
             </div>
         </form>
     </GuestLayout>

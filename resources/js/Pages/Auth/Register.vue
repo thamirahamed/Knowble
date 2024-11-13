@@ -57,6 +57,7 @@ const submit = () => {
                     required
                     autocomplete="username"
                     placeholder="Enter email here"
+
                 />
 
                 <InputError class="mt-2" :message="form.errors.email" />

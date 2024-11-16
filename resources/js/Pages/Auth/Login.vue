@@ -1,11 +1,11 @@
 <script setup>
-import Checkbox from '@/Components/Checkbox.vue';
-import GuestLayout from '@/Layouts/GuestLayout.vue';
-import InputError from '@/Components/InputError.vue';
-import InputLabel from '@/Components/InputLabel.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
-import TextInput from '@/Components/TextInput.vue';
-import { Head, Link, useForm } from '@inertiajs/vue3';
+import Checkbox from "@/Components/Checkbox.vue";
+import GuestLayout from "@/Layouts/GuestLayout.vue";
+import InputError from "@/Components/InputError.vue";
+import InputLabel from "@/Components/InputLabel.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
+import TextInput from "@/Components/TextInput.vue";
+import { Head, Link, useForm } from "@inertiajs/vue3";
 
 defineProps({
     canResetPassword: {
@@ -17,14 +17,14 @@ defineProps({
 });
 
 const form = useForm({
-    email: '',
-    password: '',
+    email: "",
+    password: "",
     remember: false,
 });
 
 const submit = () => {
-    form.post(route('login'), {
-        onFinish: () => form.reset('password'),
+    form.post(route("login"), {
+        onFinish: () => form.reset("password"),
     });
 };
 </script>
@@ -32,16 +32,16 @@ const submit = () => {
 <template>
     <GuestLayout>
         <Head title="Log in" />
-        <div class="flex flex-col w-full gap-3">
-            <h1 class="text-7xl tracking-wide text-gray-900 font-semibold ">Login</h1>
+        <div class="flex w-full flex-col gap-3">
+            <h1 class="text-7xl font-semibold tracking-wide text-gray-900">
+                Login
+            </h1>
         </div>
         <div v-if="status" class="mb-4 text-sm font-medium text-green-600">
             {{ status }}
         </div>
 
-
-
-        <form @submit.prevent="submit" class=" text-xl text-primary">
+        <form @submit.prevent="submit" class="text-xl text-primary">
             <div class="my-6">
                 <InputLabel for="email" value="Email" />
 
@@ -78,9 +78,7 @@ const submit = () => {
             <div class="-mt-2 flex justify-between">
                 <label class="flex items-center">
                     <Checkbox name="remember" v-model:checked="form.remember" />
-                    <span class="ms-2 text-gray-700"
-                        >Remember me</span
-                    >
+                    <span class="ms-2 text-gray-700">Remember me</span>
                 </label>
 
                 <Link
@@ -92,7 +90,7 @@ const submit = () => {
                 </Link>
             </div>
 
-            <div class="mt-8 flex flex-col flex-grow-1 items-center gap-6">
+            <div class="flex-grow-1 mt-8 flex flex-col items-center gap-6">
                 <PrimaryButton
                     class="w-full text-2xl"
                     :class="{ 'opacity-25': form.processing }"
@@ -101,13 +99,14 @@ const submit = () => {
                     Login
                 </PrimaryButton>
 
-                <span class="text-gray-900"> Don't have an account, 
-                <Link
-                    :href="route('register')"
-                    class="text-gray-700 underline hover:text-accentdark"
-                >
-                    Sign Up
-                </Link>
+                <span class="text-gray-900">
+                    Don't have an account,
+                    <Link
+                        :href="route('register')"
+                        class="text-gray-700 underline hover:text-accentdark"
+                    >
+                        Sign Up
+                    </Link>
                 </span>
             </div>
         </form>

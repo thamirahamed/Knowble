@@ -4,9 +4,8 @@
 
 /* Custom CSS for landing page gradient */
 .gradient-bg {
-    --gradient-color-1: #042f47; 
-    --gradient-color-2: #032031; 
-    --gradient-color-3: #167454;  
+    --gradient-color-1: #042f47;
+    --gradient-color-2: #032031;
+    --gradient-color-3: #167454;
     --gradient-color-4: #0b3d41;
 }
-  

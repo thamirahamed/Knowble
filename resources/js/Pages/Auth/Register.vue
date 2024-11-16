@@ -1,21 +1,21 @@
 <script setup>
-import GuestLayout from '@/Layouts/GuestLayout.vue';
-import InputError from '@/Components/InputError.vue';
-import InputLabel from '@/Components/InputLabel.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
-import TextInput from '@/Components/TextInput.vue';
-import { Head, Link, useForm } from '@inertiajs/vue3';
+import GuestLayout from "@/Layouts/GuestLayout.vue";
+import InputError from "@/Components/InputError.vue";
+import InputLabel from "@/Components/InputLabel.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
+import TextInput from "@/Components/TextInput.vue";
+import { Head, Link, useForm } from "@inertiajs/vue3";
 
 const form = useForm({
-    name: '',
-    email: '',
-    password: '',
-    password_confirmation: '',
+    name: "",
+    email: "",
+    password: "",
+    password_confirmation: "",
 });
 
 const submit = () => {
-    form.post(route('register'), {
-        onFinish: () => form.reset('password', 'password_confirmation'),
+    form.post(route("register"), {
+        onFinish: () => form.reset("password", "password_confirmation"),
     });
 };
 </script>
@@ -24,8 +24,10 @@ const submit = () => {
     <GuestLayout>
         <Head title="Register" />
 
-        <div class="flex flex-col w-full gap-3">
-            <h1 class="text-7xl tracking-wide text-gray-900 font-semibold ">Register</h1>
+        <div class="flex w-full flex-col gap-3">
+            <h1 class="text-7xl font-semibold tracking-wide text-gray-900">
+                Register
+            </h1>
         </div>
 
         <form @submit.prevent="submit" class="text-xl">
@@ -57,7 +59,6 @@ const submit = () => {
                     required
                     autocomplete="username"
                     placeholder="Enter email here"
-
                 />
 
                 <InputError class="mt-2" :message="form.errors.email" />
@@ -101,7 +102,7 @@ const submit = () => {
                 />
             </div>
 
-            <div class="mt-8 flex flex-col flex-grow-1 items-center gap-6">
+            <div class="flex-grow-1 mt-8 flex flex-col items-center gap-6">
                 <PrimaryButton
                     class="w-full text-2xl"
                     :class="{ 'opacity-25': form.processing }"

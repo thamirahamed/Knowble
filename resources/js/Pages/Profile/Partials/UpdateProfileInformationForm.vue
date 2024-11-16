@@ -1,9 +1,10 @@
 <script setup>
-import InputError from '@/Components/InputError.vue';
-import InputLabel from '@/Components/InputLabel.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
-import TextInput from '@/Components/TextInput.vue';
-import { Link, useForm, usePage } from '@inertiajs/vue3';
+import InputError from "@/Components/InputError.vue";
+import InputLabel from "@/Components/InputLabel.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
+import TextInput from "@/Components/TextInput.vue";
+import { Link, useForm, usePage } from "@inertiajs/vue3";
+import { defineProps } from 'vue';
 
 defineProps({
     mustVerifyEmail: {
@@ -12,6 +13,14 @@ defineProps({
     status: {
         type: String,
     },
+    validOptions: {
+        type: Object,
+        required: true,
+    },
+    profile: {
+        type: Object,
+        required: true,
+    },
 });
 
 const user = usePage().props.auth.user;
@@ -19,7 +28,16 @@ const user = usePage().props.auth.user;
 const form = useForm({
     name: user.name,
     email: user.email,
+    school_of_study: profile?.school_of_study || '',
+    year_sem: profile?.year_sem || '',
+    available_times: profile?.available_times || '',
+    profile_pic: null,
 });
+
+// Handle file change for profile picture
+const handleFileChange = (event) => {
+    form.profile_pic = event.target.files[0];
+};
 </script>
 
 <template>
@@ -30,17 +48,14 @@ const form = useForm({
             </h2>
 
             <p class="mt-1 text-sm text-gray-600">
-                Update your account's profile information and email address.
+                Update your account's profile information, email address, and more.
             </p>
         </header>
 
-        <form
-            @submit.prevent="form.patch(route('profile.update'))"
-            class="mt-6 space-y-6"
-        >
+        <form @submit.prevent="form.patch(route('profile.update'))" class="mt-6 space-y-6">
+            <!-- Name Field -->
             <div>
                 <InputLabel for="name" value="Name" />
-
                 <TextInput
                     id="name"
                     type="text"
@@ -50,13 +65,12 @@ const form = useForm({
                     autofocus
                     autocomplete="name"
                 />
-
                 <InputError class="mt-2" :message="form.errors.name" />
             </div>
 
+            <!-- Email Field -->
             <div>
                 <InputLabel for="email" value="Email" />
-
                 <TextInput
                     id="email"
                     type="email"
@@ -65,8 +79,62 @@ const form = useForm({
                     required
                     autocomplete="username"
                 />
-
                 <InputError class="mt-2" :message="form.errors.email" />
+            </div>
+
+            <!-- School of Study Field -->
+            <div>
+                <InputLabel for="school_of_study" value="School of Study" />
+                <select
+                    id="school_of_study"
+                    v-model="form.school_of_study"
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                >
+                    <option v-for="(years, school) in validOptions" :key="school" :value="school">
+                        {{ school }}
+                    </option>
+                </select>
+                <InputError class="mt-2" :message="form.errors.school_of_study" />
+            </div>
+
+            <!-- Year/Semester Field -->
+            <div>
+                <InputLabel for="year_sem" value="Year/Semester" />
+                <select
+                    id="year_sem"
+                    v-model="form.year_sem"
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                >
+                    <option v-for="year in validOptions[form.school_of_study]" :key="year" :value="year">
+                        {{ year }}
+                    </option>
+                </select>
+                <InputError class="mt-2" :message="form.errors.year_sem" />
+            </div>
+
+            <!-- Profile Picture Field -->
+            <div>
+                <InputLabel for="profile_pic" value="Profile Picture" />
+                <input
+                    type="file"
+                    id="profile_pic"
+                    @change="handleFileChange"
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                />
+                <InputError class="mt-2" :message="form.errors.profile_pic" />
+            </div>
+
+            <!-- Available Times Field -->
+            <div>
+                <InputLabel for="available_times" value="Available Times" />
+                <TextInput
+                    id="available_times"
+                    type="text"
+                    class="mt-1 block w-full"
+                    v-model="form.available_times"
+                    placeholder="Enter your available times"
+                />
+                <InputError class="mt-2" :message="form.errors.available_times" />
             </div>
 
             <div v-if="mustVerifyEmail && user.email_verified_at === null">
@@ -90,6 +158,7 @@ const form = useForm({
                 </div>
             </div>
 
+            <!-- Save Button -->
             <div class="flex items-center gap-4">
                 <PrimaryButton :disabled="form.processing">Save</PrimaryButton>
 

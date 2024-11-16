@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Cource extends Model
+class Course extends Model
 {
     protected $fillable = [
         'CourseName',
@@ -12,6 +12,6 @@ class Cource extends Model
 
     public function levels()
     {
-        return $this->hasMany(CourceLevel::class);
+        return $this->hasMany(CourseLevel::class);
     }
 }

@@ -6,7 +6,7 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class CreateCorucesLevels extends Seeder
+class CreateCourseLevels extends Seeder
 {
     /**
      * Run the database seeds.
@@ -96,16 +96,17 @@ class CreateCorucesLevels extends Seeder
                 'Year 1 - Sem 1', 'Year 1 - Sem 2',
                 'Year 2 - Sem 1', 'Year 2 - Sem 2',
                 'Year 3 - Sem 1', 'Year 3 - Sem 2',
+                'Year 4 - Sem 1', 'Year 4 - Sem 2',
             ],
         ];
 
         foreach ($courseLevels as $courseName => $levels) {
-            $course = DB::table('cources')->where('CourseName', $courseName)->first();
+            $course = DB::table('courses')->where('CourseName', $courseName)->first();
 
             if ($course) {
                 foreach ($levels as $level) {
-                    DB::table('cource_levels')->insert([
-                        'cource_id' => $course->id,
+                    DB::table('course_levels')->insert([
+                        'course_id' => $course->id,
                         'level' => $level,
                         'created_at' => now(),
                         'updated_at' => now(),

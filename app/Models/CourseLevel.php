@@ -4,15 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class CourceLevel extends Model
+class CourseLevel extends Model
 {
     protected $fillable = [
-        'cource_id',
+        'course_id',
         'level',
     ];
 
     public function cource()
     {
-        return $this->belongsTo(Cource::class);
+        return $this->belongsTo(Course::class);
     }
 }

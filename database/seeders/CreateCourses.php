@@ -6,7 +6,7 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class CreateCoruces extends Seeder
+class CreateCourses extends Seeder
 {
     /**
      * Run the database seeds.
@@ -36,7 +36,7 @@ class CreateCoruces extends Seeder
         ];
 
         foreach ($courses as $course) {
-            DB::table('cources')->insert([
+            DB::table('courses')->insert([
                 'CourseName' => $course,
                 'created_at' => now(),
                 'updated_at' => now(),

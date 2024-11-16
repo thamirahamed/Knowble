@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
-use App\Models\Cource;
-use App\Models\CourceLevel;
+use App\Models\Course;
+use App\Models\CourseLevel;
+use App\Models\User;
+use App\Models\Profile;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -12,24 +14,19 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 use Inertia\Response;
-use App\Models\User;
-use App\Models\Profile;
+
 
 class ProfileController extends Controller
 {
-    /**
-     * Return the valid options for school of study and year/semester combinations.
-     *
-     * @return array
-     */
-
-
     public function store(Request $request)
     {
         // Validate the input data (only the fields that can be set during profile creation)
         $validatedData = $request->validate([
             'profile_pic' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
+
+        $profilePictureName = 'default.webp'; // Set default picture
+
         // Handle profile picture upload
         if ($request->hasFile('profile_pic')) {
             $profilePicture = $request->file('profile_pic');
@@ -133,8 +130,8 @@ class ProfileController extends Controller
     {
 
         return Inertia::render('Profile/Create', [
-            'courses' => Cource::all(),
-            'levels' => CourceLevel::all(),
+            'courses' => Course::all(),
+            'levels' => CourseLevel::all(),
         ]);
     }
 }

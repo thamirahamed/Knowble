@@ -18,8 +18,8 @@ class CreateProfilesTable extends Migration
             $table->timestamps(); // Created at and Updated at
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('course_id')->references('id')->on('cources')->onDelete('cascade');
-            $table->foreign('level_id')->references('id')->on('cource_levels')->onDelete('cascade');
+            $table->foreign('course_id')->references('id')->on('courses')->onDelete('cascade');
+            $table->foreign('level_id')->references('id')->on('course_levels')->onDelete('cascade');
         });
     }
 

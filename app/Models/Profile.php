@@ -21,12 +21,12 @@ class Profile extends Model
 
     public function course()
     {
-        return $this->belongsTo(Cource::class);
+        return $this->belongsTo(Course::class);
     }
 
     public function level()
     {
-        return $this->belongsTo(CourceLevel::class);
+        return $this->belongsTo(CourseLevel::class);
     }
 
 }

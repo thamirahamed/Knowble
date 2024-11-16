@@ -75,7 +75,7 @@ const submitForm = () => {
                     <option value="">Select Level</option>
                     <!-- Dynamically populate levels based on the selected course -->
                     <option
-                        v-for="level in validInputs.levels.filter(l => l.cource_id === form.course)"
+                        v-for="level in validInputs.levels.filter(l => l.course_id === form.course)"
                         :key="level.id"
                         :value="level.id"
                     >

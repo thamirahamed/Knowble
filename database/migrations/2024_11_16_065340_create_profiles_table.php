@@ -10,14 +10,16 @@ class CreateProfilesTable extends Migration
     {
         Schema::create('profiles', function (Blueprint $table) {
             $table->id(); // Primary key and foreign key from users table
-            $table->foreign('id')->references('id')->on('users')->onDelete('cascade'); // Linking profiles to users table
-            $table->string('school_of_study'); // Dropdown options for school of study
-            $table->string('year'); // Year (e.g., Year 1–3, Sem 1–3, or on break)
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('course_id');
+            $table->unsignedBigInteger('level_id');
             $table->string('cb_number'); // Extracted from email
-            $table->string('profile_pic')->default('default.svg'); // user uploaded profile pic or default
-            $table->json('available_times')->nullable(); // Available time and days
-            $table->enum('role', ['Tutor', 'Student'])->default('Student'); // Tutor or Student
+            $table->text('profile_pic')->default('default.svg'); // user uploaded profile pic or default
             $table->timestamps(); // Created at and Updated at
+
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('course_id')->references('id')->on('cources')->onDelete('cascade');
+            $table->foreign('level_id')->references('id')->on('cource_levels')->onDelete('cascade');
         });
     }
 

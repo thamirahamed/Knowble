@@ -33,7 +33,12 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        $doesUserHaveProfile = $request->user()->profile()->exists();
+
+        if ($doesUserHaveProfile) {
+            return redirect()->intended(route('dashboard', absolute: false));
+        }
+        return redirect()->intended(route('profile.create', absolute: false));
     }
 
     /**

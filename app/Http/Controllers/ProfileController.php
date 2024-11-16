@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\Cource;
+use App\Models\CourceLevel;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -20,111 +22,28 @@ class ProfileController extends Controller
      *
      * @return array
      */
-    public function validOptions()
-    {
-        return [
-            'Business Foundation' => [
-                'Year 1 - Sem 1', 'Year 1 - Sem 2',
-            ],
-            'Law Foundation' => [
-                'Year 1 - Sem 1', 'Year 1 - Sem 2',
-            ],
-            'Computing Foundation' => [
-                'Year 1 - Sem 1', 'Year 1 - Sem 2',
-            ],
-            'BSc (Hons) Computer Science' => [
-                'Year 1 - Sem 1', 'Year 1 - Sem 2', 'Year 2 - Sem 1', 'Year 2 - Sem 2',
-                'Year 3 - Sem 1', 'Year 3 - Sem 2',
-            ],
-            'BSc (Hons) Computer Science (Cloud Technologies)' => [
-                'Year 1 - Sem 1', 'Year 1 - Sem 2', 'Year 2 - Sem 1', 'Year 2 - Sem 2',
-                'Year 3 - Sem 1', 'Year 3 - Sem 2',
-            ],
-            'BSc (Hons) Computer Science (Internet and Web Management)' => [
-                'Year 1 - Sem 1', 'Year 1 - Sem 2', 'Year 2 - Sem 1', 'Year 2 - Sem 2',
-                'Year 3 - Sem 1', 'Year 3 - Sem 2',
-            ],
-            'BSc (Hons) Computer Science (Network Computing)' => [
-                'Year 1 - Sem 1', 'Year 1 - Sem 2', 'Year 2 - Sem 1', 'Year 2 - Sem 2',
-                'Year 3 - Sem 1', 'Year 3 - Sem 2',
-            ],
-            'BSc (Hons) Computer Science (Software Development)' => [
-                'Year 1 - Sem 1', 'Year 1 - Sem 2', 'Year 2 - Sem 1', 'Year 2 - Sem 2',
-                'Year 3 - Sem 1', 'Year 3 - Sem 2',
-            ],
-            'BSc (Hons) Cyber Security' => [
-                'Year 1 - Sem 1', 'Year 1 - Sem 2', 'Year 2 - Sem 1', 'Year 2 - Sem 2',
-                'Year 3 - Sem 1', 'Year 3 - Sem 2',
-            ],
-            'BSc (Hons) Accounting and Finance' => [
-                'Year 1 - Sem 1', 'Year 1 - Sem 2', 'Year 2 - Sem 1', 'Year 2 - Sem 2',
-                'Year 3 - Sem 1', 'Year 3 - Sem 2',
-            ],
-            'BSc (Hons) Digital and Social Media Marketing' => [
-                'Year 1 - Sem 1', 'Year 1 - Sem 2', 'Year 2 - Sem 1', 'Year 2 - Sem 2',
-                'Year 3 - Sem 1', 'Year 3 - Sem 2',
-            ],
-            'BSc (Hons) International Business Management' => [
-                'Year 1 - Sem 1', 'Year 1 - Sem 2', 'Year 2 - Sem 1', 'Year 2 - Sem 2',
-                'Year 3 - Sem 1', 'Year 3 - Sem 2',
-            ],
-            'BSc (Hons) Business Management (Sustainability)' => [
-                'Year 1 - Sem 1', 'Year 1 - Sem 2', 'Year 2 - Sem 1', 'Year 2 - Sem 2',
-                'Year 3 - Sem 1', 'Year 3 - Sem 2',
-            ],
-            'BSc (Hons) Business Management (Human Resource Management)' => [
-                'Year 1 - Sem 1', 'Year 1 - Sem 2', 'Year 2 - Sem 1', 'Year 2 - Sem 2',
-                'Year 3 - Sem 1', 'Year 3 - Sem 2',
-            ],
-            'BSc (Hons) Business Management (Innovation and Entrepreneurship)' => [
-                'Year 1 - Sem 1', 'Year 1 - Sem 2', 'Year 2 - Sem 1', 'Year 2 - Sem 2',
-                'Year 3 - Sem 1', 'Year 3 - Sem 2',
-            ],
-            'BSc (Hons) Business Management' => [
-                'Year 1 - Sem 1', 'Year 1 - Sem 2', 'Year 2 - Sem 1', 'Year 2 - Sem 2',
-                'Year 3 - Sem 1', 'Year 3 - Sem 2',
-            ],
-            'LLB (Hons) Law' => [
-                'Year 1 - Sem 1', 'Year 1 - Sem 2', 'Year 2 - Sem 1', 'Year 2 - Sem 2',
-                'Year 3 - Sem 1', 'Year 3 - Sem 2',
-            ],
-            'LLB (Hons) Law – Digital' => [
-                'Year 1 - Sem 1', 'Year 1 - Sem 2', 'Year 2 - Sem 1', 'Year 2 - Sem 2',
-                'Year 3 - Sem 1', 'Year 3 - Sem 2',
-            ],
-            'LLB (Hons) Law (Part-Time)' => [
-                'Year 1 - Sem 1', 'Year 1 - Sem 2', 'Year 2 - Sem 1', 'Year 2 - Sem 2',
-                'Year 3 - Sem 1', 'Year 3 - Sem 2',
-            ],
-        ];
-    }
+
 
     public function store(Request $request)
     {
-        $validOptions = $this->validOptions();
-
         // Validate the input data (only the fields that can be set during profile creation)
         $validatedData = $request->validate([
-            'school_of_study' => 'required|string|in:' . implode(',', array_keys($validOptions)),
-            'year_sem' => 'required|string|in:' . implode(',', $validOptions[$request->school_of_study] ?? []),
-            'profile_pic' => 'nullable|image|max:5120', // Profile pic max size is 5MB
-            'available_times' => 'nullable|array', // If available times are provided
+            'profile_pic' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
-
         // Handle profile picture upload
         if ($request->hasFile('profile_pic')) {
-            $validatedData['profile_pic'] = $request->file('profile_pic')->store('profile_pics', 'public');
+            $profilePicture = $request->file('profile_pic');
+            $profilePictureName = time() . '.' . $profilePicture->extension();
+            $profilePicture->storeAs('public/path_images', $profilePictureName);
         }
 
         // Handle storing the validated data
         Profile::create([
             'user_id' => auth()->id(),
-            'school_of_study' => $validatedData['school_of_study'],
-            'year_sem' => $validatedData['year_sem'],
-            'cb_number' => substr(explode('@', auth()->user()->email)[0], 0, 10), // Example based on email
-            'profile_pic' => $validatedData['profile_pic'] ?? 'default.svg', // default pic if not provided
-            'available_times' => $validatedData['available_times'] ?? null,
-            'role' => 'student', // Default to student
+            'course_id' => $request->course,
+            'level_id' => $request->level,
+            'cb_number' => $request->cb_number, // Example based on email
+            'profile_pic' => $profilePictureName,
         ]);
 
         return redirect()->route('profile.edit')->with('success', 'Profile updated successfully!');
@@ -212,10 +131,10 @@ class ProfileController extends Controller
     // New Method to create the profile
     public function create()
     {
-        $validInputs = $this->validOptions(); // Get the valid inputs
 
-        return Inertia::render('CreateProfile', [
-            'validInputs' => $validInputs, // Pass the valid options to the frontend
+        return Inertia::render('Profile/Create', [
+            'courses' => Cource::all(),
+            'levels' => CourceLevel::all(),
         ]);
     }
 }

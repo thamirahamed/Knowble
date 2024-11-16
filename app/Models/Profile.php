@@ -7,18 +7,26 @@ use Illuminate\Database\Eloquent\Model;
 class Profile extends Model
 {
     protected $fillable = [
-        'user_id', 
-        'school_of_study', 
-        'year_sem', 
-        'cb_number', 
-        'profile_pic', 
-        'available_times', 
-        'role',
+        'user_id',
+        'course_id',
+        'level_id',
+        'cb_number',
+        'profile_pic',
     ];
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'id');
+        return $this->belongsTo(User::class);
+    }
+
+    public function course()
+    {
+        return $this->belongsTo(Cource::class);
+    }
+
+    public function level()
+    {
+        return $this->belongsTo(CourceLevel::class);
     }
 
 }

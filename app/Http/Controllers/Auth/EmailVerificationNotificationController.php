@@ -14,6 +14,13 @@ class EmailVerificationNotificationController extends Controller
     public function store(Request $request): RedirectResponse
     {
         if ($request->user()->hasVerifiedEmail()) {
+
+            $doesUserHaveProfile = $request->user()->profile()->exists();
+
+            if (!$doesUserHaveProfile) {
+                return redirect()->route('profile.create')->with('status', 'verification-link-sent');
+            }
+
             return redirect()->intended(route('dashboard', absolute: false));
         }
 

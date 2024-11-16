@@ -28,7 +28,7 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 // Route::middleware('auth')->group(function () {
-//     
+//
 //     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 //     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 // });
@@ -40,10 +40,6 @@ Route::middleware(['auth'])->group(function () {
 
     // Route to create a new profile (for users who haven't filled out their profile)
     Route::get('/profile/create', [ProfileController::class, 'create'])->name('profile.create');
-
-    Route::get('/profile/create', function () {
-        return Inertia::render('Profile/Create');
-    })->name('profile.create');
 
     // Route to store the new profile data (when user submits the form to create their profile)
     Route::post('/profile', [ProfileController::class, 'store'])->name('profile.store');

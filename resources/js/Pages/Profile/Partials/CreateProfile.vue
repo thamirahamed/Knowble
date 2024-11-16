@@ -6,20 +6,20 @@ import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 
-// Get valid inputs (school and year options) from the page props
+// Get courses and levels from the page props
 const pageProps = usePage().props;
-const validInputs = pageProps?.validInputs; // Fallback if validInputs is undefined
+const validInputs = {
+    courses: pageProps?.courses || [], // Fallback if courses are undefined
+    levels: pageProps?.levels || [], // Fallback if levels are undefined
+};
 console.log(validInputs); // Log to verify the data
-
 
 // Initialize the form
 const form = useForm({
-    school_of_study: '',
-    year: '',
-    available_time: '',
-    profile_picture: null,
+    course: '',
+    level: '',
+    profile_pic: null,
     cb_number: '', // Will be set automatically from email
-    role: 'student', // Default to student
 });
 
 // Extract CB Number from the email automatically
@@ -35,7 +35,6 @@ const submitForm = () => {
 };
 </script>
 
-
 <template>
     <section>
         <header>
@@ -46,82 +45,56 @@ const submitForm = () => {
         </header>
 
         <form @submit.prevent="submitForm" class="mt-6 space-y-6">
-            <!-- School of Study -->
+            <!-- Courses -->
             <div>
-                <InputLabel for="school_of_study" value="School of Study" />
+                <InputLabel for="course" value="Course" />
                 <select
-                    id="school_of_study"
+                    id="course"
                     class="mt-1 block w-full"
-                    v-model="form.school_of_study"
+                    v-model="form.course"
                     required
                 >
-                    <option value="">Select School</option>
-                    <!-- Dynamically populate the schools from validInputs -->
-                    <!-- <option v-for="(semesters, school) in validInputs" :key="school" :value="school">
-                        {{ school }}
-                    </option> -->
+                    <option value="">Select Course</option>
+                    <!-- Dynamically populate the courses -->
+                    <option v-for="course in validInputs.courses" :key="course.id" :value="course.id">
+                        {{ course.CourseName }}
+                    </option>
                 </select>
-                <InputError class="mt-2" :message="form.errors.school_of_study" />
+                <InputError class="mt-2" :message="form.errors.course" />
             </div>
 
-            <!-- Year and Semester -->
+            <!-- Levels -->
             <div>
-                <InputLabel for="year" value="Year and Semester" />
+                <InputLabel for="level" value="Level" />
                 <select
-                    id="year"
+                    id="level"
                     class="mt-1 block w-full"
-                    v-model="form.year"
+                    v-model="form.level"
                     required
                 >
-                    <option value="">Select Year and Semester</option>
-                    <!-- Dynamically populate the semesters based on selected school -->
-                    <!-- <option
-                        v-for="semester in validInputs[form.school_of_study] || []"
-                        :key="semester"
-                        :value="semester"
+                    <option value="">Select Level</option>
+                    <!-- Dynamically populate levels based on the selected course -->
+                    <option
+                        v-for="level in validInputs.levels.filter(l => l.cource_id === form.course)"
+                        :key="level.id"
+                        :value="level.id"
                     >
-                        {{ semester }}
-                    </option> -->
+                        {{ level.level }}
+                    </option>
                 </select>
-                <InputError class="mt-2" :message="form.errors.year" />
-            </div>
-
-            <!-- Available Time -->
-            <div>
-                <InputLabel for="available_time" value="Available Time" />
-                <TextInput
-                    id="available_time"
-                    type="text"
-                    class="mt-1 block w-full"
-                    v-model="form.available_time"
-                    required
-                />
-                <InputError class="mt-2" :message="form.errors.available_time" />
+                <InputError class="mt-2" :message="form.errors.level" />
             </div>
 
             <!-- Profile Picture -->
             <div>
-                <InputLabel for="profile_picture" value="Profile Picture" />
+                <InputLabel for="profile_pic" value="Profile Picture" />
                 <input
                     type="file"
-                    id="profile_picture"
+                    id="profile_pic"
                     class="mt-1 block w-full"
-                    @change="event => form.profile_picture = event.target.files[0]"
+                    @change="event => form.profile_pic = event.target.files[0]"
                 />
-                <InputError class="mt-2" :message="form.errors.profile_picture" />
-            </div>
-
-            <!-- CB Number (Auto-filled, not editable) -->
-            <div>
-                <InputLabel for="cb_number" value="CB Number" />
-                <TextInput
-                    id="cb_number"
-                    type="text"
-                    class="mt-1 block w-full"
-                    v-model="form.cb_number"
-                    disabled
-                />
-                <InputError class="mt-2" :message="form.errors.cb_number" />
+                <InputError class="mt-2" :message="form.errors.profile_pic" />
             </div>
 
             <!-- Submit Button -->

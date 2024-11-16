@@ -47,6 +47,11 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return redirect(route('dashboard'));
+        $doesUserHaveProfile = $request->user()->profile()->exists();
+
+        if ($doesUserHaveProfile) {
+            return redirect()->intended(route('dashboard', absolute: false));
+        }
+        return redirect()->intended(route('profile.create', absolute: false));
     }
 }

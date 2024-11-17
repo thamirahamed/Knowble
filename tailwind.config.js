@@ -13,7 +13,7 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ["Author", ...defaultTheme.fontFamily.sans],
+                sans: ["expose", ...defaultTheme.fontFamily.sans],
                 mainh: ["clash display", "sans-serif"],
                 subh: ["Satoshi", "sans-serif"],
             },

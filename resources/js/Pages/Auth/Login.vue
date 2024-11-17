@@ -33,7 +33,7 @@ const submit = () => {
     <GuestLayout>
         <Head title="Log in" />
         <div class="flex w-full flex-col gap-3">
-            <h1 class="text-7xl font-semibold tracking-wide text-gray-900">
+            <h1 class="text-7xl font-black tracking-wide text-gray-900">
                 Login
             </h1>
         </div>
@@ -41,7 +41,7 @@ const submit = () => {
             {{ status }}
         </div>
 
-        <form @submit.prevent="submit" class="text-xl text-primary">
+        <form @submit.prevent="submit" class="text-lg text-primary">
             <div class="my-6">
                 <InputLabel for="email" value="Email" />
 
@@ -92,7 +92,7 @@ const submit = () => {
 
             <div class="flex-grow-1 mt-8 flex flex-col items-center gap-6">
                 <PrimaryButton
-                    class="w-full text-2xl"
+                    class="w-full text-xl"
                     :class="{ 'opacity-25': form.processing }"
                     :disabled="form.processing"
                 >

@@ -48,15 +48,15 @@ class ProfileController extends Controller
     }
 
     public function getimage($filename) {
-    $path = storage_path('app/private/public/path_images/' . $filename);
+        $path = storage_path('app/private/public/path_images/' . $filename);
 
-    // Check if the file exists
-    if (!file_exists($path)) {
-        abort(404, 'Image not found.');
-    }
+        // Check if the file exists
+        if (!file_exists($path)) {
+            abort(404, 'Image not found.');
+        }
 
-    // Serve the file as a response
-    return response()->file($path);
+        // Serve the file as a response
+        return response()->file($path);
     }
 
     /**

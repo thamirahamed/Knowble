@@ -1,44 +1,40 @@
-<script>
+<script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import { Head, Link, useForm } from "@inertiajs/vue3";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
+import ProfilePicture from "@/Components/ProfilePicture.vue";
 
-export default {
-    components: { AuthenticatedLayout },
-    props: {
-        profile: Object,
-        user: Object,
-        course: Object,
-        level : Object
-    },
-    computed: {
-        profilePictureUrl() {
-            return `/private-profile-picture/${this.profile.profile_pic}`;
-        },
-    },
-};
+// Props
+const props = defineProps({
+    profile: Object,
+    user: Object,
+    course: Object,
+    level: Object
+});
 </script>
 
 <template>
     <Head title="Profile" />
 
     <AuthenticatedLayout>
-        <div class="profile-container">
-            <div class="profile-content">
+        <div class="flex justify-center">
+            <div class="flex container w-full bg-white rounded-md mt-4 shadow-[5px_5px_0px_0px_rgba(27,143,103,.6)]" >
                 <!-- Profile Section -->
-                <div class="profile-section">
-                    <img :src="profilePictureUrl" alt="Profile Picture" class="w-32 h-32 rounded-full object-cover">
-                    <a :href="route('profile.edit')" class="inline-block px-6 py-3 text-white bg-blue-500 hover:bg-blue-600 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
-                        Edit Profile
-                    </a>
-                    <h1 class="profile-name">{{ profile.cb_number }}</h1>
-                    <p class="profile-email">{{ course.CourseName}}</p>
-                    <p>{{ level.level}}</p>
-
+                <div class="flex w-1/4 p-10">
+                    <ProfilePicture :profile="profile" class="w-full h-auto shadow-[rgba(50,_50,_105,_0.15)_0px_2px_5px_0px,_rgba(0,_0,_0,_0.05)_0px_1px_1px_0px]" />
                 </div>
                 <!-- User Information Section -->
-                <div class="user-info-section">
-                    <h1 class="info-title">User Information</h1>
-                    <p class="info-detail">Username: {{ user.name }}</p>
-                    <p class="info-detail">Email: {{ user.email }}</p>
+                <div class="relative flex flex-col w-3/4 py-10 px-4">
+                    <p class="text-8xl font-extrabold tracking-wide mb-2">{{ user.name }}</p>
+                    <p class="text-4xl font-subh font-semibold text-gray-700 mb-1">{{ profile.cb_number.toUpperCase() }}</p>
+                    <p class="text-3xl font-subh text-gray-700 mb-1">{{ course.CourseName}}</p>
+                    <p class="text-2xl font-subh text-gray-700 mb-1">{{ level.level}}</p>
+
+                    <PrimaryButton class="absolute w-fit bottom-10 right-10 text-lg">
+                        <a :href="route('profile.edit')">
+                            Edit Profile
+                        </a>
+                    </PrimaryButton>
                 </div>
             </div>
         </div>

@@ -15,13 +15,19 @@ class EmailVerificationPromptController extends Controller
      */
     public function __invoke(Request $request): RedirectResponse|Response
     {
-        $doesUserHaveProfile = $request->user()->profile()->exists();
+        $user = $request->user();
 
-        if (!$doesUserHaveProfile) {
+        // If the email is not verified, show the Verify Email page
+        if (!$user->hasVerifiedEmail()) {
+            return Inertia::render('Auth/VerifyEmail', ['status' => session('status')]);
+        }
+
+        // If the email is verified, check if the user has a profile
+        if (!$user->profile()->exists()) {
             return redirect()->route('profile.create');
         }
-        return $request->user()->hasVerifiedEmail()
-                    ? redirect()->intended(route('dashboard', absolute: false))
-                    : Inertia::render('Auth/VerifyEmail', ['status' => session('status')]);
+
+        // If the user has a profile and their email is verified, go to the dashboard
+        return redirect()->intended(route('dashboard', absolute: false));
     }
 }

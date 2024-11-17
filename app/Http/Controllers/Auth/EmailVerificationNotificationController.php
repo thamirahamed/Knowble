@@ -15,19 +15,20 @@ class EmailVerificationNotificationController extends Controller
     {
         $user = $request->user();
 
-        // Step 1: Check if the user's email is verified
+        // Step 1: Ensure the user's email is verified
         if (!$user->hasVerifiedEmail()) {
-            // Send verification email if not already sent
+            // Send a verification email if it hasn't been sent
             $user->sendEmailVerificationNotification();
             return back()->with('status', 'verification-link-sent');
         }
 
-        // Step 2: Check if the user has a profile
+        // Step 2: Ensure the user has a profile
         if (!$user->profile()->exists()) {
-            return redirect()->route('profile.create')->with('status', 'profile-creation-required');
+            return redirect()->route('profile.create')->with('status', 'Please complete your profile before proceeding.');
         }
 
-        // Step 3: Redirect to the dashboard
-        return redirect()->intended(route('dashboard', absolute: false));
+        // Step 3: Redirect the user to the dashboard
+        return redirect()->intended(route('dashboard', absolute: false))->with('status', 'Welcome to your dashboard!');
     }
+
 }

@@ -13,10 +13,6 @@ defineProps({
     status: {
         type: String,
     },
-    validOptions: {
-        type: Object,
-        required: true,
-    },
     profile: {
         type: Object,
         required: true,

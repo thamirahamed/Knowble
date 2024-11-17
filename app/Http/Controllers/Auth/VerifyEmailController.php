@@ -14,19 +14,19 @@ class VerifyEmailController extends Controller
      */
     public function __invoke(EmailVerificationRequest $request): RedirectResponse
     {
-        $doesUserHaveProfile = $request->user()->profile()->exists();
+        $user = $request->user();
 
-        if (!$doesUserHaveProfile) {
+        // Mark the email as verified and fire the Verified event
+        if (!$user->hasVerifiedEmail() && $user->markEmailAsVerified()) {
+            event(new Verified($user));
+        }
+
+        // Check if the user has a profile
+        if (!$user->profile()->exists()) {
             return redirect()->route('profile.create')->with('status', 'verification-link-sent');
         }
-        if ($request->user()->hasVerifiedEmail()) {
-            return redirect()->intended(route('dashboard', absolute: false).'?verified=1');
-        }
 
-        if ($request->user()->markEmailAsVerified()) {
-            event(new Verified($request->user()));
-        }
-
-        return redirect()->intended(route('dashboard', absolute: false).'?verified=1');
+        // Redirect to the dashboard with a verification success parameter
+        return redirect()->intended(route('dashboard', absolute: false) . '?verified=1');
     }
 }

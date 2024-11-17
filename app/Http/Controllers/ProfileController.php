@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Support\Facades\Storage;
 
 
 class ProfileController extends Controller
@@ -44,6 +45,18 @@ class ProfileController extends Controller
         ]);
 
         return redirect()->route('profile.edit')->with('success', 'Profile updated successfully!');
+    }
+
+    public function getimage($filename) {
+    $path = storage_path('app/private/public/path_images/' . $filename);
+
+    // Check if the file exists
+    if (!file_exists($path)) {
+        abort(404, 'Image not found.');
+    }
+
+    // Serve the file as a response
+    return response()->file($path);
     }
 
     /**
@@ -121,8 +134,19 @@ class ProfileController extends Controller
     // New Method to display the profile
     public function show()
     {
-        $profile = Profile::where('id', auth()->id())->firstOrFail();
-        return Inertia::render('Profile/Show', compact('profile'));
+        $profile = Profile::where('user_id', auth()->id())->firstOrFail();
+        $userdetails = auth()->user();
+        $usercourse = Course::find($profile->course_id);
+        $userlevel  = CourseLevel::find($profile->level_id);
+
+
+
+        return Inertia::render('Profile/View',[
+            'profile' => $profile,
+            'user' => $userdetails,
+            'course' => $usercourse,
+            'level' => $userlevel
+        ]);
     }
 
     // New Method to create the profile

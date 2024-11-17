@@ -44,13 +44,16 @@ Route::middleware(['auth'])->group(function () {
     // Route to store the new profile data (when user submits the form to create their profile)
     Route::post('/profile', [ProfileController::class, 'store'])->name('profile.store');
 
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
 
     // Route to update existing profile information
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 
     // Route to delete the user profile (optional based on your needs)
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    //Get the picture from the storage
+    Route::get('/private-profile-picture/{filename}', [ProfileController::class, 'getimage'])->name('private.profile.picture');
 });
 
 

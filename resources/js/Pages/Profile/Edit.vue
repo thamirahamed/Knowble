@@ -17,7 +17,16 @@ defineProps({
         type: Object,
         required: true,
     },
+    courses: {
+        type: Array,
+        required: true
+    },
+    levels: {
+        type: Array,
+        required: true
+    }
 });
+
 </script>
 
 <template>
@@ -36,8 +45,9 @@ defineProps({
                     <UpdateProfileInformationForm
                         :must-verify-email="mustVerifyEmail"
                         :status="status"
-                        :validOptions="validOptions"
                         :profile="profile"
+                        :courses="courses"
+                        :levels="levels"
                         class="max-w-xl"
                     />
                 </div>

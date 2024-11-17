@@ -47,7 +47,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
 
     // Route to update existing profile information
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
 
     // Route to delete the user profile (optional based on your needs)
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

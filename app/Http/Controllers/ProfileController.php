@@ -64,51 +64,60 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): Response
     {
+        $course = Course::all();
+        $courselevel = CourseLevel::all();
         return Inertia::render('Profile/Edit', [
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => session('status'),
             'profile' => $request->user()->profile, // Include the user's profile data
+            'courses' => $course,
+            'levels' => $courselevel
         ]);
     }
 
     /**
      * Update the user's profile information.
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(Request $request)
     {
-        $validOptions = $this->validOptions();
-
-        $request->user()->fill($request->validated());
-
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
-        }
-
-        $request->user()->save();
-
-        // Validate the fields that can be updated (school of study, year_sem, profile_pic, available_times)
+        // Validate the incoming data
         $validatedData = $request->validate([
-            'school_of_study' => 'nullable|string|in:' . implode(',', array_keys($validOptions)),
-            'year_sem' => 'nullable|string|in:' . implode(',', $validOptions[$request->school_of_study] ?? []),
-            'profile_pic' => 'nullable|image|max:5120', // Profile pic max size is 5MB
-            'available_times' => 'nullable|array', // If available times are provided
+            'course_id' => 'required|integer',
+            'level_id' => 'required|integer',
+            'cb_number' => 'required|string|max:255',
+            'profile_pic' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        // Handle profile picture upload (if exists)
+        // Get the authenticated user and their profile
+        $user = $request->user();
+        $profile = $user->profile; // Use the existing profile
+
+        // Handle profile picture upload
+        $profilePictureName = $profile->profile_pic; // Default to the old picture name
         if ($request->hasFile('profile_pic')) {
-            $validatedData['profile_pic'] = $request->file('profile_pic')->store('profile_pics', 'public');
+            // Delete the old profile picture if it exists
+            if ($profilePictureName) {
+                Storage::delete('public/path_images/' . $profilePictureName);
+            }
+
+            // Store the new profile picture
+            $profilePicture = $request->file('profile_pic');
+            $profilePictureName = time() . '.' . $profilePicture->extension();
+            $profilePicture->storeAs('public/path_images', $profilePictureName);
         }
 
-        // Get the current user's profile
-        $profile = $request->user()->profile;
+        // Update the profile data
+        $profile->update([
+            'course_id' => $validatedData['course_id'],
+            'level_id' => $validatedData['level_id'],
+            'cb_number' => $validatedData['cb_number'],
+            'profile_pic' => $profilePictureName,
+        ]);
 
-        // Update the profile data with the validated input
-        if ($profile) {
-            $profile->update($validatedData);
-        }
-
+        // Redirect back with a success message
         return Redirect::route('profile.edit')->with('status', 'Profile updated successfully!');
     }
+
 
     /**
      * Delete the user's account.

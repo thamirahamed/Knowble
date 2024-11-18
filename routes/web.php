@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminVerificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ChatController;
 use Illuminate\Foundation\Application;
@@ -56,6 +57,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/private-profile-picture/{filename}', [ProfileController::class, 'getimage'])->name('private.profile.picture');
 });
 
+// Admin Verification
+Route::middleware(['auth'])->group(function () {
+    Route::get('/admin/request',[AdminVerificationController::class, 'index'])->name('admin.tutor.request');
+    Route::get('/tutor/dashboard',[AdminVerificationController::class, 'tutorDashboard'])->name('tutor.dashboard');
+});
 
 Route::get('/chat', [ChatController::class, 'index'])->name('chatpage');
 

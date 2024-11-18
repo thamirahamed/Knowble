@@ -12,7 +12,7 @@ const profilePictureUrl = computed(() => {
 </script>
 
 <template>
-    <img :src="profilePictureUrl" alt="Profile Picture" class="rounded-full object-cover">
+    <img :src="profilePictureUrl" alt="Profile Picture" class="aspect-square rounded-full object-cover">
 </template>
 
 

@@ -22,7 +22,7 @@ const props = defineProps({
             <div class="flex container w-full bg-white rounded-md mt-4 shadow-[5px_5px_0px_0px_rgba(27,143,103,.6)]" >
                 <!-- Profile Section -->
                 <div class="flex w-1/4 p-10">
-                    <ProfilePicture :profile="profile" class="w-full h-auto shadow-[rgba(50,_50,_105,_0.15)_0px_2px_5px_0px,_rgba(0,_0,_0,_0.05)_0px_1px_1px_0px]" />
+                    <ProfilePicture :profile="profile" class=" object-cover object-center shadow-[rgba(50,_50,_105,_0.15)_0px_2px_5px_0px,_rgba(0,_0,_0,_0.05)_0px_1px_1px_0px]" />
                 </div>
                 <!-- User Information Section -->
                 <div class="relative flex flex-col w-3/4 py-10 px-4">

@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Support\Facades\Storage;
+use PhpParser\Node\Expr\Print_;
 
 
 class ProfileController extends Controller
@@ -45,11 +46,11 @@ class ProfileController extends Controller
             'profile_pic' => $profilePictureName,
         ]);
 
-        return redirect()->route('profile.edit')->with('success', 'Profile updated successfully!');
+        return redirect()->route('profile.show')->with('success', 'Profile updated successfully!');
     }
 
     public function getimage($filename) {
-        $path = storage_path('app/private/public/path_images/' . $filename);
+        $path = storage_path('app/private/public/path_images/'. $filename);
 
         // Check if the file exists
         if (!file_exists($path)) {
@@ -67,10 +68,12 @@ class ProfileController extends Controller
     {
         $course = Course::all();
         $courselevel = CourseLevel::all();
+
+        $profile = Profile::where('user_id', auth()->id())->firstOrFail();
         return Inertia::render('Profile/Edit', [
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => session('status'),
-            'profile' => $request->user()->profile, // Include the user's profile data
+            'profile' => $profile, // Include the user's profile data
             'courses' => $course,
             'levels' => $courselevel
         ]);
@@ -91,7 +94,7 @@ class ProfileController extends Controller
 
         // Get the authenticated user and their profile
         $user = $request->user();
-        $profile = $user->profile; // Use the existing profile
+        $profile = Profile::where('user_id', auth()->id())->firstOrFail(); // Use the existing profile
 
         // Handle profile picture upload
         $profilePictureName = $profile->profile_pic; // Default to the old picture name
@@ -172,6 +175,11 @@ class ProfileController extends Controller
     // New Method to create the profile
     public function create()
     {
+        $profile = Profile::where('user_id', auth()->id())->first();
+
+        if ($profile) {
+            return back();
+        }
 
         return Inertia::render('Profile/Create', [
             'courses' => Course::all(),

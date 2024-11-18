@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminVerificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ChatController;
+use App\Models\Tutor;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -61,6 +62,12 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/admin/request',[AdminVerificationController::class, 'index'])->name('admin.tutor.request');
     Route::get('/tutor/dashboard',[AdminVerificationController::class, 'tutorDashboard'])->name('tutor.dashboard');
+
+    Route::get('/approve-tutor/{id}', function ($id) {
+        $tutor = Tutor::findOrFail($id);
+        $tutor->update(['status' => 'approved']);
+        return redirect()->back()->with('success', 'Tutor approved successfully!');
+    })->name('approve.tutor');
 });
 
 Route::get('/chat', [ChatController::class, 'index'])->name('chatpage');

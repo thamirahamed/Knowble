@@ -25,12 +25,12 @@ const submit = () => {
         <Head title="Register" />
 
         <div class="flex w-full flex-col gap-3">
-            <h1 class="text-7xl font-semibold tracking-wide text-gray-900">
+            <h1 class="text-7xl font-black tracking-wide text-gray-900">
                 Register
             </h1>
         </div>
 
-        <form @submit.prevent="submit" class="text-xl">
+        <form @submit.prevent="submit" class="text-lg">
             <div class="my-6">
                 <InputLabel for="name" value="Name" />
 
@@ -104,7 +104,7 @@ const submit = () => {
 
             <div class="flex-grow-1 mt-8 flex flex-col items-center gap-6">
                 <PrimaryButton
-                    class="w-full text-2xl"
+                    class="w-full text-xl"
                     :class="{ 'opacity-25': form.processing }"
                     :disabled="form.processing"
                 >

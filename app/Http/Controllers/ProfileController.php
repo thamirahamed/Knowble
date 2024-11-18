@@ -116,7 +116,7 @@ class ProfileController extends Controller
         ]);
 
         // Redirect back with a success message
-        return Redirect::route('profile.edit')->with('status', 'Profile updated successfully!');
+        return Redirect::route('profile.show')->with('status', 'Profile updated successfully!');
     }
 
 

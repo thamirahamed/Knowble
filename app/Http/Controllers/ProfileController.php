@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ProfileUpdateRequest;
 use App\Models\Course;
 use App\Models\CourseLevel;
+use App\Models\Tutor;
 use App\Models\User;
 use App\Models\Profile;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -148,13 +149,23 @@ class ProfileController extends Controller
         $usercourse = Course::find($profile->course_id);
         $userlevel  = CourseLevel::find($profile->level_id);
 
+        $tutorstatus = Tutor::where('user_id', auth()->id())->first();
 
-
+        if ($tutorstatus == null){
+            return Inertia::render('Profile/View',[
+                'profile' => $profile,
+                'user' => $userdetails,
+                'course' => $usercourse,
+                'level' => $userlevel,
+                'tutor' => $tutorstatus
+            ]);
+        }
         return Inertia::render('Profile/View',[
             'profile' => $profile,
             'user' => $userdetails,
             'course' => $usercourse,
-            'level' => $userlevel
+            'level' => $userlevel,
+            'tutor' => $tutorstatus->status
         ]);
     }
 

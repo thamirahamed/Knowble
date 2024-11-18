@@ -18,4 +18,9 @@ class AdminVerificationController extends Controller
         );
         return Inertia::render(route('profile.show'));
     }
+
+    public function tutorDashboard()
+    {
+        return Inertia::render('Tutor/Dashboard');
+    }
 }

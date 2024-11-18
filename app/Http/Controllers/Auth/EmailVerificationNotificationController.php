@@ -28,7 +28,7 @@ class EmailVerificationNotificationController extends Controller
         }
 
         // Step 3: Redirect the user to the dashboard
-        return redirect()->intended(route('dashboard', absolute: false))->with('status', 'Welcome to your dashboard!');
+        return redirect()->intended(route('profile.show', absolute: false))->with('status', 'Welcome to your dashboard!');
     }
 
 }

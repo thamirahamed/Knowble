@@ -27,6 +27,6 @@ class VerifyEmailController extends Controller
         }
 
         // Redirect to the dashboard with a verification success parameter
-        return redirect()->intended(route('dashboard', absolute: false) . '?verified=1');
+        return redirect()->intended(route('profile.show', absolute: false) . '?verified=1');
     }
 }

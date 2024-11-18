@@ -28,6 +28,6 @@ class EmailVerificationPromptController extends Controller
         }
 
         // If the user has a profile and their email is verified, go to the dashboard
-        return redirect()->intended(route('dashboard', absolute: false));
+        return redirect()->intended(route('profile.show', absolute: false));
     }
 }

@@ -50,7 +50,7 @@ class RegisteredUserController extends Controller
         $doesUserHaveProfile = $request->user()->profile()->exists();
 
         if ($doesUserHaveProfile) {
-            return redirect()->intended(route('dashboard', absolute: false));
+            return redirect()->intended(route('profile.show', absolute: false));
         }
         return redirect()->intended(route('profile.create', absolute: false));
     }

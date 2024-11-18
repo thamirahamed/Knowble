@@ -60,6 +60,7 @@ Route::middleware(['auth'])->group(function () {
 // Admin Verification
 Route::middleware(['auth'])->group(function () {
     Route::get('/admin/request',[AdminVerificationController::class, 'index'])->name('admin.tutor.request');
+    Route::get('/tutor/dashboard',[AdminVerificationController::class, 'tutorDashboard'])->name('tutor.dashboard');
 });
 
 Route::get('/chat', [ChatController::class, 'index'])->name('chatpage');

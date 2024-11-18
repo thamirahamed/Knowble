@@ -54,7 +54,7 @@ const props = defineProps({
 
                     <template v-else-if="tutor === 'accepted'">
                         <PrimaryButton class="absolute w-fit bottom-10 right-40 text-lg mr-10">
-                            <a :href="route('admin.dashboard')">
+                            <a :href="route('tutor.dashboard')">
                                 Go to Dashboard
                             </a>
                         </PrimaryButton>

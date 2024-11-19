@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Mail\ApproveTutorMail;
+use App\Models\Profile;
 use App\Models\Tutor;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
@@ -33,14 +35,11 @@ class AdminVerificationController extends Controller
 
     public function adminDashboard()
     {
-        $useremail = auth()->user()->email;
+        $tutors = Tutor::all();
+        $user = User::all();
+        $profile = Profile::all();
 
-        if ($useremail === 'admin@apiit.lk') {
-            
-
-            return Inertia::render('Admin/Dashboard');
-        }
-
-        return redirect()->back();
+        dd($tutors);
+        return Inertia::render('Admin/Dashboard');
     }
 }

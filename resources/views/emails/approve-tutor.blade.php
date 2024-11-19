@@ -9,6 +9,6 @@
     <li>User ID: {{ $tutor->user_id }}</li>
     <li>Status: {{ $tutor->status }}</li>
 </ul>
-<p><a href="{{ route('approve.tutor', $tutor->id) }}">Click here to approve the tutor</a></p>
+<p><a href="{{ route('admin.dashboard') }}">Go to Admin Dashboard</a></p>
 </body>
 </html>

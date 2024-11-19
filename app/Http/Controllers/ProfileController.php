@@ -29,7 +29,7 @@ class ProfileController extends Controller
         ]);
 
         // Default profile picture
-        $profilePictureName = 'default.webp';  // Set default picture
+        $profilePictureName = 'https://knowblestorage.s3.ap-southeast-1.amazonaws.com/profile_pic/default.jpg';  // Set default picture
         $s3Url = null;  // Initialize variable for S3 URL
 
 

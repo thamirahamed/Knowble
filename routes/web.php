@@ -36,7 +36,7 @@ Route::get('/dashboard', function () {
 // });
 
 // Ensure only authenticated users can access the profile routes
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth','studentportal'])->group(function () {
     // Route to view the profile
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
 
@@ -58,8 +58,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/private-profile-picture/{filename}', [ProfileController::class, 'getimage'])->name('private.profile.picture');
 });
 
+Route::middleware(['auth','adminportal'])->group(function () {
+    Route::prefix('admin')->group(function () {
+        Route::get('/dashboard', [AdminVerificationController::class, 'adminDashboard'])->name('admin.dashboard');
+    });
+});
+
 // Admin Verification
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth' ,'studentportal'])->group(function () {
     Route::get('/admin/request',[AdminVerificationController::class, 'index'])->name('admin.tutor.request');
     Route::get('/tutor/dashboard',[AdminVerificationController::class, 'tutorDashboard'])->name('tutor.dashboard');
 
@@ -69,7 +75,6 @@ Route::middleware(['auth'])->group(function () {
         return redirect()->back()->with('success', 'Tutor approved successfully!');
     })->name('approve.tutor');
 
-    Route::get('/admin/dashboard',[AdminVerificationController::class, 'adminDashboard'])->name('admin.dashboard');
 });
 
 Route::get('/chat', [ChatController::class, 'index'])->name('chatpage');

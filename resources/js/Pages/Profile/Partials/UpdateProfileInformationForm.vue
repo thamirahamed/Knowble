@@ -26,7 +26,7 @@ const props = defineProps({
 
 // Define the computed property for the profile picture URL
 const profilePictureUrl = computed(() => {
-    return `/private-profile-picture/${props.profile.profile_pic}`;
+    return `${props.profile.profile_pic}`;
 });
 
 const user = usePage().props.auth.user;
@@ -50,13 +50,17 @@ const handleFileChange = (event) => {
 
     if (file) {
         const reader = new FileReader();
-        reader.onload = () => {
-            profilePicPreview.value = reader.result; // Preview the image
+
+        // Listen for the file load event
+        reader.onload = (e) => {
+            profilePicPreview.value = e.target.result; // Update the preview with the base64 data
         };
-        reader.readAsDataURL(file);
-        form.profile_pic = file; // Add the file to the form
+
+        reader.readAsDataURL(file); // Read the file as a Data URL
+        form.profile_pic = file; // Attach the file to the form
     } else {
-        form.profile_pic = null; // Explicitly set to null if no file is selected
+        form.profile_pic = null; // Clear the form's profile picture if no file is selected
+        profilePicPreview.value = profilePictureUrl.value; // Reset to the existing profile picture
     }
 };
 
@@ -68,7 +72,7 @@ watch(() => form.course_id, (newCourseId) => {
 
 //Remove and Set default Pfp
 const removeProfilePic = async () => {
-    const defaultImageUrl = '/private-profile-picture/default.png';
+    const defaultImageUrl = 'https://knowblestorage.s3.ap-southeast-1.amazonaws.com/profile_pic/default.jpg';
     profilePicPreview.value = defaultImageUrl;
 
     // Fetch the default image as a Blob

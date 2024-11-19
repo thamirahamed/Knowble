@@ -69,6 +69,7 @@ class ProfileController extends Controller
         $course = Course::all();
         $courselevel = CourseLevel::all();
 
+
         $profile = Profile::where('user_id', auth()->id())->firstOrFail();
         return Inertia::render('Profile/Edit', [
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
@@ -84,6 +85,7 @@ class ProfileController extends Controller
      */
     public function update(Request $request)
     {
+
         // Validate the incoming data
         $validatedData = $request->validate([
             'course_id' => 'required|integer',
@@ -92,15 +94,17 @@ class ProfileController extends Controller
             'profile_pic' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
+
         // Get the authenticated user and their profile
         $user = $request->user();
         $profile = Profile::where('user_id', auth()->id())->firstOrFail(); // Use the existing profile
 
         // Handle profile picture upload
         $profilePictureName = $profile->profile_pic; // Default to the old picture name
-        if ($request->hasFile('profile_pic')) {
+        if ($request->hasFile('profile_pic') && $request->profile_pic != 'default.png') {
             // Delete the old profile picture if it exists
-            if ($profilePictureName) {
+
+            if ($profilePictureName != 'default.png') {
                 Storage::delete('public/path_images/' . $profilePictureName);
             }
 
@@ -152,23 +156,12 @@ class ProfileController extends Controller
         $usercourse = Course::find($profile->course_id);
         $userlevel  = CourseLevel::find($profile->level_id);
 
-        $tutorstatus = Tutor::where('user_id', auth()->id())->first();
 
-        if ($tutorstatus == null){
-            return Inertia::render('Profile/View',[
-                'profile' => $profile,
-                'user' => $userdetails,
-                'course' => $usercourse,
-                'level' => $userlevel,
-                'tutor' => $tutorstatus
-            ]);
-        }
         return Inertia::render('Profile/View',[
             'profile' => $profile,
             'user' => $userdetails,
             'course' => $usercourse,
             'level' => $userlevel,
-            'tutor' => $tutorstatus->status
         ]);
     }
 

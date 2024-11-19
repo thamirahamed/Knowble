@@ -36,35 +36,6 @@ const props = defineProps({
                             Edit Profile
                         </a>
                     </PrimaryButton>
-
-                    <!-- Tutor Status Button -->
-                    <template v-if="tutor === null">
-                        <PrimaryButton class="absolute w-fit bottom-10 right-40 text-lg mr-10">
-                            <a :href="route('admin.tutor.request')">
-                                Request to be a Tutor
-                            </a>
-                        </PrimaryButton>
-                    </template>
-
-                    <template v-else-if="tutor === 'pending'">
-                        <PrimaryButton class="absolute w-fit bottom-10 right-40 text-lg mr-10" disabled>
-                            Request Sent
-                        </PrimaryButton>
-                    </template>
-
-                    <template v-else-if="tutor === 'accepted'">
-                        <PrimaryButton class="absolute w-fit bottom-10 right-40 text-lg mr-10">
-                            <a :href="route('tutor.dashboard')">
-                                Go to Dashboard
-                            </a>
-                        </PrimaryButton>
-                    </template>
-
-                    <template v-else-if="tutor === 'rejected'">
-                        <PrimaryButton class="absolute w-fit bottom-10 right-40 text-lg mr-10" disabled>
-                            Request Rejected
-                        </PrimaryButton>
-                    </template>
                 </div>
             </div>
         </div>

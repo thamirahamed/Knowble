@@ -30,4 +30,17 @@ class AdminVerificationController extends Controller
     {
         return Inertia::render('Tutor/Dashboard');
     }
+
+    public function adminDashboard()
+    {
+        $useremail = auth()->user()->email;
+
+        if ($useremail === 'admin@apiit.lk') {
+            
+
+            return Inertia::render('Admin/Dashboard');
+        }
+
+        return redirect()->back();
+    }
 }

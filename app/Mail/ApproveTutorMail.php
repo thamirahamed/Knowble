@@ -2,7 +2,6 @@
 
 namespace App\Mail;
 
-use App\Models\Profile;
 use App\Models\Tutor;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -31,12 +30,10 @@ class ApproveTutorMail extends Mailable
      */
     public function build()
     {
-        $userprofile = Profile::where('user_id', $this->tutor->user_id)->first();
         return $this->subject('Tutor Approval Required')
             ->view('emails.approve-tutor')
             ->with([
                 'tutor' => $this->tutor,
-                'profile' => $userprofile,
             ]);
     }
 }

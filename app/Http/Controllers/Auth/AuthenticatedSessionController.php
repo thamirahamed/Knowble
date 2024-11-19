@@ -33,6 +33,10 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        if (Auth::user()->email === 'admin@apiit.lk') {
+            return redirect()->intended(route('admin.dashboard', absolute: false));
+        }
+
         $doesUserHaveProfile = $request->user()->profile()->exists();
 
         if ($doesUserHaveProfile) {

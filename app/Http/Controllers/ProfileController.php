@@ -32,6 +32,7 @@ class ProfileController extends Controller
         $profilePictureName = 'default.webp';  // Set default picture
         $s3Url = null;  // Initialize variable for S3 URL
 
+
         // Handle profile picture upload
         if ($request->hasFile('profile_pic')) {
             $profilePicture = $request->file('profile_pic');

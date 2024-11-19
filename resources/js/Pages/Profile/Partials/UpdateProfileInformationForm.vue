@@ -5,6 +5,8 @@ import TextInput from "@/Components/TextInput.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
+import DynamicDropdown from "@/Components/DynamicDropdown.vue";
+import DangerButton from "@/Components/DangerButton.vue";
 
 // Access profile from props or usePage()
 const props = defineProps({
@@ -67,6 +69,8 @@ const filteredLevels = ref(props.levels);
 watch(() => form.course_id, (newCourseId) => {
     filteredLevels.value = props.levels.filter(level => level.course_id === newCourseId);
 });
+
+//Remove and Set default Pfp
 const removeProfilePic = async () => {
     const defaultImageUrl = 'https://knowblestorage.s3.ap-southeast-1.amazonaws.com/profile_pic/default.jpg';
     profilePicPreview.value = defaultImageUrl;
@@ -89,107 +93,108 @@ const removeProfilePic = async () => {
 
     <section>
         <header>
-            <h2 class="text-lg font-medium text-gray-900">
+            <h2 class="text-xl font-medium text-gray-900">
                 Profile Information
             </h2>
-            <p class="mt-1 text-sm text-gray-600">
+            <p class="mt-1 text-lg text-gray-600">
                 Update your account's profile information, email address, and more.
             </p>
         </header>
 
         <!-- Form with enctype -->
-        <form @submit.prevent="form.post(route('profile.update'))" enctype="multipart/form-data" class="mt-6 space-y-6">
-
-                <!-- Name Field -->
-                <div>
-                    <InputLabel for="name" value="Name" />
-                    <TextInput
-                        id="name"
-                        type="text"
-                        class="mt-1 block w-full"
-                        v-model="form.name"
-                        readonly
-                        autocomplete="name"
-                    />
-                    <InputError class="mt-2" :message="form.errors.name" />
+        <form @submit.prevent="form.post(route('profile.update'))" enctype="multipart/form-data" class="mt-6 flex flex-col">
+            <div class="flex flex-row items-center">
+                <!-- Profile Picture Field -->
+                <div class="flex flex-col p-4 px-10 gap-4">
+                    <!-- Display profile picture preview -->
+                    <InputLabel for="profile_pic" value="Profile Picture" />
+                    <div v-if="profilePicPreview">
+                        <img :src="profilePicPreview" alt="Profile Picture" class="w-80 h-80 aspect-square rounded-full object-cover" />
+                    </div>
+                    <InputError class="mt-2" :message="form.errors.profile_pic" />
+                    <div class="flex items-baseline justify-between">
+                        <input
+                            type="file"
+                            id="profile_pic"
+                            @change="handleFileChange"
+                            accept=".jpg, .png, .jpeg"
+                            class="hidden"
+                        />
+                        <!-- Custom button styled as a label -->
+                        <label
+                            for="profile_pic"
+                            class="cursor-pointer rounded-lg bg-accent px-5 py-2.5 text-center font-semibold tracking-wide text-white transition-all duration-200 ease-in-out hover:bg-accentdark hover:tracking-wider hover:shadow-[5px_5px_rgba(0,_98,_90,_0.4),_10px_10px_rgba(0,_98,_90,_0.3),_15px_15px_rgba(0,_98,_90,_0.2)] focus:outline-none focus:ring-2 focus:ring-accent w-fit"
+                        >
+                            Upload Picture
+                        </label>
+                        <DangerButton
+                            v-if="profilePicPreview"
+                            type="button"
+                            @click="removeProfilePic"
+                            class="w-fit"
+                        >
+                            Remove
+                        </DangerButton>
+                    </div>
                 </div>
 
-                <!-- Email Field -->
-                <div>
-                    <InputLabel for="email" value="Email" />
-                    <TextInput
-                        id="email"
-                        type="email"
-                        class="mt-1 block w-full"
-                        v-model="form.email"
-                        readonly
-                        autocomplete="username"
-                    />
-                    <InputError class="mt-2" :message="form.errors.email" />
+                <div class="flex flex-col h-full flex-1 p-4 px-10 gap-4">
+                    <!-- Name Field -->
+                    <div>
+                        <InputLabel for="name" value="Name" />
+                        <TextInput
+                            id="name"
+                            type="text"
+                            class="mt-1 block w-full text-gray-500 hover:border-gray-300 focus:!ring-0 focus:border-gray-400"
+                            v-model="form.name"
+                            disabled
+                            autocomplete="name"
+                        />
+                        <InputError class="mt-2" :message="form.errors.name" />
+                    </div>
+
+                    <!-- Email Field -->
+                    <div>
+                        <InputLabel for="email" value="Email" />
+                        <TextInput
+                            id="email"
+                            type="email"
+                            class="mt-1 block w-full text-gray-500 hover:border-gray-300 focus:!ring-0 focus:border-gray-400"
+                            v-model="form.email"
+                            disabled
+                            autocomplete="email"
+                        />
+                        <InputError class="mt-2" :message="form.errors.email" />
+                    </div>
+
+                    <!-- Course Dropdown -->
+                    <div>
+                        <InputLabel for="courses" value="School of Study" />
+                        <DynamicDropdown
+                            label="Course"
+                            id="course"
+                            :options="courses"
+                            v-model="form.course_id"
+                            :error="form.errors.course_id"
+                        />
+                    </div>
+
+                    <!-- Level Dropdown -->
+                    <div>
+                        <InputLabel for="levels" value="Year" />
+                        <DynamicDropdown
+                            label="Level"
+                            id="level"
+                            :options="filteredLevels"
+                            v-model="form.level_id"
+                            :error="form.errors.level_id"
+                        />
+                    </div>
                 </div>
-
-                <!-- CB Number Field -->
-                <div>
-                    <InputLabel for="cb_number" value="CB Number" />
-                    <TextInput
-                        id="cb_number"
-                        type="text"
-                        class="mt-1 block w-full"
-                        v-model="form.cb_number"
-                        readonly
-                    />
-                    <InputError class="mt-2" :message="form.errors.cb_number" />
-                </div>
-
-            <!-- Profile Picture Field -->
-            <div>
-                <InputLabel for="profile_pic" value="Profile Picture" />
-                <input
-                    type="file"
-                    id="profile_pic"
-                    @change="handleFileChange"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                />
-                <InputError class="mt-2" :message="form.errors.profile_pic" />
-
-                <!-- Display profile picture preview -->
-                <div v-if="profilePicPreview">
-                    <img :src="profilePicPreview" alt="Profile Picture" class="w-32 h-32 rounded-full object-cover" />
-                </div>
-                <button
-                    v-if="profilePicPreview"
-                    type="button"
-                    @click="removeProfilePic"
-                    class="top-2 right-2 bg-red-500 text-white text-sm px-2 py-1 rounded-md shadow-md"
-                >
-                    Remove
-                </button>
-            </div>
-
-            <!-- Course Dropdown -->
-            <div>
-                <InputLabel for="course" value="Course" />
-                <select id="course" v-model="form.course_id" class="mt-1 block w-full">
-                    <option v-for="course in courses" :key="course.id" :value="course.id">
-                        {{ course.CourseName }}
-                    </option>
-                </select>
-                <InputError class="mt-2" :message="form.errors.course_id" />
-            </div>
-
-            <!-- Level Dropdown -->
-            <div>
-                <InputLabel for="level" value="Level" />
-                <select id="level" v-model="form.level_id" class="mt-1 block w-full">
-                    <option v-for="level in filteredLevels" :key="level.id" :value="level.id">
-                        {{ level.level }}
-                    </option>
-                </select>
-                <InputError class="mt-2" :message="form.errors.level_id" />
             </div>
 
             <!-- Save Button -->
-            <div class="flex items-center gap-4">
+            <div class="flex items-center px-10 w-full justify-end">
                 <PrimaryButton :disabled="form.processing">Save</PrimaryButton>
                 <Transition
                     enter-active-class="transition ease-in-out"

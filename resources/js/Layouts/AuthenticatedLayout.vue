@@ -5,12 +5,32 @@ import Dropdown from "@/Components/Dropdown.vue";
 import DropdownLink from "@/Components/DropdownLink.vue";
 import NavLink from "@/Components/NavLink.vue";
 import ResponsiveNavLink from "@/Components/ResponsiveNavLink.vue";
-import { Link, usePage } from "@inertiajs/vue3";
+import { Link, usePage, router } from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
+import SecondaryButton from "@/Components/SecondaryButton.vue";
+import Modal from "@/Components/Modal.vue";
 
 const tutor = usePage().props.tutor;
-console.log(tutor);
 const showingNavigationDropdown = ref(false);
+const confirmingTutorRequest = ref(false);
+
+const confirmTutorRequest = () => {
+    confirmingTutorRequest.value = true;
+};
+
+const TutorRequest = () => {
+    router.visit(route("admin.tutor.request"))
+    closeModal()
+    setTimeout(() => {
+        location.reload();
+    }, 3000);
+
+};
+
+const closeModal = () => {
+    confirmingTutorRequest.value = false;
+};
+
 </script>
 
 <template>
@@ -20,7 +40,7 @@ const showingNavigationDropdown = ref(false);
                 <!-- Primary Navigation Menu -->
                 <div class="w-full px-4 sm:px-6 lg:px-8 flex justify-center">
                     <div class=" container flex h-16 justify-between">
-                        <div class="flex">
+                        <div class="flex align-baseline">
                             <!-- Logo -->
                             <div class="flex shrink-0 items-center">
                                 <Link :href="route('dashboard')">
@@ -38,7 +58,7 @@ const showingNavigationDropdown = ref(false);
                                     :href="route('dashboard')"
                                     :active="route().current('dashboard')"
                                 >
-                                    Dashboard
+                                    Home
                                 </NavLink>
                                 <NavLink
                                     :href="route('chatpage')"
@@ -46,40 +66,18 @@ const showingNavigationDropdown = ref(false);
                                 >
                                     Chat
                                 </NavLink>
+                                <template v-if="tutor === 'approved'">
+                                    <NavLink 
+                                        :href="route('tutor.dashboard')"
+                                        :active="route().current('tutor.dashboard')"
+                                    >
+                                        Tutor Dashboard
+                                    </NavLink>
+                                </template>
                             </div>
                         </div>
 
                         <div class="hidden sm:ms-6 sm:flex sm:items-center">
-                            <!-- Tutor Status Button -->
-                            <div class="ml-4">
-                                <template v-if="tutor === null">
-                                    <PrimaryButton>
-                                        <a :href="route('admin.tutor.request')">
-                                            Request to be a Tutor
-                                        </a>
-                                    </PrimaryButton>
-                                </template>
-
-                                <template v-else-if="tutor === 'pending'">
-                                    <PrimaryButton disabled>
-                                        Request Sent
-                                    </PrimaryButton>
-                                </template>
-
-                                <template v-else-if="tutor === 'approved'">
-                                    <PrimaryButton>
-                                        <a :href="route('tutor.dashboard')">
-                                            Go to Dashboard
-                                        </a>
-                                    </PrimaryButton>
-                                </template>
-
-                                <template v-else-if="tutor === 'rejected'">
-                                    <PrimaryButton disabled>
-                                        Request Rejected
-                                    </PrimaryButton>
-                                </template>
-                            </div>
                             <!-- Settings Dropdown -->
                             <div class="relative ms-3">
                                 <Dropdown align="right" width="48">
@@ -87,7 +85,7 @@ const showingNavigationDropdown = ref(false);
                                         <span class="inline-flex rounded-md">
                                             <button
                                                 type="button"
-                                                class="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none"
+                                                class="inline-flex align-baseline rounded-md border border-transparent bg-white px-3 py-2 text-lg font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none"
                                             >
                                                 {{ $page.props.auth.user.name }}
 
@@ -113,6 +111,26 @@ const showingNavigationDropdown = ref(false);
                                         >
                                             Profile
                                         </DropdownLink>
+
+                                        <!-- Tutor Status -->
+                                        <template v-if="tutor === null">
+                                            <button class="block w-full px-4 py-2 text-start text-sm leading-5 text-gray-700 transition duration-150 ease-in-out hover:bg-gray-100 focus:bg-gray-100 focus:outline-none" @click="confirmTutorRequest">
+                                                Request to be a Tutor
+                                            </button>
+                                        </template>
+
+                                        <template v-if="tutor === 'pending'">
+                                            <DropdownLink class="pointer-events-none !text-gray-400">
+                                                Tutor Request Sent
+                                            </DropdownLink>
+                                        </template>
+
+                                        <template v-else-if="tutor === 'rejected'">
+                                            <DropdownLink class="pointer-events-none !text-red-400">
+                                                Request Rejected
+                                            </DropdownLink>
+                                        </template>
+
                                         <DropdownLink
                                             :href="route('logout')"
                                             method="post"
@@ -168,6 +186,31 @@ const showingNavigationDropdown = ref(false);
                     </div>
                 </div>
 
+                <!-- Tutor Request Confirmation Modak -->
+                <Modal :show="confirmingTutorRequest" @close="closeModal">
+                    <div class="p-6">
+                        <h2 class="text-xl font-medium text-gray-900">
+                            Are you sure you want to become a Tutor?
+                        </h2>
+
+                        <p class="mt-1 text-md text-gray-600">
+                            To qualify as a tutor, you must be beyond Foundation Sem 1 or Degree Year 1 - Sem 1, with a minimum score of 60% per module.
+                        </p>
+
+                        <div class="mt-6 flex justify-end gap-4">
+                            <SecondaryButton @click="closeModal">
+                                Cancel
+                            </SecondaryButton>
+
+                            <PrimaryButton
+                                @click="TutorRequest"
+                            >
+                                Send Request
+                            </PrimaryButton>
+                        </div>
+                    </div>
+                </Modal>
+
                 <!-- Responsive Navigation Menu -->
                 <div
                     :class="{
@@ -181,8 +224,22 @@ const showingNavigationDropdown = ref(false);
                             :href="route('dashboard')"
                             :active="route().current('dashboard')"
                         >
-                            Dashboard
+                            Home
                         </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            :href="route('chatpage')"
+                            :active="route().current('chatpage')"
+                        >
+                            Chat
+                        </ResponsiveNavLink>
+                        <template v-if="tutor === 'approved'">
+                            <ResponsiveNavLink 
+                                :href="route('tutor.dashboard')"
+                                :active="route().current('tutor.dashboard')"
+                            >
+                                Tutor Dashboard
+                            </ResponsiveNavLink>
+                        </template>
                     </div>
 
                     <!-- Responsive Settings Options -->
@@ -200,6 +257,24 @@ const showingNavigationDropdown = ref(false);
                             <ResponsiveNavLink :href="route('profile.edit')">
                                 Profile
                             </ResponsiveNavLink>
+                            <!-- Tutor Status -->
+                            <template v-if="tutor === null">
+                                <button class="block w-full ps-3 pe-4 py-2 border-l-4 border-transparent text-start text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 focus:outline-none focus:text-gray-800 focus:bg-gray-50 focus:border-gray-300 transition duration-150 ease-in-out" @click="confirmTutorRequest">
+                                    Request to be a Tutor
+                                </button>
+                            </template>
+
+                            <template v-if="tutor === 'pending'">
+                                <ResponsiveNavLink class="pointer-events-none !text-gray-400">
+                                    Tutor Request Sent
+                                </ResponsiveNavLink>
+                            </template>
+
+                            <template v-else-if="tutor === 'rejected'">
+                                <ResponsiveNavLink class="pointer-events-none !text-red-400">
+                                    Request Rejected
+                                </ResponsiveNavLink>
+                            </template>
                             <ResponsiveNavLink
                                 :href="route('logout')"
                                 method="post"

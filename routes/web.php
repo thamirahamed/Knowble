@@ -68,6 +68,8 @@ Route::middleware(['auth'])->group(function () {
         $tutor->update(['status' => 'approved']);
         return redirect()->back()->with('success', 'Tutor approved successfully!');
     })->name('approve.tutor');
+
+    Route::get('/admin/dashboard',[AdminVerificationController::class, 'adminDashboard'])->name('admin.dashboard');
 });
 
 Route::get('/chat', [ChatController::class, 'index'])->name('chatpage');

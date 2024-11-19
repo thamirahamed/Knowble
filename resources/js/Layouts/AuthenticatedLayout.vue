@@ -20,7 +20,7 @@ const showingNavigationDropdown = ref(false);
                 <!-- Primary Navigation Menu -->
                 <div class="w-full px-4 sm:px-6 lg:px-8 flex justify-center">
                     <div class=" container flex h-16 justify-between">
-                        <div class="flex">
+                        <div class="flex align-baseline">
                             <!-- Logo -->
                             <div class="flex shrink-0 items-center">
                                 <Link :href="route('dashboard')">
@@ -38,7 +38,7 @@ const showingNavigationDropdown = ref(false);
                                     :href="route('dashboard')"
                                     :active="route().current('dashboard')"
                                 >
-                                    Dashboard
+                                    Home
                                 </NavLink>
                                 <NavLink
                                     :href="route('chatpage')"
@@ -46,40 +46,18 @@ const showingNavigationDropdown = ref(false);
                                 >
                                     Chat
                                 </NavLink>
+                                <template v-if="tutor === 'approved'">
+                                    <NavLink 
+                                        :href="route('tutor.dashboard')"
+                                        :active="route().current('tutor.dashboard')"
+                                    >
+                                        Tutor Dashboard
+                                    </NavLink>
+                                </template>
                             </div>
                         </div>
 
                         <div class="hidden sm:ms-6 sm:flex sm:items-center">
-                            <!-- Tutor Status Button -->
-                            <div class="ml-4">
-                                <template v-if="tutor === null">
-                                    <PrimaryButton>
-                                        <a :href="route('admin.tutor.request')">
-                                            Request to be a Tutor
-                                        </a>
-                                    </PrimaryButton>
-                                </template>
-
-                                <template v-else-if="tutor === 'pending'">
-                                    <PrimaryButton disabled>
-                                        Request Sent
-                                    </PrimaryButton>
-                                </template>
-
-                                <template v-else-if="tutor === 'approved'">
-                                    <PrimaryButton>
-                                        <a :href="route('tutor.dashboard')">
-                                            Go to Dashboard
-                                        </a>
-                                    </PrimaryButton>
-                                </template>
-
-                                <template v-else-if="tutor === 'rejected'">
-                                    <PrimaryButton disabled>
-                                        Request Rejected
-                                    </PrimaryButton>
-                                </template>
-                            </div>
                             <!-- Settings Dropdown -->
                             <div class="relative ms-3">
                                 <Dropdown align="right" width="48">
@@ -87,7 +65,7 @@ const showingNavigationDropdown = ref(false);
                                         <span class="inline-flex rounded-md">
                                             <button
                                                 type="button"
-                                                class="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none"
+                                                class="inline-flex align-baseline rounded-md border border-transparent bg-white px-3 py-2 text-lg font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none"
                                             >
                                                 {{ $page.props.auth.user.name }}
 
@@ -113,6 +91,26 @@ const showingNavigationDropdown = ref(false);
                                         >
                                             Profile
                                         </DropdownLink>
+
+                                        <!-- Tutor Status -->
+                                        <template v-if="tutor === null">
+                                            <DropdownLink :href="route('admin.tutor.request')" class="pointer-events-none">
+                                                Request to be a Tutor
+                                            </DropdownLink>
+                                        </template>
+
+                                        <template v-if="tutor === 'pending'">
+                                            <DropdownLink class="pointer-events-none !text-gray-400">
+                                                Tutor Request Sent
+                                            </DropdownLink>
+                                        </template>
+
+                                        <template v-else-if="tutor === 'rejected'">
+                                            <DropdownLink class="pointer-events-none !text-red-400">
+                                                Request Rejected
+                                            </DropdownLink>
+                                        </template>
+
                                         <DropdownLink
                                             :href="route('logout')"
                                             method="post"
@@ -181,8 +179,22 @@ const showingNavigationDropdown = ref(false);
                             :href="route('dashboard')"
                             :active="route().current('dashboard')"
                         >
-                            Dashboard
+                            Home
                         </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            :href="route('chatpage')"
+                            :active="route().current('chatpage')"
+                        >
+                            Chat
+                        </ResponsiveNavLink>
+                        <template v-if="tutor === 'approved'">
+                            <ResponsiveNavLink 
+                                :href="route('tutor.dashboard')"
+                                :active="route().current('tutor.dashboard')"
+                            >
+                                Tutor Dashboard
+                            </ResponsiveNavLink>
+                        </template>
                     </div>
 
                     <!-- Responsive Settings Options -->
@@ -200,6 +212,24 @@ const showingNavigationDropdown = ref(false);
                             <ResponsiveNavLink :href="route('profile.edit')">
                                 Profile
                             </ResponsiveNavLink>
+                            <!-- Tutor Status -->
+                            <template v-if="tutor === null">
+                                <ResponsiveNavLink :href="route('admin.tutor.request')" class="pointer-events-none">
+                                    Request to be a Tutor
+                                </ResponsiveNavLink>
+                            </template>
+
+                            <template v-if="tutor === 'pending'">
+                                <ResponsiveNavLink class="pointer-events-none !text-gray-400">
+                                    Tutor Request Sent
+                                </ResponsiveNavLink>
+                            </template>
+
+                            <template v-else-if="tutor === 'rejected'">
+                                <ResponsiveNavLink class="pointer-events-none !text-red-400">
+                                    Request Rejected
+                                </ResponsiveNavLink>
+                            </template>
                             <ResponsiveNavLink
                                 :href="route('logout')"
                                 method="post"

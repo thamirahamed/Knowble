@@ -9,7 +9,7 @@ import { Link, usePage } from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 
 const tutor = usePage().props.tutor;
-
+console.log(tutor);
 const showingNavigationDropdown = ref(false);
 </script>
 
@@ -66,7 +66,7 @@ const showingNavigationDropdown = ref(false);
                                     </PrimaryButton>
                                 </template>
 
-                                <template v-else-if="tutor === 'accepted'">
+                                <template v-else-if="tutor === 'approved'">
                                     <PrimaryButton>
                                         <a :href="route('tutor.dashboard')">
                                             Go to Dashboard

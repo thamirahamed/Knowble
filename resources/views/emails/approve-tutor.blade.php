@@ -6,7 +6,7 @@
 <body>
 <p>A new tutor has registered and is awaiting approval:</p>
 <ul>
-    <li>User ID: {{ $profile->cb_number }}</li>
+    <li>User ID: {{ $tutor->user_id }}</li>
     <li>Status: {{ $tutor->status }}</li>
 </ul>
 <p><a href="{{ route('approve.tutor', $tutor->id) }}">Click here to approve the tutor</a></p>

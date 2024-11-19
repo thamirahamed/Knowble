@@ -14,7 +14,7 @@ class CreateProfilesTable extends Migration
             $table->unsignedBigInteger('course_id');
             $table->unsignedBigInteger('level_id');
             $table->string('cb_number'); // Extracted from email
-            $table->text('profile_pic')->default('default.svg'); // user uploaded profile pic or default
+            $table->text('profile_pic'); // user uploaded profile pic or default
             $table->timestamps(); // Created at and Updated at
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

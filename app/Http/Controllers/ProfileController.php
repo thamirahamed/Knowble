@@ -28,7 +28,7 @@ class ProfileController extends Controller
             'profile_pic' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $profilePictureName = 'default.webp'; // Set default picture
+        $profilePictureName = 'default.png'; // Set default picture
 
         // Handle profile picture upload
         if ($request->hasFile('profile_pic')) {

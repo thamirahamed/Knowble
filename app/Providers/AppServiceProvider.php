@@ -30,6 +30,9 @@ class AppServiceProvider extends ServiceProvider
         Inertia::share([
             'tutor' => function () {
                 $user = Auth::user();
+                if (!$user) {
+                    return null;
+                }
                 $tutor = Tutor::where('user_id', $user->id)->first();
                 $tutorstatus = $tutor ? $tutor->status : null;
                 return $tutorstatus;

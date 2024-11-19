@@ -7,7 +7,7 @@ const props = defineProps({
 
 // Computed property for the profile picture URL
 const profilePictureUrl = computed(() => {
-    return `/private-profile-picture/${props.profile.profile_pic}`;
+    return `${props.profile.profile_pic}`;
 });
 </script>
 

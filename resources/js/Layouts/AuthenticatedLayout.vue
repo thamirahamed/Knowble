@@ -5,7 +5,10 @@ import Dropdown from "@/Components/Dropdown.vue";
 import DropdownLink from "@/Components/DropdownLink.vue";
 import NavLink from "@/Components/NavLink.vue";
 import ResponsiveNavLink from "@/Components/ResponsiveNavLink.vue";
-import { Link } from "@inertiajs/vue3";
+import { Link, usePage } from "@inertiajs/vue3";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
+
+const tutor = usePage().props.tutor;
 
 const showingNavigationDropdown = ref(false);
 </script>
@@ -47,6 +50,36 @@ const showingNavigationDropdown = ref(false);
                         </div>
 
                         <div class="hidden sm:ms-6 sm:flex sm:items-center">
+                            <!-- Tutor Status Button -->
+                            <div class="ml-4">
+                                <template v-if="tutor === null">
+                                    <PrimaryButton>
+                                        <a :href="route('admin.tutor.request')">
+                                            Request to be a Tutor
+                                        </a>
+                                    </PrimaryButton>
+                                </template>
+
+                                <template v-else-if="tutor === 'pending'">
+                                    <PrimaryButton disabled>
+                                        Request Sent
+                                    </PrimaryButton>
+                                </template>
+
+                                <template v-else-if="tutor === 'accepted'">
+                                    <PrimaryButton>
+                                        <a :href="route('tutor.dashboard')">
+                                            Go to Dashboard
+                                        </a>
+                                    </PrimaryButton>
+                                </template>
+
+                                <template v-else-if="tutor === 'rejected'">
+                                    <PrimaryButton disabled>
+                                        Request Rejected
+                                    </PrimaryButton>
+                                </template>
+                            </div>
                             <!-- Settings Dropdown -->
                             <div class="relative ms-3">
                                 <Dropdown align="right" width="48">

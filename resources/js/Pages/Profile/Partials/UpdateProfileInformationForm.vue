@@ -34,7 +34,7 @@ const form = useForm({
     name: user.name,
     email: user.email,
     cb_number: props.profile?.cb_number || '',
-    profile_pic: props.profile?.profile_pic || null, // Set this as null initially
+    profile_pic: null, // Set this as null initially
     course_id: props.profile?.course_id || '',
     level_id: props.profile?.level_id || ''
 });
@@ -62,6 +62,22 @@ const filteredLevels = ref(props.levels);
 watch(() => form.course_id, (newCourseId) => {
     filteredLevels.value = props.levels.filter(level => level.course_id === newCourseId);
 });
+const removeProfilePic = async () => {
+    const defaultImageUrl = '/private-profile-picture/default.png';
+    profilePicPreview.value = defaultImageUrl;
+
+    // Fetch the default image as a Blob
+    const response = await fetch(defaultImageUrl);
+    const blob = await response.blob();
+
+    // Create a File object from the Blob
+    const file = new File([blob], 'default.png', { type: blob.type });
+
+    // Update the form with the File object
+    form.profile_pic = file;
+};
+
+
 </script>
 
 <template>
@@ -79,48 +95,46 @@ watch(() => form.course_id, (newCourseId) => {
         <!-- Form with enctype -->
         <form @submit.prevent="form.post(route('profile.update'))" enctype="multipart/form-data" class="mt-6 space-y-6">
 
+                <!-- Name Field -->
+                <div>
+                    <InputLabel for="name" value="Name" />
+                    <TextInput
+                        id="name"
+                        type="text"
+                        class="mt-1 block w-full"
+                        v-model="form.name"
+                        readonly
+                        autocomplete="name"
+                    />
+                    <InputError class="mt-2" :message="form.errors.name" />
+                </div>
 
-        <!-- Name Field -->
-            <div>
-                <InputLabel for="name" value="Name" />
-                <TextInput
-                    id="name"
-                    type="text"
-                    class="mt-1 block w-full"
-                    v-model="form.name"
-                    required
-                    autofocus
-                    autocomplete="name"
-                />
-                <InputError class="mt-2" :message="form.errors.name" />
-            </div>
+                <!-- Email Field -->
+                <div>
+                    <InputLabel for="email" value="Email" />
+                    <TextInput
+                        id="email"
+                        type="email"
+                        class="mt-1 block w-full"
+                        v-model="form.email"
+                        readonly
+                        autocomplete="username"
+                    />
+                    <InputError class="mt-2" :message="form.errors.email" />
+                </div>
 
-            <!-- Email Field -->
-            <div>
-                <InputLabel for="email" value="Email" />
-                <TextInput
-                    id="email"
-                    type="email"
-                    class="mt-1 block w-full"
-                    v-model="form.email"
-                    required
-                    autocomplete="username"
-                />
-                <InputError class="mt-2" :message="form.errors.email" />
-            </div>
-
-            <!-- CB Number Field -->
-            <div>
-                <InputLabel for="cb_number" value="CB Number" />
-                <TextInput
-                    id="cb_number"
-                    type="text"
-                    class="mt-1 block w-full"
-                    v-model="form.cb_number"
-                    required
-                />
-                <InputError class="mt-2" :message="form.errors.cb_number" />
-            </div>
+                <!-- CB Number Field -->
+                <div>
+                    <InputLabel for="cb_number" value="CB Number" />
+                    <TextInput
+                        id="cb_number"
+                        type="text"
+                        class="mt-1 block w-full"
+                        v-model="form.cb_number"
+                        readonly
+                    />
+                    <InputError class="mt-2" :message="form.errors.cb_number" />
+                </div>
 
             <!-- Profile Picture Field -->
             <div>
@@ -137,6 +151,14 @@ watch(() => form.course_id, (newCourseId) => {
                 <div v-if="profilePicPreview">
                     <img :src="profilePicPreview" alt="Profile Picture" class="w-32 h-32 rounded-full object-cover" />
                 </div>
+                <button
+                    v-if="profilePicPreview"
+                    type="button"
+                    @click="removeProfilePic"
+                    class="top-2 right-2 bg-red-500 text-white text-sm px-2 py-1 rounded-md shadow-md"
+                >
+                    Remove
+                </button>
             </div>
 
             <!-- Course Dropdown -->

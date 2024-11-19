@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -29,7 +30,7 @@ class RegisteredUserController extends Controller
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
@@ -43,15 +44,25 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
+        // Trigger the email verification process
         event(new Registered($user));
 
-        Auth::login($user);
+        // Check if the user's email is verified
+        if (!$user->hasVerifiedEmail()) {
+            // Log the user in to access verification page
+            Auth::login($user);
 
-        $doesUserHaveProfile = $request->user()->profile()->exists();
+            return redirect()->route('verification.notice');
+        }
+
+        // Check if the user already has a profile
+        $doesUserHaveProfile = $user->profile()->exists();
 
         if ($doesUserHaveProfile) {
-            return redirect()->intended(route('profile.show', absolute: false));
+            return redirect()->intended(route('profile.show'));
         }
-        return redirect()->intended(route('profile.create', absolute: false));
+
+        return redirect()->intended(route('profile.create'));
     }
+
 }

@@ -28,13 +28,19 @@ class ProfileController extends Controller
             'profile_pic' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $profilePictureName = 'default.webp'; // Set default picture
+        // Default profile picture
+        $profilePictureName = 'https://knowblestorage.s3.ap-southeast-1.amazonaws.com/profile_pic/default.jpg';  // Set default picture
+        $s3Url = null;  // Initialize variable for S3 URL
+
 
         // Handle profile picture upload
         if ($request->hasFile('profile_pic')) {
             $profilePicture = $request->file('profile_pic');
             $profilePictureName = time() . '.' . $profilePicture->extension();
-            $profilePicture->storeAs('public/path_images', $profilePictureName);
+
+            // Upload to S3
+            $uploadS3 = $profilePicture->store('profile_pic', 's3');
+            $s3Url = Storage::disk('s3')->url($uploadS3);
         }
 
         // Handle storing the validated data
@@ -43,11 +49,12 @@ class ProfileController extends Controller
             'course_id' => $request->course,
             'level_id' => $request->level,
             'cb_number' => $request->cb_number, // Example based on email
-            'profile_pic' => $profilePictureName,
+            'profile_pic' => $s3Url ?: $profilePictureName,  // Use S3 URL or default image
         ]);
 
         return redirect()->route('profile.show')->with('success', 'Profile updated successfully!');
     }
+
 
     public function getimage($filename) {
         $path = storage_path('app/private/public/path_images/'. $filename);
@@ -83,10 +90,10 @@ class ProfileController extends Controller
     /**
      * Update the user's profile information.
      */
+
     public function update(Request $request)
     {
-
-        // Validate the incoming data
+        // Validate the input data
         $validatedData = $request->validate([
             'course_id' => 'required|integer',
             'level_id' => 'required|integer',
@@ -94,24 +101,28 @@ class ProfileController extends Controller
             'profile_pic' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-
         // Get the authenticated user and their profile
         $user = $request->user();
-        $profile = Profile::where('user_id', auth()->id())->firstOrFail(); // Use the existing profile
+        $profile = Profile::where('user_id', $user->id)->firstOrFail();
 
-        // Handle profile picture upload
-        $profilePictureName = $profile->profile_pic; // Default to the old picture name
-        if ($request->hasFile('profile_pic') && $request->profile_pic != 'default.png') {
-            // Delete the old profile picture if it exists
+        // Default to the current profile picture
+        $profilePictureUrl = $profile->profile_pic;
 
-            if ($profilePictureName != 'default.png') {
-                Storage::delete('public/path_images/' . $profilePictureName);
+        // Handle profile picture upload if a new file is provided
+        if ($request->hasFile('profile_pic')) {
+            $profilePicture = $request->file('profile_pic');
+
+            // Delete the old profile picture from S3 if it's not the default
+            if ($profilePictureUrl !== 'https://knowblestorage.s3.ap-southeast-1.amazonaws.com/profile_pic/default.jpg') {
+                Storage::disk('s3')->delete('profile_pic/' . basename($profilePictureUrl));
             }
 
-            // Store the new profile picture
-            $profilePicture = $request->file('profile_pic');
-            $profilePictureName = time() . '.' . $profilePicture->extension();
-            $profilePicture->storeAs('public/path_images', $profilePictureName);
+            // Upload the new profile picture to S3
+            $uploadS3 = $profilePicture->store('profile_pic', 's3');
+            $profilePictureUrl = Storage::disk('s3')->url($uploadS3);
+        } elseif ($request->profile_pic === null) {
+            // If profile_pic is null, set it to the default URL
+            $profilePictureUrl = 'https://knowblestorage.s3.ap-southeast-1.amazonaws.com/profile_pic/default.jpg';
         }
 
         // Update the profile data
@@ -119,12 +130,13 @@ class ProfileController extends Controller
             'course_id' => $validatedData['course_id'],
             'level_id' => $validatedData['level_id'],
             'cb_number' => $validatedData['cb_number'],
-            'profile_pic' => $profilePictureName,
+            'profile_pic' => $profilePictureUrl, // Save the new URL, default URL, or retain the old one
         ]);
 
         // Redirect back with a success message
         return Redirect::route('profile.show')->with('status', 'Profile updated successfully!');
     }
+
 
 
     /**

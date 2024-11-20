@@ -16,15 +16,15 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
-        $faker = Faker::create();
+
 
         // Create 6 dummy users
-        for ($i = 0; $i < 6; $i++) {
+        for ($i = 0; $i < 1; $i++) {
             DB::table('users')->insert([
-                'name' => $faker->name,
-                'email' => $faker->userName . '@students.apiit.lk', // Email with the required domain
+                'name' => 'Admin',
+                'email' => 'admin@apiit.lk', // Email with the required domain
                 'email_verified_at' => now(),
-                'password' => bcrypt('password123'), // You can change this to any default password
+                'password' => bcrypt('password'), // You can change this to any default password
                 'remember_token' => Str::random(10),
                 'created_at' => now(),
                 'updated_at' => now(),

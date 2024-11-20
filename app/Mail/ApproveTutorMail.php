@@ -31,12 +31,12 @@ class ApproveTutorMail extends Mailable
      */
     public function build()
     {
-        $userprofile = Profile::where('user_id', $this->tutor->user_id)->first();
+        $profile = Profile::where('user_id', $this->tutor->user_id)->first();
         return $this->subject('Tutor Approval Required')
             ->view('emails.approve-tutor')
             ->with([
                 'tutor' => $this->tutor,
-                'profile' => $userprofile,
+                'profile' => $profile
             ]);
     }
 }

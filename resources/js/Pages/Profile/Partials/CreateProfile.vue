@@ -3,11 +3,11 @@ import { usePage } from "@inertiajs/vue3";
 import { useForm } from "@inertiajs/vue3";
 import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
-import TextInput from "@/Components/TextInput.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 
 // Get courses and levels from the page props
 const pageProps = usePage().props;
+
 const validInputs = {
     courses: pageProps?.courses || [], // Fallback if courses are undefined
     levels: pageProps?.levels || [], // Fallback if levels are undefined
@@ -33,29 +33,29 @@ const submitForm = () => {
         onFinish: () => form.reset(),
     });
 };
+
 </script>
 
 <template>
     <section>
         <header>
-            <h2 class="text-lg font-medium text-gray-900">Create Your Profile</h2>
-            <p class="mt-1 text-sm text-gray-600">
+            <h2 class="text-7xl font-black text-gray-900">Create Your Profile</h2>
+            <p class="mt-1 text-md text-gray-600">
                 Please fill in the details below to complete your profile.
             </p>
         </header>
 
-        <form @submit.prevent="submitForm" class="mt-6 space-y-6">
+        <form @submit.prevent="submitForm" class="flex flex-col mt-6 gap-6">
             <!-- Courses -->
             <div>
                 <InputLabel for="course" value="Course" />
                 <select
                     id="course"
-                    class="mt-1 block w-full"
+                    class="cursor-pointer mt-1 block w-full text-lg shadow-sm border-gray-300 rounded-md hover:border-accent focus:border-transparent focus:outline-none focus:ring-2 focus:ring-accent"
                     v-model="form.course"
                     required
                 >
                     <option value="">Select Course</option>
-                    <!-- Dynamically populate the courses -->
                     <option v-for="course in validInputs.courses" :key="course.id" :value="course.id">
                         {{ course.CourseName }}
                     </option>
@@ -68,12 +68,11 @@ const submitForm = () => {
                 <InputLabel for="level" value="Level" />
                 <select
                     id="level"
-                    class="mt-1 block w-full"
+                    class="cursor-pointer mt-1 block w-full text-lg shadow-sm border-gray-300 rounded-md hover:border-accent focus:border-transparent focus:outline-none focus:ring-2 focus:ring-accent"
                     v-model="form.level"
                     required
                 >
                     <option value="">Select Level</option>
-                    <!-- Dynamically populate levels based on the selected course -->
                     <option
                         v-for="level in validInputs.levels.filter(l => l.course_id === form.course)"
                         :key="level.id"
@@ -85,20 +84,8 @@ const submitForm = () => {
                 <InputError class="mt-2" :message="form.errors.level" />
             </div>
 
-            <!-- Profile Picture -->
-            <div>
-                <InputLabel for="profile_pic" value="Profile Picture" />
-                <input
-                    type="file"
-                    id="profile_pic"
-                    class="mt-1 block w-full"
-                    @change="event => form.profile_pic = event.target.files[0]"
-                />
-                <InputError class="mt-2" :message="form.errors.profile_pic" />
-            </div>
-
             <!-- Submit Button -->
-            <div class="flex items-center gap-4">
+            <div class="flex mt-2 w-full justify-end">
                 <PrimaryButton :disabled="form.processing">Create Profile</PrimaryButton>
             </div>
         </form>

@@ -20,10 +20,10 @@ const pendingTutors = computed(() => {
     return props.tutors
         .filter(tutor => tutor.status === "pending")
         .map(tutor => {
-            const user = props.users[tutor.user_id] || {};
+            const user = props.users[tutor.user_id - 1] || {};
             const profile = Object.values(props.profiles).find(p => p.user_id === tutor.user_id) || {};
-            const course = props.courses[profile.course_id] || {};
-            const year = props.years[profile.level_id] || {};
+            const course = props.courses[profile.course_id - 1] || {};
+            const year = props.years[profile.level_id - 1] || {};
 
             const formattedDate = tutor.created_at ? format(new Date(tutor.created_at), "dd/MM/yyyy") : "N/A";
 

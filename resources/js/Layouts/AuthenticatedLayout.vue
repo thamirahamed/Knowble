@@ -127,7 +127,7 @@ const closeModal = () => {
 
                                         <template v-else-if="tutor === 'rejected'">
                                             <DropdownLink class="pointer-events-none !text-red-400">
-                                                Request Rejected
+                                                Tutor Request Rejected
                                             </DropdownLink>
                                         </template>
 
@@ -272,7 +272,7 @@ const closeModal = () => {
 
                             <template v-else-if="tutor === 'rejected'">
                                 <ResponsiveNavLink class="pointer-events-none !text-red-400">
-                                    Request Rejected
+                                    Tutor Request Rejected
                                 </ResponsiveNavLink>
                             </template>
                             <ResponsiveNavLink

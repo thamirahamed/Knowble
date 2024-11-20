@@ -42,10 +42,10 @@ const processedTutors = computed(() => {
     return props.tutors
         .filter(tutor => tutor.status === "approved" || tutor.status === "rejected")
         .map(tutor => {
-            const user = props.users[tutor.user_id] || {};
+            const user = props.users[tutor.user_id - 1] || {};
             const profile = Object.values(props.profiles).find(p => p.user_id === tutor.user_id) || {};
-            const course = props.courses[profile.course_id] || {};
-            const year = props.years[profile.level_id] || {};
+            const course = props.courses[profile.course_id - 1] || {};
+            const year = props.years[profile.level_id - 1] || {};
 
             const formattedDate = tutor.created_at ? format(new Date(tutor.created_at), "dd/MM/yyyy") : "N/A";
 
@@ -155,7 +155,7 @@ const deleteTutor = id => {
                         <th class="border-b font-semibold px-4 py-2 text-left">date</th>
                         <th class="border-b font-semibold px-4 py-2 text-left">Name</th>
                         <th class="border-b font-semibold px-4 py-2 text-left">CB Number</th>
-                        <th class="border-b font-semibold px-4 py-2 text-left">School of Study</th>
+                        <th class="border-b font-semibold px-4 py-2 text-left">Course</th>
                         <th class="border-b font-semibold px-4 py-2 text-left">Year</th>
                         <th class="border-b font-semibold px-4 py-2 text-left">Status</th>
                         <th class="border-b font-semibold px-4 py-2 text-left">Delete</th>

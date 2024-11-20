@@ -14,7 +14,7 @@ onMounted(() => {
         class="flex max-h-screen flex-col items-center bg-transparent lg:flex-row"
     >
         <div
-            class="relative flex h-screen w-full items-center overflow-hidden bg-transparent lg:w-3/5 pointer-events-none"
+            class="relative flex h-screen w-full items-center overflow-hidden bg-transparent lg:w-3/5 pointer-events-none select-none"
         >
             <div
                 class="absolute flex h-full w-full flex-col bg-transparent pl-12 pr-[13%] text-white md:pl-20 md:pr-[20%]"

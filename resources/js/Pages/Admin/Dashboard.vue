@@ -107,7 +107,7 @@ const deleteTutor = id => {
                     <thead class="text-lg bg-secondary text-white">
                     <tr>
                         <th class="border-b font-semibold px-4 py-2 text-left">Request#</th>
-                        <th class="border-b font-semibold px-4 py-2 text-left">Date & Time</th>
+                        <th class="border-b font-semibold px-4 py-2 text-left">Date</th>
                         <th class="border-b font-semibold px-4 py-2 text-left">Name</th>
                         <th class="border-b font-semibold px-4 py-2 text-left">CB Number</th>
                         <th class="border-b font-semibold px-4 py-2 text-left">Course</th>
@@ -133,7 +133,7 @@ const deleteTutor = id => {
                             </DangerButton>
                         </td>
                         <td class="border-b px-4 py-2">
-                            <button @click="deleteTutor(tutor.id)" class="text-red-500 hover:text-red-700">
+                            <button @click="deleteTutor(tutor.id)" class="text-red-500 hover:text-red-700 underline">
                                 Delete
                             </button>
                         </td>
@@ -152,7 +152,7 @@ const deleteTutor = id => {
                     <thead class="text-lg bg-secondary text-white">
                     <tr>
                         <th class="border-b font-semibold px-4 py-2 text-left">Request#</th>
-                        <th class="border-b font-semibold px-4 py-2 text-left">Date & Time</th>
+                        <th class="border-b font-semibold px-4 py-2 text-left">date</th>
                         <th class="border-b font-semibold px-4 py-2 text-left">Name</th>
                         <th class="border-b font-semibold px-4 py-2 text-left">CB Number</th>
                         <th class="border-b font-semibold px-4 py-2 text-left">School of Study</th>
@@ -176,7 +176,7 @@ const deleteTutor = id => {
                         </td>
 
                         <td class="border-b px-4 py-2">
-                            <button class="text-red-500 hover:text-red-700" @click="deleteTutor(tutor.id)">Delete</button>
+                            <button class="text-red-500 hover:text-red-700 underline" @click="deleteTutor(tutor.id)">Delete</button>
                         </td>
                     </tr>
                     </tbody>

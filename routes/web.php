@@ -61,19 +61,22 @@ Route::middleware(['auth','studentportal'])->group(function () {
 Route::middleware(['auth','adminportal'])->group(function () {
     Route::prefix('admin')->group(function () {
         Route::get('/dashboard', [AdminVerificationController::class, 'adminDashboard'])->name('admin.dashboard');
+
     });
+});
+Route::middleware(['auth'])->group(function (){
+    // Approve tutor
+    Route::post('/approve-tutor/{id}', [AdminVerificationController::class, 'approveTutor'])->name('approve.tutor');
+    // Reject tutor
+    Route::post('/reject-tutor/{id}', [AdminVerificationController::class, 'rejectTutor'])->name('reject.tutor');
+    // Delete tutor
+    Route::delete('/tutors/{id}', [AdminVerificationController::class, 'deleteTutor'])->name('delete.tutor');
 });
 
 // Admin Verification
 Route::middleware(['auth' ,'studentportal'])->group(function () {
     Route::get('/admin/request',[AdminVerificationController::class, 'index'])->name('admin.tutor.request');
     Route::get('/tutor/dashboard',[AdminVerificationController::class, 'tutorDashboard'])->name('tutor.dashboard');
-
-    Route::get('/approve-tutor/{id}', function ($id) {
-        $tutor = Tutor::findOrFail($id);
-        $tutor->update(['status' => 'approved']);
-        return redirect()->back()->with('success', 'Tutor approved successfully!');
-    })->name('approve.tutor');
 
 });
 

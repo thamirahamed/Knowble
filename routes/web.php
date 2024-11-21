@@ -72,7 +72,16 @@ Route::middleware(['auth'])->group(function (){
     // Delete tutor
     Route::delete('/tutors/{id}', [AdminVerificationController::class, 'deleteTutor'])->name('delete.tutor');
 });
+//chat
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/chat', [ChatController::class, 'index'])->name('chatpage');
+    Route::get('/api/chat/users', [ChatController::class, 'getUsers']);
+    Route::post('/api/chat/start', [ChatController::class, 'startChat']);
+    Route::post('/api/chat/message', [ChatController::class, 'sendMessage']);
 
+    Route::get('/api/chat/messages/{chatId}', [ChatController::class, 'getMessages']);
+
+});
 // Admin Verification
 Route::middleware(['auth' ,'studentportal'])->group(function () {
     Route::get('/admin/request',[AdminVerificationController::class, 'index'])->name('admin.tutor.request');
@@ -80,6 +89,5 @@ Route::middleware(['auth' ,'studentportal'])->group(function () {
 
 });
 
-Route::get('/chat', [ChatController::class, 'index'])->name('chatpage');
 
 require __DIR__.'/auth.php';

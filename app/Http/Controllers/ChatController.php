@@ -30,7 +30,7 @@ class ChatController extends Controller
     {
         $fromUserId = auth()->id();
         $toUserId = $request->user_id;
-
+        
         $chat = Chat::with('messages')
             ->whereHas('users', fn($q) => $q->where('user_id', $fromUserId))
             ->whereHas('users', fn($q) => $q->where('user_id', $toUserId))

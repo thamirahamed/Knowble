@@ -17,7 +17,7 @@ onMounted(() => {
             class="relative flex h-screen w-full items-center overflow-hidden bg-transparent lg:w-3/5 pointer-events-none select-none"
         >
             <div
-                class="absolute flex h-full w-full flex-col bg-transparent pl-12 pr-[13%] text-white md:pl-20 md:pr-[20%]"
+                class="absolute flex h-full w-full flex-col bg-transparent pl-12 pr-[12%] text-white md:pl-20 md:pr-[10%]"
             >
                 <div class="flex items-start pt-8">
                     <img
@@ -35,7 +35,7 @@ onMounted(() => {
                         Welcome to,
                     </h1>
                     <h1
-                        class="h-fit font-mainh text-6xl font-bold tracking-wider md:text-8xl xl:text-9xl 2xl:text-[9rem]"
+                        class="h-fit font-mainh text-6xl font-bold tracking-wider md:text-8xl xl:text-9xl 2xl:text-[8.5rem]"
                     >
                         Knowble
                     </h1>

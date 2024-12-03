@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ProfileUpdateRequest;
 use App\Models\Course;
 use App\Models\CourseLevel;
+use App\Models\DegreeProgram;
+use App\Models\Level;
+use App\Models\SchoolOfStudy;
+use App\Models\Semester;
 use App\Models\Tutor;
 use App\Models\User;
 use App\Models\Profile;
@@ -46,7 +50,9 @@ class ProfileController extends Controller
         // Handle storing the validated data
         Profile::create([
             'user_id' => auth()->id(),
-            'course_id' => $request->course,
+            'school_id' => $request->school,
+            'degree_id' => $request->degree,
+            'semester_id' => $request->semester,
             'level_id' => $request->level,
             'cb_number' => $request->cb_number, // Example based on email
             'profile_pic' => $s3Url ?: $profilePictureName,  // Use S3 URL or default image
@@ -73,8 +79,10 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): Response
     {
-        $course = Course::all();
-        $courselevel = CourseLevel::all();
+        $school = SchoolOfStudy::all();
+        $degree = DegreeProgram::all();
+        $level = Level::all();
+        $semester = Semester::all();
 
 
         $profile = Profile::where('user_id', auth()->id())->firstOrFail();
@@ -82,8 +90,10 @@ class ProfileController extends Controller
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => session('status'),
             'profile' => $profile, // Include the user's profile data
-            'courses' => $course,
-            'levels' => $courselevel
+            'school' => $school,
+            'degree' => $degree,
+            'level' => $level,
+            'semester' => $semester,
         ]);
     }
 
@@ -95,11 +105,15 @@ class ProfileController extends Controller
     {
         // Validate the input data
         $validatedData = $request->validate([
-            'course_id' => 'required|integer',
-            'level_id' => 'required|integer',
+            'school_id' => 'required|integer|exists:school_of_studies,id',
+            'degree_id' => 'required|integer|exists:degree_programs,id',
+            'semester_id' => 'required|integer|exists:semesters,id',
+            'level_id' => 'required|integer|exists:levels,id',
             'cb_number' => 'required|string|max:255',
             'profile_pic' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
+
+
 
         // Get the authenticated user and their profile
         $user = $request->user();
@@ -127,8 +141,10 @@ class ProfileController extends Controller
 
         // Update the profile data
         $profile->update([
-            'course_id' => $validatedData['course_id'],
+            'school_id' => $validatedData['school_id'],
+            'degree_id' => $validatedData['degree_id'],
             'level_id' => $validatedData['level_id'],
+            'semester_id' => $validatedData['semester_id'],
             'cb_number' => $validatedData['cb_number'],
             'profile_pic' => $profilePictureUrl, // Save the new URL, default URL, or retain the old one
         ]);
@@ -165,15 +181,19 @@ class ProfileController extends Controller
     {
         $profile = Profile::where('user_id', auth()->id())->firstOrFail();
         $userdetails = auth()->user();
-        $usercourse = Course::find($profile->course_id);
-        $userlevel  = CourseLevel::find($profile->level_id);
+        $userschool = SchoolOfStudy::find($profile->school_id);
+        $userlevel  = Level::find($profile->level_id);
+        $usersemster = Semester::find($profile->semester_id);
+        $usercourse = DegreeProgram::find($profile->degree_id);
 
 
         return Inertia::render('Profile/View',[
             'profile' => $profile,
             'user' => $userdetails,
-            'course' => $usercourse,
+            'school' => $userschool,
             'level' => $userlevel,
+            'semester' => $usersemster,
+            'course' => $usercourse,
         ]);
     }
 
@@ -187,8 +207,10 @@ class ProfileController extends Controller
         }
 
         return Inertia::render('Profile/Create', [
-            'courses' => Course::all(),
-            'levels' => CourseLevel::all(),
+            'SchoolOfStudy' => SchoolOfStudy::all(),
+            'DegreeProgram' => DegreeProgram::all(),
+            'Level' => Level::all(),
+            'Semester' => Semester::all(),
         ]);
     }
 }

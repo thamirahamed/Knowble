@@ -17,14 +17,22 @@ defineProps({
         type: Object,
         required: true,
     },
-    courses: {
+    school: {
         type: Array,
         required: true
     },
-    levels: {
+    level: {
         type: Array,
         required: true
-    }
+    },
+    degree: {
+        type: Array,
+        required: true
+    },
+    semester: {
+        type: Array,
+        required: true
+    },
 });
 
 </script>
@@ -41,15 +49,17 @@ defineProps({
                         :must-verify-email="mustVerifyEmail"
                         :status="status"
                         :profile="profile"
-                        :courses="courses"
-                        :levels="levels"
+                        :school="school"
+                        :degree="degree"
+                        :level="level"
+                        :semester="semester"
                         class="w-full"
                     />
                 </div>
 
                 <div class="bg-white p-4 shadow rounded-lg sm:p-8">
                     <UpdatePasswordForm class="w-full" />
-                </div>           
+                </div>
 
                 <div class="bg-white p-4 shadow rounded-lg sm:p-8">
                     <DeleteUserForm class="w-full" />

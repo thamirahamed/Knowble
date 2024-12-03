@@ -9,15 +9,19 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 const pageProps = usePage().props;
 
 const validInputs = {
-    courses: pageProps?.courses || [], // Fallback if courses are undefined
-    levels: pageProps?.levels || [], // Fallback if levels are undefined
+    school : pageProps.SchoolOfStudy,
+    degree : pageProps.DegreeProgram,
+    levels : pageProps.Level,
+    semester : pageProps.Semester,
 };
 console.log(validInputs); // Log to verify the data
 
 // Initialize the form
 const form = useForm({
-    course: '',
+    school: '',
+    degree: '',
     level: '',
+    semester: '',
     profile_pic: null,
     cb_number: '', // Will be set automatically from email
 });
@@ -48,22 +52,42 @@ const submitForm = () => {
         <form @submit.prevent="submitForm" class="flex flex-col mt-6 gap-6">
             <!-- Courses -->
             <div>
-                <InputLabel for="course" value="Course" />
+                <InputLabel for="School" value="School of Study" />
                 <select
-                    id="course"
+                    id="school"
                     class="cursor-pointer mt-1 block w-full text-lg shadow-sm border-gray-300 rounded-md hover:border-accent focus:border-transparent focus:outline-none focus:ring-2 focus:ring-accent"
-                    v-model="form.course"
+                    v-model="form.school"
                     required
                 >
-                    <option value="">Select Course</option>
-                    <option v-for="course in validInputs.courses" :key="course.id" :value="course.id">
-                        {{ course.CourseName }}
+                    <option value="">Select School</option>
+                    <option v-for="schools in validInputs.school" :key="schools.id" :value="schools.id">
+                        {{ schools.school_name }}
                     </option>
                 </select>
-                <InputError class="mt-2" :message="form.errors.course" />
+                <InputError class="mt-2" :message="form.errors.school" />
             </div>
 
-            <!-- Levels -->
+            <!-- Degree Program -->
+            <div>
+                <InputLabel for="degree_program" value="Degree Program" />
+                <select
+                    id="degree_program"
+                    class="cursor-pointer mt-1 block w-full text-lg shadow-sm border-gray-300 rounded-md hover:border-accent focus:border-transparent focus:outline-none focus:ring-2 focus:ring-accent"
+                    v-model="form.degree"
+                    required
+                >
+                    <option value="">Select Level</option>
+                    <option
+                        v-for="degrees in validInputs.degree.filter(l => l.school_id === form.school)"
+                        :key="degrees.id"
+                        :value="degrees.id"
+                    >
+                        {{ degrees.degree_name }}
+                    </option>
+                </select>
+                <InputError class="mt-2" :message="form.errors.degree" />
+            </div>
+            <!-- Level -->
             <div>
                 <InputLabel for="level" value="Level" />
                 <select
@@ -74,14 +98,35 @@ const submitForm = () => {
                 >
                     <option value="">Select Level</option>
                     <option
-                        v-for="level in validInputs.levels.filter(l => l.course_id === form.course)"
-                        :key="level.id"
-                        :value="level.id"
+                        v-for="levels in validInputs.levels"
+                        :key="levels.id"
+                        :value="levels.id"
                     >
-                        {{ level.level }}
+                        {{ levels.level_name }}
                     </option>
                 </select>
                 <InputError class="mt-2" :message="form.errors.level" />
+            </div>
+
+            <!-- Semester -->
+            <div>
+                <InputLabel for="semester" value="Semester" />
+                <select
+                    id="semester"
+                    class="cursor-pointer mt-1 block w-full text-lg shadow-sm border-gray-300 rounded-md hover:border-accent focus:border-transparent focus:outline-none focus:ring-2 focus:ring-accent"
+                    v-model="form.semester"
+                    required
+                >
+                    <option value="">Select Semester</option>
+                    <option
+                        v-for="semesters in validInputs.semester"
+                        :key="semesters.id"
+                        :value="semesters.id"
+                    >
+                        {{ semesters.semester_name }}
+                    </option>
+                </select>
+                <InputError class="mt-2" :message="form.errors.semester" />
             </div>
 
             <!-- Submit Button -->

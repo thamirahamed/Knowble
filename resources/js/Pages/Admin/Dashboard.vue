@@ -11,10 +11,12 @@ const props = defineProps({
     users: Object, // Users data
     tutors: Array, // Tutors data with 'status'
     profiles: Object, // Profiles data
-    courses: Object, // Courses data with 'CourseName'
-    years: Object, // Years data with 'level'
+    schools: Object, // Schools data
+    degrees: Object, // Degrees data
+    levels: Object, // Levels data
+    semesters: Object, // Semesters data
 });
-
+console.log(props.profiles);
 // Filter tutors with status 'pending'
 const pendingTutors = computed(() => {
     return props.tutors
@@ -22,8 +24,8 @@ const pendingTutors = computed(() => {
         .map(tutor => {
             const user = props.users[tutor.user_id - 1] || {};
             const profile = Object.values(props.profiles).find(p => p.user_id === tutor.user_id) || {};
-            const course = props.courses[profile.course_id - 1] || {};
-            const year = props.years[profile.level_id - 1] || {};
+            const degree = props.degrees[profile.degree_id] || {};
+            const year = props.levels[profile.level_id - 1] || {};
 
             const formattedDate = tutor.created_at ? format(new Date(tutor.created_at), "dd/MM/yyyy") : "N/A";
 
@@ -32,7 +34,7 @@ const pendingTutors = computed(() => {
                 date: formattedDate,
                 name: user.name,
                 cbNumber: profile.cb_number,
-                course: course.CourseName,
+                course: degree.degree_name,
                 year: year.level,
             };
         });
@@ -44,8 +46,8 @@ const processedTutors = computed(() => {
         .map(tutor => {
             const user = props.users[tutor.user_id - 1] || {};
             const profile = Object.values(props.profiles).find(p => p.user_id === tutor.user_id) || {};
-            const course = props.courses[profile.course_id - 1] || {};
-            const year = props.years[profile.level_id - 1] || {};
+            const degree = props.degrees[profile.degree_id - 1] || {};
+            const year = props.levels[profile.level_id - 1] || {};
 
             const formattedDate = tutor.created_at ? format(new Date(tutor.created_at), "dd/MM/yyyy") : "N/A";
 
@@ -54,7 +56,7 @@ const processedTutors = computed(() => {
                 date: formattedDate,
                 name: user.name || "N/A",
                 cbNumber: profile.cb_number || "N/A",
-                course: course.CourseName || "N/A",
+                course: degree.degree_name || "N/A",
                 year: year.level || "N/A",
                 status: tutor.status,
             };

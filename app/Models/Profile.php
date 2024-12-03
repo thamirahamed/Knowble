@@ -8,8 +8,10 @@ class Profile extends Model
 {
     protected $fillable = [
         'user_id',
-        'course_id',
         'level_id',
+        'degree_id',
+        'school_id',
+        'semester_id',
         'cb_number',
         'profile_pic',
     ];
@@ -19,14 +21,24 @@ class Profile extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function course()
+    public function degree()
     {
-        return $this->belongsTo(Course::class);
+        return $this->belongsTo(DegreeProgram::class);
+    }
+
+    public function semester()
+    {
+        return $this->belongsTo(Semester::class);
+    }
+
+    public function school()
+    {
+        return $this->belongsTo(SchoolOfStudy::class);
     }
 
     public function level()
     {
-        return $this->belongsTo(CourseLevel::class);
+        return $this->belongsTo(Level::class);
     }
 
 }

@@ -5,7 +5,11 @@ namespace App\Http\Controllers;
 use App\Mail\ApproveTutorMail;
 use App\Models\Course;
 use App\Models\CourseLevel;
+use App\Models\DegreeProgram;
+use App\Models\Level;
 use App\Models\Profile;
+use App\Models\SchoolOfStudy;
+use App\Models\Semester;
 use App\Models\Tutor;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -40,15 +44,20 @@ class AdminVerificationController extends Controller
         $tutors = Tutor::all();
         $user = User::all();
         $profile = Profile::all();
-        $course = Course::all();
-        $year = CourseLevel::all();
+        $school = SchoolOfStudy::all();
+        $degree = DegreeProgram::all();
+        $level = Level::all();
+        $semester = Semester::all();
+
 
         return Inertia::render('Admin/Dashboard', [
             'tutors' => $tutors,
             'users' => $user,
             'profiles' => $profile,
-            'courses' => $course,
-            'years' => $year
+            'schools' => $school,
+            'degrees' => $degree,
+            'levels' => $level,
+            'semesters' => $semester
         ]
         );
     }

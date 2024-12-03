@@ -16,7 +16,7 @@ class EmailVerificationNotificationController extends Controller
         $user = $request->user();
 
         // Step 1: Ensure the user's email is verified
-        if ($user->hasVerifiedEmail()) {
+        if (!$user->hasVerifiedEmail()) {
             // Send a verification email if it hasn't been sent
             $user->sendEmailVerificationNotification();
             return back()->with('status', 'verification-link-sent');

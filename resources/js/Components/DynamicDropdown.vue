@@ -1,5 +1,6 @@
 <script setup>
 import { ref, watch } from "vue";
+import InputLabel from "@/Components/InputLabel.vue";
 
 const props = defineProps({
     label: {
@@ -60,9 +61,10 @@ watch(selectedValue, (newValue) => {
                 :key="option.id"
                 :value="option.id"
             >
-                {{ option.name || option.level || option.CourseName }}
+                {{ option.level_name || option.degree_name || option.school_name || option.semester_name }}
             </option>
         </select>
+
 
         <!-- Error -->
         <InputError class="mt-2" :message="error" />

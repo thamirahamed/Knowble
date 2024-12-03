@@ -11,13 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('course_levels', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('course_id');
-            $table->string('level');
-            $table->timestamps();
-
-            $table->foreign('course_id')->references('id')->on('courses');
+        Schema::table('degree_programs', function (Blueprint $table) {
+            $table->softDeletes();
         });
     }
 
@@ -26,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('course_levels');
+        Schema::table('degree_programs', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
     }
 };

@@ -14,16 +14,24 @@ const props = defineProps({
         type: Object,
         required: true
     },
-    courses: {
+    school: {
         type: Array,
         required: true
     },
-    levels: {
+    level: {
+        type: Array,
+        required: true
+    },
+    degree: {
+        type: Array,
+        required: true
+    },
+    semester: {
         type: Array,
         required: true
     }
 });
-
+console.log(props.school);
 // Define the computed property for the profile picture URL
 const profilePictureUrl = computed(() => {
     return `${props.profile.profile_pic}`;
@@ -37,9 +45,12 @@ const form = useForm({
     email: user.email,
     cb_number: props.profile?.cb_number || '',
     profile_pic: null, // Set this as null initially
-    course_id: props.profile?.course_id || '',
-    level_id: props.profile?.level_id || ''
+    school_id: props.profile?.school_id || '',
+    level_id: props.profile?.level_id || '',
+    degree_id: props.profile?.degree_id || '',
+    semester_id: props.profile?.semester_id || '',
 });
+
 
 // Reactive variable to hold the selected profile picture preview
 const profilePicPreview = ref(profilePictureUrl.value);
@@ -65,9 +76,9 @@ const handleFileChange = (event) => {
 };
 
 // Watch for changes to course_id and filter levels
-const filteredLevels = ref(props.levels);
-watch(() => form.course_id, (newCourseId) => {
-    filteredLevels.value = props.levels.filter(level => level.course_id === newCourseId);
+const filteredLevels = ref(props.degree);
+watch(() => form.school_id, (newCourseId) => {
+    filteredLevels.value = props.degree.filter(level => level.school_id === newCourseId);
 });
 
 //Remove and Set default Pfp
@@ -85,6 +96,8 @@ const removeProfilePic = async () => {
     // Update the form with the File object
     form.profile_pic = file;
 };
+
+
 
 
 </script>
@@ -167,27 +180,49 @@ const removeProfilePic = async () => {
                         <InputError class="mt-2" :message="form.errors.email" />
                     </div>
 
-                    <!-- Course Dropdown -->
+                    <!-- School Dropdown -->
                     <div>
-                        <InputLabel for="courses" value="School of Study" />
+                        <InputLabel for="school"/>
                         <DynamicDropdown
-                            label="Course"
-                            id="course"
-                            :options="courses"
-                            v-model="form.course_id"
-                            :error="form.errors.course_id"
+                            label="School of Study"
+                            id="school"
+                            :options="school"
+                            v-model="form.school_id"
+                            :error="form.errors.school_id"
                         />
                     </div>
 
+                    <!-- Degree Dropdown -->
+                    <div>
+                        <InputLabel for="degree" />
+                        <DynamicDropdown
+                            label="Degree Program"
+                            id="degree"
+                            :options="filteredLevels"
+                            v-model="form.degree_id"
+                            :error="form.errors.degree_id"
+                        />
+                    </div>
                     <!-- Level Dropdown -->
                     <div>
-                        <InputLabel for="levels" value="Year" />
+                        <InputLabel for="level" />
                         <DynamicDropdown
                             label="Level"
                             id="level"
-                            :options="filteredLevels"
+                            :options="level"
                             v-model="form.level_id"
                             :error="form.errors.level_id"
+                        />
+                    </div>
+                    <!-- Semester Dropdown -->
+                    <div>
+                        <InputLabel for="semester" />
+                        <DynamicDropdown
+                            label="Semester"
+                            id="semester"
+                            :options="semester"
+                            v-model="form.semester_id"
+                            :error="form.errors.semester_id"
                         />
                     </div>
                 </div>

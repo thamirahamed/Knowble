@@ -6,6 +6,9 @@ import DangerButton from "@/Components/DangerButton.vue";
 import { computed } from "vue";
 import { format } from "date-fns";
 import { router } from '@inertiajs/vue3';
+import SecondaryButton from "@/Components/SecondaryButton.vue";
+import TutorVerificationModel from "@/Components/TutorVerificationModel.vue";
+import { ref } from "vue";
 
 const props = defineProps({
     users: Object, // Users data
@@ -62,7 +65,47 @@ const processedTutors = computed(() => {
             };
         });
 });
+const showModal = ref(false);
+const modalData = ref('');
 
+const openModal = async (id) => {
+    console.log('Opening modal for tutor:', id);
+    showModal.value = true;
+
+    // // Find the tutor by ID
+    // const tutor = props.tutors.find(t => t.id === id);
+    //
+    // if (tutor) {
+    //     const user = props.users[tutor.user_id - 1] || {};
+    //     const profile = Object.values(props.profiles).find(p => p.user_id === tutor.user_id) || {};
+    //
+    //     // Pass the tutor's name and cbNumber to modalData
+    //     tutorName.value = user.name || "N/A";
+    //     tutorCBNumber.value = profile.cb_number || "N/A";
+    //
+    //     modalData.value = {
+    //         ...tutor, // Keep the other tutor details
+    //     };
+    // }
+
+    try {
+        const response = await axios.get(`/admin/data/${id}`);
+        console.log('Fetched data:', response.data);
+        // Merge the response data with modalData but do not overwrite tutor-related information
+        modalData.value = {
+            ...modalData.value,
+            ...response.data,
+        };
+
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        modalData.value = { error: 'Failed to load data.' }; // Handle errors gracefully
+    }
+};
+
+const closeModal = () => {
+    showModal.value = false;
+};
 // Approve Tutor
 const approveTutor = id => {
     router.post(`/approve-tutor/${id}`, {}, {
@@ -127,13 +170,22 @@ const deleteTutor = id => {
                         <td class="border-b px-4 py-2">{{ tutor.course }}</td>
                         <td class="border-b px-4 py-2">{{ tutor.year }}</td>
                         <td class="border-b px-4 py-2 space-x-4">
-                            <PrimaryButton @click="approveTutor(tutor.id)">
+                            <SecondaryButton @click="openModal(tutor.id)">
                                 Approve
-                            </PrimaryButton>
+                            </SecondaryButton>
                             <DangerButton @click="rejectTutor(tutor.id)">
                                 Reject
                             </DangerButton>
                         </td>
+                        <TutorVerificationModel
+                            :is-visible="showModal"
+                            :modal-data="modalData"
+                            :name="tutor.name"
+                            :cbnumber="tutor.cbNumber"
+                            :tutorid="tutor.id"
+                            @close="closeModal"
+                        />
+
                         <td class="border-b px-4 py-2">
                             <button @click="deleteTutor(tutor.id)" class="text-red-500 hover:text-red-700 underline">
                                 Delete

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Modules extends Model
+class Module extends Model
 {
     use SoftDeletes;
 
@@ -31,4 +31,16 @@ class Modules extends Model
     {
         return $this->belongsTo(Semester::class);
     }
+
+    public function tutors()
+    {
+        return $this->belongsToMany(Tutor::class, 'tutor_modules_approved', 'module_id', 'tutor_id');
+    }
+
+    public function rejectedTutors()
+    {
+        return $this->belongsToMany(Tutor::class, 'tutor_modules_rejected', 'module_id', 'tutor_id');
+    }
+
+
 }

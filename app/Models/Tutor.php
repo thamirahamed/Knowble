@@ -14,4 +14,15 @@ class Tutor extends Model
     }
 
 
+    public function approvedModules()
+    {
+        return $this->belongsToMany(Module::class, 'tutor_modules_approved', 'tutor_id', 'module_id');
+    }
+
+    public function  rejectedModules()
+    {
+        return $this->belongsToMany(Module::class, 'tutor_modules_rejected', 'tutor_id', 'module_id');
+    }
+
+
 }

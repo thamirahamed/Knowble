@@ -114,16 +114,16 @@ class DatabaseSeeder extends Seeder
               'Business Foundation' => [
                   'Semester 1' => [
                       'Level 3' => [
-                          'English for Academic Purposes',
-                          'Self & Society',
+                          'English for Academic Purposes - 1',
+                          'Self & Society - 1',
                           'Business Mathematics',
                           'Introduction to Business Environments',
                       ],
                   ],
                   'Semester 2' => [
                       'Level 3' => [
-                          'English for Academic Purposes',
-                          'Self & Society',
+                          'English for Academic Purposes -1',
+                          'Self & Society -1',
                           'Digital Literacy & Communication',
                           'Organisations & Behaviour',
                       ],
@@ -132,16 +132,16 @@ class DatabaseSeeder extends Seeder
             'Computing Foundation' => [
                 'Semester 1' => [
                     'Level 3' => [
-                        'English for Academic Purposes',
-                        'Self & Society',
+                        'English for Academic Purposes - 1',
+                        'Self & Society - 1',
                         'Computing Mathematics',
                         'Introduction to Business Environment',
                     ],
                 ],
                 'Semester 2' => [
                     'Level 3' => [
-                        'English for Academic Purposes',
-                        'Self & Society',
+                        'English for Academic Purposes - 2',
+                        'Self & Society - 2',
                         'Digital Literacy & Communication',
                         'Programming $ Web Development',
                     ],
@@ -150,16 +150,16 @@ class DatabaseSeeder extends Seeder
             'Law Foundation' => [
                 'Semester 1' => [
                     'Level 3' => [
-                        'English for Academic Purposes',
-                        'Self & Society',
+                        'English for Academic Purposes - 1',
+                        'Self & Society - 1',
                         'Legal Systems & History',
                         'Legal Methods',
                     ],
                 ],
                 'Semester 2' => [
                     'Level 3' => [
-                        'English for Academic Purposes',
-                        'Self & Society',
+                        'English for Academic Purposes - 2',
+                        'Self & Society - 2',
                         'Digital Literacy & Communication',
                         'Legal Skills & Critical Thinking',
                     ],
@@ -186,41 +186,41 @@ class DatabaseSeeder extends Seeder
             'BEng (Hons) Software Engineering' => [
                 'Semester 1' => [
                     'Level 4' => [
-                        'Software Development and Application Modelling',
-                        'Digital Technologies',
-                        'Networking Concepts and Cyber Security',
-                        'Web Development and Operating Systems',
+                        'Software Development and Application Modelling - 1',
+                        'Digital Technologies - 1',
+                        'Networking Concepts and Cyber Security - 1',
+                        'Web Development and Operating Systems - 1',
                     ],
                     'Level 5' => [
-                        'Commercial Computing for Software Engineers',
-                        'Databases and Data Structures',
-                        'Server-Side Programming',
-                        'Mobile App Development ',
+                        'Commercial Computing for Software Engineers - 1',
+                        'Databases and Data Structures - 1',
+                        'Server-Side Programming - 1',
+                        'Mobile App Development - 1 ',
                     ],
                     'Level 6' => [
-                        'Emerging Technologies',
-                        'Clean Coding and Networks',
-                        'Enterprise Cloud and Distributed Web Applications',
+                        'Emerging Technologies - 1',
+                        'Clean Coding and Networks - 1',
+                        'Enterprise Cloud and Distributed Web Applications - 1',
                         'Final Year Project',
                     ]
                 ],
                 'Semester 2' => [
                     'Level 4' => [
-                        'Software Development and Application Modelling',
-                        'Digital Technologies',
-                        'Networking Concepts and Cyber Security',
-                        'Web Development and Operating Systems',
+                        'Software Development and Application Modelling - 2',
+                        'Digital Technologies - 2',
+                        'Networking Concepts and Cyber Security - 2',
+                        'Web Development and Operating Systems - 2',
                     ],
                     'Level 5' => [
-                        'Commercial Computing for Software Engineers',
-                        'Databases and Data Structures',
-                        'Server-Side Programming',
-                        'Mobile App Development ',
+                        'Commercial Computing for Software Engineers - 2',
+                        'Databases and Data Structures - 2',
+                        'Server-Side Programming - 2',
+                        'Mobile App Development - 2 ',
                     ],
                     'Level 6' => [
-                        'Emerging Technologies',
-                        'Clean Coding and Networks',
-                        'Enterprise Cloud and Distributed Web Applications',
+                        'Emerging Technologies - 2',
+                        'Clean Coding and Networks - 2',
+                        'Enterprise Cloud and Distributed Web Applications - 2',
                         'Final Year Project',
                     ]
                 ],
@@ -228,59 +228,59 @@ class DatabaseSeeder extends Seeder
             'BSc (Hons) Computer Science' => [
                 'Semester 1' => [
                     'Level 4' => [
-                        'Software Development and Application Modelling',
-                        'Digital Technologies',
-                        'Networking Concepts and Cyber Security',
-                        'Web Development and Operating Systems',
+                        'Software Development and Application Modelling - 1',
+                        'Digital Technologies - 1',
+                        'Networking Concepts and Cyber Security - 1',
+                        'Web Development and Operating Systems - 1',
                     ],
                     'Level 5' => [
-                        'Commercial Computing for Software Engineers',
-                        'Databases and Data Structures',
-                        'Server-Side Programming',
-                        'Mobile App Development ',
-                        'Cyber Operations and Network Security',
-                        'Enterprise Cloud and Infrastructure Automation',
-                        'Routed and Switched Architectures',
-                        'Web Development'
+                        'Commercial Computing for Software Engineers - 1',
+                        'Databases and Data Structures - 1',
+                        'Server-Side Programming - 1',
+                        'Mobile App Development - 1 ',
+                        'Cyber Operations and Network Security - 1',
+                        'Enterprise Cloud and Infrastructure Automation - 1',
+                        'Routed and Switched Architectures - 1',
+                        'Web Development - 1'
                     ],
                     'Level 6' => [
-                        'Emerging Technologies',
-                        'Clean Coding and Networks',
-                        'Decision Analytics',
-                        'Multiple Devices and User Experience',
-                        'Web and Artificial Intelligence',
-                        'Advanced Networks and Operating Systems Security',
-                        'Cloud Virtualization and Communications',
-                        'Enterprise Cloud and Distributed Web Applications',
+                        'Emerging Technologies - 1',
+                        'Clean Coding and Networks - 1',
+                        'Decision Analytics - 1',
+                        'Multiple Devices and User Experience - 1',
+                        'Web and Artificial Intelligence - 1',
+                        'Advanced Networks and Operating Systems Security - 1',
+                        'Cloud Virtualization and Communications - 1',
+                        'Enterprise Cloud and Distributed Web Applications - 1',
                         'Final Year Project',
                     ]
                 ],
                 'Semester 2' => [
                     'Level 4' => [
-                        'Software Development and Application Modelling',
-                        'Digital Technologies',
-                        'Networking Concepts and Cyber Security',
-                        'Web Development and Operating Systems',
+                        'Software Development and Application Modelling - 2',
+                        'Digital Technologies - 2',
+                        'Networking Concepts and Cyber Security - 2',
+                        'Web Development and Operating Systems - 2',
                     ],
                     'Level 5' => [
-                        'Commercial Computing for Software Engineers',
-                        'Databases and Data Structures',
-                        'Server-Side Programming',
-                        'Mobile App Development ',
-                        'Cyber Operations and Network Security',
-                        'Enterprise Cloud and Infrastructure Automation',
-                        'Routed and Switched Architectures',
-                        'Web Development'
+                        'Commercial Computing for Software Engineers - 2',
+                        'Databases and Data Structures - 2',
+                        'Server-Side Programming - 2',
+                        'Mobile App Development - 2 ',
+                        'Cyber Operations and Network Security - 2',
+                        'Enterprise Cloud and Infrastructure Automation - 2',
+                        'Routed and Switched Architectures - 2',
+                        'Web Development - 2'
                     ],
                     'Level 6' => [
-                        'Emerging Technologies',
-                        'Clean Coding and Networks',
-                        'Decision Analytics',
-                        'Multiple Devices and User Experience',
-                        'Web and Artificial Intelligence',
-                        'Advanced Networks and Operating Systems Security',
-                        'Cloud Virtualization and Communications',
-                        'Enterprise Cloud and Distributed Web Applications',
+                        'Emerging Technologies - 2',
+                        'Clean Coding and Networks - 2',
+                        'Decision Analytics - 2',
+                        'Multiple Devices and User Experience - 2',
+                        'Web and Artificial Intelligence - 2',
+                        'Advanced Networks and Operating Systems Security - 2',
+                        'Cloud Virtualization and Communications - 2',
+                        'Enterprise Cloud and Distributed Web Applications - 2',
                         'Final Year Project',
                     ]
                 ],
@@ -288,41 +288,41 @@ class DatabaseSeeder extends Seeder
             'BSc (Hons) Cyber Security' => [
                 'Semester 1' => [
                     'Level 4' => [
-                        'Software Development and Application Modelling',
-                        'Digital Technologies',
-                        'Networking Concepts and Cyber Security',
-                        'Web Development and Operating Systems',
+                        'Software Development and Application Modelling - 1',
+                        'Digital Technologies - 1',
+                        'Networking Concepts and Cyber Security - 1',
+                        'Web Development and Operating Systems - 1',
                     ],
                     'Level 5' => [
-                        'Commercial Computing for Software Engineers',
-                        'Cyber Operations and Network Security',
-                        'Ethical Hacking',
-                        'Cyber Security',
+                        'Commercial Computing for Software Engineers - 1',
+                        'Cyber Operations and Network Security - 1',
+                        'Ethical Hacking - 1',
+                        'Cyber Security - 1',
                     ],
                     'Level 6' => [
-                        'IT Infrastructure Security',
-                        'Advanced Topics in Cyber Security',
-                        'Operating Systems Internals and Biometrics',
+                        'IT Infrastructure Security - 1',
+                        'Advanced Topics in Cyber Security - 1',
+                        'Operating Systems Internals and Biometrics - 1',
                         'Final Year Project',
                     ]
                 ],
                 'Semester 2' => [
                     'Level 4' => [
-                        'Software Development and Application Modelling',
-                        'Digital Technologies',
-                        'Networking Concepts and Cyber Security',
-                        'Web Development and Operating Systems',
+                        'Software Development and Application Modelling - 2',
+                        'Digital Technologies - 2',
+                        'Networking Concepts and Cyber Security - 2',
+                        'Web Development and Operating Systems - 2',
                     ],
                     'Level 5' => [
-                        'Commercial Computing for Software Engineers',
-                        'Cyber Operations and Network Security',
-                        'Ethical Hacking',
-                        'Cyber Security',
+                        'Commercial Computing for Software Engineers - 2',
+                        'Cyber Operations and Network Security - 2',
+                        'Ethical Hacking - 2',
+                        'Cyber Security - 2',
                     ],
                     'Level 6' => [
-                        'IT Infrastructure Security',
-                        'Advanced Topics in Cyber Security',
-                        'Operating Systems Internals and Biometrics',
+                        'IT Infrastructure Security - 2',
+                        'Advanced Topics in Cyber Security - 2',
+                        'Operating Systems Internals and Biometrics - 2',
                         'Final Year Project',
                     ]
                 ],

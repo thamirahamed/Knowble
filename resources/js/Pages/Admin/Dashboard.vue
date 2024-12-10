@@ -9,6 +9,7 @@ import { router } from '@inertiajs/vue3';
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import TutorVerificationModel from "@/Components/TutorVerificationModel.vue";
 import { ref } from "vue";
+import TutorDetailsModel from "@/Components/TutorDetailsModel.vue";
 
 const props = defineProps({
     users: Object, // Users data
@@ -19,7 +20,7 @@ const props = defineProps({
     levels: Object, // Levels data
     semesters: Object, // Semesters data
 });
-console.log(props.profiles);
+console.log(props.levels);
 // Filter tutors with status 'pending'
 const pendingTutors = computed(() => {
     return props.tutors
@@ -38,7 +39,7 @@ const pendingTutors = computed(() => {
                 name: user.name,
                 cbNumber: profile.cb_number,
                 course: degree.degree_name,
-                year: year.level,
+                year: year.level_name,
             };
         });
 });
@@ -47,11 +48,11 @@ const processedTutors = computed(() => {
     return props.tutors
         .filter(tutor => tutor.status === "approved" || tutor.status === "rejected")
         .map(tutor => {
+
             const user = props.users[tutor.user_id - 1] || {};
             const profile = Object.values(props.profiles).find(p => p.user_id === tutor.user_id) || {};
             const degree = props.degrees[profile.degree_id - 1] || {};
             const year = props.levels[profile.level_id - 1] || {};
-
             const formattedDate = tutor.created_at ? format(new Date(tutor.created_at), "dd/MM/yyyy") : "N/A";
 
             return {
@@ -60,7 +61,7 @@ const processedTutors = computed(() => {
                 name: user.name || "N/A",
                 cbNumber: profile.cb_number || "N/A",
                 course: degree.degree_name || "N/A",
-                year: year.level || "N/A",
+                year: year.level_name || "N/A",
                 status: tutor.status,
             };
         });
@@ -68,29 +69,14 @@ const processedTutors = computed(() => {
 const showModal = ref(false);
 const modalData = ref('');
 
-const openModal = async (id) => {
-    console.log('Opening modal for tutor:', id);
-    showModal.value = true;
+const TdshowModal = ref(false);
+const TdmodalData = ref('');
 
-    // // Find the tutor by ID
-    // const tutor = props.tutors.find(t => t.id === id);
-    //
-    // if (tutor) {
-    //     const user = props.users[tutor.user_id - 1] || {};
-    //     const profile = Object.values(props.profiles).find(p => p.user_id === tutor.user_id) || {};
-    //
-    //     // Pass the tutor's name and cbNumber to modalData
-    //     tutorName.value = user.name || "N/A";
-    //     tutorCBNumber.value = profile.cb_number || "N/A";
-    //
-    //     modalData.value = {
-    //         ...tutor, // Keep the other tutor details
-    //     };
-    // }
+const openModal = async (id) => {
+    showModal.value = true;
 
     try {
         const response = await axios.get(`/admin/data/${id}`);
-        console.log('Fetched data:', response.data);
         // Merge the response data with modalData but do not overwrite tutor-related information
         modalData.value = {
             ...modalData.value,
@@ -103,8 +89,30 @@ const openModal = async (id) => {
     }
 };
 
+const openTdModal = async (id) => {
+    TdshowModal.value = true;
+
+    try {
+        const response = await axios.get(`/admin/tutordata/${id}`);
+        // Merge the response data with modalData but do not overwrite tutor-related information
+        TdmodalData.value = {
+            ...TdmodalData.value,
+            ...response.data,
+        };
+        console.log(TdmodalData.value);
+
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        TdmodalData.value = { error: 'Failed to load data.' }; // Handle errors gracefully
+    }
+};
+
 const closeModal = () => {
     showModal.value = false;
+};
+
+const closeTdModal = () => {
+    TdshowModal.value = false;
 };
 // Approve Tutor
 const approveTutor = id => {
@@ -212,6 +220,7 @@ const deleteTutor = id => {
                         <th class="border-b font-semibold px-4 py-2 text-left">Course</th>
                         <th class="border-b font-semibold px-4 py-2 text-left">Year</th>
                         <th class="border-b font-semibold px-4 py-2 text-left">Status</th>
+                        <th class="border-b font-semibold px-4 py-2 text-left">Module</th>
                         <th class="border-b font-semibold px-4 py-2 text-left">Delete</th>
                     </tr>
                     </thead>
@@ -228,7 +237,24 @@ const deleteTutor = id => {
                                  {{ tutor.status }}
                              </span>
                         </td>
-
+                        <td class="border-b px-4 py-2">
+                            <template v-if="tutor.status === 'approved'">
+                                <button @click="openTdModal(tutor.id)" class="text-blue-500 hover:text-blue-700 justify-center">
+                                    View
+                                </button>
+                            </template>
+                            <template v-else>
+                                No Modules
+                            </template>
+                        </td>
+                        <TutorDetailsModel
+                            :is-visible="TdshowModal"
+                            :modal-data="TdmodalData"
+                            :name="tutor.name"
+                            :cbnumber="tutor.cbNumber"
+                            :tutorid="tutor.id"
+                            @close="closeTdModal"
+                        />
                         <td class="border-b px-4 py-2">
                             <button class="text-red-500 hover:text-red-700 underline" @click="deleteTutor(tutor.id)">Delete</button>
                         </td>

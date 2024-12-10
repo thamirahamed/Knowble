@@ -36,10 +36,7 @@ class AdminVerificationController extends Controller
         return Inertia::render(route('profile.show'));
     }
 
-    public function tutorDashboard()
-    {
-        return Inertia::render('Tutor/Dashboard');
-    }
+
 
     public function adminDashboard()
     {
@@ -64,12 +61,14 @@ class AdminVerificationController extends Controller
         );
     }
 
-    public function approveTutor($subjectId, Request $request)
+    public function approveTutor(Request $request)
     {
         $tutor_id = $request->tutor_id;
+        $subjectId = $request->subject_ids;
         $tutor = Tutor::find($tutor_id);
         $tutor->status = 'approved';
         $tutor->save();
+
 
         $tutor->approvedModules()->attach($subjectId);
 
@@ -83,14 +82,20 @@ class AdminVerificationController extends Controller
     public function rejectTutor(Request $request)
     {
 
+
         $tutor = Tutor::find($request['tutor_id']);
 
         if ($tutor) {
-            $tutor->rejectedModules()->attach($request['module_ids']); // Attach all module IDs at once
-            return Inertia::render('Admin/Dashboard',
-                [
-                    'showModal' => false,
-                ]);
+            $modulesWithReason = [];
+
+            foreach ($request['module_ids'] as $moduleId) {
+                $modulesWithReason[$moduleId] = ['rejection_reason' => $request['reason']];
+            }
+
+            // Attach all module IDs with the reason
+            $tutor->rejectedModules()->attach($modulesWithReason);
+
+            return redirect()->route('admin.dashboard');
         }
 
         return redirect()->back()->with('error' , 404);
@@ -140,6 +145,35 @@ class AdminVerificationController extends Controller
         }
 
         return response()->json($modules);
+
+    }
+
+    public function tutordata($id)
+    {
+        $tutor = Tutor::find($id);
+
+        $approvedModules = $tutor->approvedModules()->get();
+        $rejectedModules = $tutor->rejectedModules()->get();
+
+        return response()->json([
+            'approvedModules' => $approvedModules,
+            'rejectedModules' => $rejectedModules
+        ]);
+    }
+
+    public function singleModule($module_id)
+    {
+
+
+    }
+
+    public function rejectTutorFully($id)
+    {
+        $tutor = Tutor::find($id);
+        $tutor->status = 'rejected';
+        $tutor->save();
+
+        return redirect()->route('admin.dashboard');
 
     }
 

@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminVerificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\TutorController;
 use App\Models\Tutor;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -68,13 +69,14 @@ Route::middleware(['auth','adminportal'])->group(function () {
 
 Route::middleware(['auth'])->group(function (){
     // Approve tutor
-    Route::post('/approve-tutor/{subjectId}', [AdminVerificationController::class, 'approveTutor'])->name('approve.tutor');
+    Route::post('/approve-tutor', [AdminVerificationController::class, 'approveTutor'])->name('approve.tutor');
     // Reject tutor
     Route::post('/reject-tutor', [AdminVerificationController::class, 'rejectTutor'])->name('reject.tutor');
     // Delete tutor
     Route::delete('/tutors/{id}', [AdminVerificationController::class, 'deleteTutor'])->name('delete.tutor');
     Route::get('admin/data/{id}',[AdminVerificationController::class, 'getData'])->name('tutor.data');
-
+    Route::post('/reject-tutor/{id}', [AdminVerificationController::class, 'rejectTutorFully'])->name('reject.tutor.full');
+    Route::get('/admin/tutordata/{id}', [AdminVerificationController::class, 'tutordata'])->name('get.tutor.data');
 });
 //chat
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -85,11 +87,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/api/chat/messages/{chatId}', [ChatController::class, 'getMessages']);
 
+    Route::prefix('tutor')->group(function () {
+        Route::get('/dashboard',[TutorController::class, 'index'])->name('tutor.dashboard');
+    });
+
 });
 // Admin Verification
 Route::middleware(['auth' ,'studentportal'])->group(function () {
     Route::get('/admin/request',[AdminVerificationController::class, 'index'])->name('admin.tutor.request');
-    Route::get('/tutor/dashboard',[AdminVerificationController::class, 'tutorDashboard'])->name('tutor.dashboard');
+    Route::post('/admin/request/{module_id}',[AdminVerificationController::class, 'singleModule'])->name('admin.tutor.single.request');
+
 });
 
 

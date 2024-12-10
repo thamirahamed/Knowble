@@ -10,12 +10,12 @@
         <link rel="apple-touch-icon" sizes="180x180" href="/images/webmanifest/apple-touch-icon.png" />
         <meta name="apple-mobile-web-app-title" content="Knowble" />
         <link rel="manifest" href="/images/webmanifest/manifest.json" />
-
+        <meta name="csrf-token" content="{{ csrf_token() }}">
         <title inertia>{{ config('app.name', 'Laravel') }}</title>
 
         <!-- Fonts -->
         <link href="https://api.fontshare.com/v2/css?f[]=satoshi@1&f[]=clash-display@1&display=swap" rel="stylesheet">
-        <link href="https://api.fontshare.com/v2/css?f[]=expose@1&display=swap" rel="stylesheet"> 
+        <link href="https://api.fontshare.com/v2/css?f[]=expose@1&display=swap" rel="stylesheet">
 
         <!-- Scripts -->
         @routes

@@ -17,8 +17,8 @@ const confirmingTutorRequest = ref(false);
 const confirmTutorRequest = () => {
     confirmingTutorRequest.value = true;
 };
-const TutorRequest = () => {
-    router.visit(route("admin.tutor.request"))
+const TutorRequest = ($id) => {
+    router.post(route("admin.tutor.single.request", $id))
     closeModal()
     setTimeout(() => {
         location.reload();

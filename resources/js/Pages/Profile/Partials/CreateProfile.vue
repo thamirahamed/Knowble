@@ -55,7 +55,7 @@ const submitForm = () => {
                 <InputLabel for="School" value="School of Study" />
                 <select
                     id="school"
-                    class="cursor-pointer mt-1 block w-full text-lg shadow-sm border-gray-300 rounded-md hover:border-accent focus:border-transparent focus:outline-none focus:ring-2 focus:ring-accent"
+                    class="cursor-pointer mt-1 block w-full text-lg shadow-sm border-gray-300 rounded-md hover:border-slate-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-slate-500"
                     v-model="form.school"
                     required
                 >
@@ -72,7 +72,7 @@ const submitForm = () => {
                 <InputLabel for="degree_program" value="Degree Program" />
                 <select
                     id="degree_program"
-                    class="cursor-pointer mt-1 block w-full text-lg shadow-sm border-gray-300 rounded-md hover:border-accent focus:border-transparent focus:outline-none focus:ring-2 focus:ring-accent"
+                    class="cursor-pointer mt-1 block w-full text-lg shadow-sm border-gray-300 rounded-md hover:border-slate-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-slate-500"
                     v-model="form.degree"
                     required
                 >
@@ -92,7 +92,7 @@ const submitForm = () => {
                 <InputLabel for="level" value="Level" />
                 <select
                     id="level"
-                    class="cursor-pointer mt-1 block w-full text-lg shadow-sm border-gray-300 rounded-md hover:border-accent focus:border-transparent focus:outline-none focus:ring-2 focus:ring-accent"
+                    class="cursor-pointer mt-1 block w-full text-lg shadow-sm border-gray-300 rounded-md hover:border-slate-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-slate-500"
                     v-model="form.level"
                     required
                 >
@@ -113,7 +113,7 @@ const submitForm = () => {
                 <InputLabel for="semester" value="Semester" />
                 <select
                     id="semester"
-                    class="cursor-pointer mt-1 block w-full text-lg shadow-sm border-gray-300 rounded-md hover:border-accent focus:border-transparent focus:outline-none focus:ring-2 focus:ring-accent"
+                    class="cursor-pointer mt-1 block w-full text-lg shadow-sm border-gray-300 rounded-md hover:border-slate-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-slate-500"
                     v-model="form.semester"
                     required
                 >

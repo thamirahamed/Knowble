@@ -37,11 +37,11 @@ const submit = () => {
                 Login
             </h1>
         </div>
-        <div v-if="status" class="mb-4 text-sm font-medium text-green-600">
+        <div v-if="status" class="mt-2 text-sm font-medium text-green-600">
             {{ status }}
         </div>
 
-        <form @submit.prevent="submit" class="text-lg text-primary">
+        <form @submit.prevent="submit" class="text-primary">
             <div class="my-6">
                 <InputLabel for="email" value="Email" />
 
@@ -99,7 +99,7 @@ const submit = () => {
                     Login
                 </PrimaryButton>
 
-                <span class="text-gray-900">
+                <span class="text-gray-900 text-lg">
                     Don't have an account,
                     <Link
                         :href="route('register')"

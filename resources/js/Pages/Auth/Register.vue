@@ -30,7 +30,7 @@ const submit = () => {
             </h1>
         </div>
 
-        <form @submit.prevent="submit" class="text-lg">
+        <form @submit.prevent="submit">
             <div class="my-6">
                 <InputLabel for="name" value="Name" />
 

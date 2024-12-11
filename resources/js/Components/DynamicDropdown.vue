@@ -53,7 +53,7 @@ watch(selectedValue, (newValue) => {
         <select
             :id="id"
             v-model="selectedValue"
-            class="cursor-pointer mt-1 block w-full text-lg shadow-sm border-gray-300 rounded-md hover:border-accent focus:border-transparent focus:outline-none focus:ring-2 focus:ring-accent"
+            class="cursor-pointer mt-1 block w-full text-lg shadow-sm border-gray-300 rounded-md hover:border-slate-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-accent"
         >
             <option disabled value="">Select {{ label }}</option>
             <option

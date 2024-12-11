@@ -7,6 +7,7 @@ import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import DynamicDropdown from "@/Components/DynamicDropdown.vue";
 import DangerButton from "@/Components/DangerButton.vue";
+import { ArrowUpTrayIcon, TrashIcon } from '@heroicons/vue/24/solid'
 
 // Access profile from props or usePage()
 const props = defineProps({
@@ -106,10 +107,11 @@ const removeProfilePic = async () => {
 
     <section>
         <header>
-            <h2 class="text-xl font-medium text-gray-900">
+            <h2 class="text-lg font-medium text-gray-900">
                 Profile Information
             </h2>
-            <p class="mt-1 text-lg text-gray-600">
+            
+            <p class=" text-base text-gray-600">
                 Update your account's profile information, email address, and more.
             </p>
         </header>
@@ -125,7 +127,7 @@ const removeProfilePic = async () => {
                         <img :src="profilePicPreview" alt="Profile Picture" class="w-80 h-80 aspect-square rounded-full object-cover" />
                     </div>
                     <InputError class="mt-2" :message="form.errors.profile_pic" />
-                    <div class="flex items-baseline justify-between">
+                    <div class="flex items-center justify-between">
                         <input
                             type="file"
                             id="profile_pic"
@@ -136,17 +138,22 @@ const removeProfilePic = async () => {
                         <!-- Custom button styled as a label -->
                         <label
                             for="profile_pic"
-                            class="cursor-pointer rounded-lg bg-accent px-5 py-2.5 text-center font-semibold tracking-wide text-white transition-all duration-200 ease-in-out hover:bg-accentdark hover:tracking-wider hover:shadow-[5px_5px_rgba(0,_98,_90,_0.4),_10px_10px_rgba(0,_98,_90,_0.3),_15px_15px_rgba(0,_98,_90,_0.2)] focus:outline-none focus:ring-2 focus:ring-accent w-fit"
+                            class="cursor-pointer rounded-lg bg-accent px-5 py-2.5 text-center font-semibold tracking-wide text-white relative z-0 overflow-hidden transition-all duration-200 after:absolute after:inset-0 after:-z-10 after:translate-x-[-150%] after:translate-y-[150%] after:scale-[2.5] after:rounded-[100%] after:bg-gradient-to-l from-accentdark after:transition-transform after:duration-550  hover:after:translate-x-[0%] hover:after:translate-y-[0%]"
                         >
-                            Upload Picture
+                            Upload
                         </label>
                         <DangerButton
                             v-if="profilePicPreview"
                             type="button"
                             @click="removeProfilePic"
                             class="w-fit"
+                            :icon="true" 
+                            iconPlacement="left"
                         >
-                            Remove
+                            <template #icon>
+                                <TrashIcon class="h-5 w-5 text-white" />
+                            </template>
+                            Remove  
                         </DangerButton>
                     </div>
                 </div>
@@ -230,7 +237,7 @@ const removeProfilePic = async () => {
 
             <!-- Save Button -->
             <div class="flex items-center px-10 w-full justify-end">
-                <PrimaryButton :disabled="form.processing">Save</PrimaryButton>
+                <PrimaryButton class="flex gap-1 items-center" :disabled="form.processing">Save</PrimaryButton>
                 <Transition
                     enter-active-class="transition ease-in-out"
                     enter-from-class="opacity-0"

@@ -23,6 +23,9 @@ export default {
                 accent: "#1b8f67",
                 accentdark: "#136b4d",
             },
+            transitionDuration: {
+                '550': '550ms',
+            }
         },
     },
 

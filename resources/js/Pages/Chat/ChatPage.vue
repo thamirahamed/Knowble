@@ -6,6 +6,7 @@ import { Head } from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import TextInput from "@/Components/TextInput.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
+import { ArrowUpRightIcon, MagnifyingGlassIcon } from "@heroicons/vue/24/solid";
 
 const props = defineProps({
     users: Array,
@@ -160,7 +161,7 @@ onBeforeUnmount(() => {
                             v-model="searchQuery"
                             type="text"
                             placeholder="Search users..."
-                            class="!text-md w-full rounded-lg border p-2"
+                            class=" w-full p-2 !text-base"
                         />
                     </div>
 
@@ -240,7 +241,7 @@ onBeforeUnmount(() => {
                                 <PrimaryButton
                                     @click="sendMessage"
                                 >
-                                    Send
+                                    <ArrowUpRightIcon class="w-6 font-bold" />
                                 </PrimaryButton>
                             </div>
                         </div>

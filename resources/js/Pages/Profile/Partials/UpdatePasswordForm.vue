@@ -36,9 +36,9 @@ const updatePassword = () => {
 <template>
     <section>
         <header>
-            <h2 class="text-xl font-medium text-gray-900">Update Password</h2>
+            <h2 class="text-lg font-medium text-gray-900">Update Password</h2>
 
-            <p class="mt-1 text-lg text-gray-600">
+            <p class="text-base text-gray-600">
                 Ensure your account is safe using a long, random password to stay
                 secure.
             </p>
@@ -47,7 +47,7 @@ const updatePassword = () => {
         <form @submit.prevent="updatePassword" class="mt-6 flex flex-col gap-6">
             <div class="flex flex-wrap gap-16 px-10">
                 <div class="flex flex-1 flex-col">
-                    <InputLabel for="current_password" value="Current Password" />
+                    <InputLabel for="current_password" value="Current Password"/>
 
                     <TextInput
                         id="current_password"

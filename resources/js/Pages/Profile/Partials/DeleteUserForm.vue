@@ -7,6 +7,7 @@ import SecondaryButton from "@/Components/SecondaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
 import { useForm } from "@inertiajs/vue3";
 import { nextTick, ref } from "vue";
+import { TrashIcon } from "@heroicons/vue/24/solid";
 
 const confirmingUserDeletion = ref(false);
 const passwordInput = ref(null);
@@ -41,23 +42,32 @@ const closeModal = () => {
 <template>
     <section class="space-y-6">
         <header>
-            <h2 class="text-xl font-medium text-gray-900">Delete Account</h2>
+            <h2 class="text-lg font-medium text-gray-900">Delete Account</h2>
 
-            <p class="mt-1 text-lg text-gray-600">
+            <p class="text-base text-gray-600">
                 Once your account is deleted, all of its resources and data will
                 be permanently deleted.
             </p>
         </header>
 
-        <DangerButton @click="confirmUserDeletion">Delete Account</DangerButton>
+        <DangerButton
+            @click="confirmUserDeletion"
+            :icon="true" 
+            iconPlacement="left"
+        >
+            <template #icon>
+                <TrashIcon class="h-5 w-5 text-white" />
+            </template>
+            Delete Account  
+        </DangerButton>
 
         <Modal :show="confirmingUserDeletion" @close="closeModal">
             <div class="p-6">
-                <h2 class="text-xl font-medium text-gray-900">
+                <h2 class="text-lg font-medium text-gray-900">
                     Are you sure you want to delete your account?
                 </h2>
 
-                <p class="mt-1 text-md text-gray-600">
+                <p class="text-base text-gray-600">
                     Once your account is deleted, all of its resources and data
                     will be permanently deleted. Please enter your password to
                     confirm you would like to permanently delete your account.
@@ -75,7 +85,7 @@ const closeModal = () => {
                         ref="passwordInput"
                         v-model="form.password"
                         type="password"
-                        class="mt-1 block w-3/4"
+                        class="mt-1 block w-3/4 text-lg"
                         placeholder="Password"
                         @keyup.enter="deleteUser"
                     />
@@ -89,11 +99,15 @@ const closeModal = () => {
                     </SecondaryButton>
 
                     <DangerButton
-                        class=""
                         :class="{ 'opacity-25': form.processing }"
                         :disabled="form.processing"
                         @click="deleteUser"
+                        :icon="true" 
+                        iconPlacement="left"
                     >
+                        <template #icon>
+                            <TrashIcon class="h-5 w-5 text-white" />
+                        </template>
                         Delete Account
                     </DangerButton>
                 </div>

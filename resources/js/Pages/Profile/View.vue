@@ -37,7 +37,7 @@ const props = defineProps({
                     <div class="flex justify-end">
                         <a 
                             :href="route('profile.edit')" 
-                            class="rounded-lg bg-accent px-5 py-2.5 text-center font-semibold tracking-wide text-white transition-all duration-200 ease-in-out hover:bg-accentdark hover:tracking-wider hover:shadow-[5px_5px_rgba(0,_98,_90,_0.4),_10px_10px_rgba(0,_98,_90,_0.3),_15px_15px_rgba(0,_98,_90,_0.2)] focus:outline-none focus:ring-2 focus:ring-accent"
+                            class="rounded-lg bg-accent px-5 py-2.5 text-center font-semibold tracking-wide text-white relative z-0 overflow-hidden transition-all duration-200 after:absolute after:inset-0 after:-z-10 after:translate-x-[-150%] after:translate-y-[150%] after:scale-[2.5] after:rounded-[100%] after:bg-gradient-to-l from-accentdark after:transition-transform after:duration-550  hover:after:translate-x-[0%] hover:after:translate-y-[0%]"
                         >
                             Edit Profile
                         </a>

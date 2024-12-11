@@ -94,7 +94,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 // Admin Verification
 Route::middleware(['auth' ,'studentportal'])->group(function () {
-    Route::get('/admin/request',[AdminVerificationController::class, 'index'])->name('admin.tutor.request');
+    Route::post('/admin/request',[AdminVerificationController::class, 'index'])->name('admin.tutor.request');
     Route::post('/admin/request/{module_id}',[AdminVerificationController::class, 'singleModule'])->name('admin.tutor.single.request');
 
 });

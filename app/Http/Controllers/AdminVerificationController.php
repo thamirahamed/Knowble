@@ -155,6 +155,8 @@ class AdminVerificationController extends Controller
         $approvedModules = $tutor->approvedModules()->get();
         $rejectedModules = $tutor->rejectedModules()->get();
 
+
+        dd($rejectedModules);
         return response()->json([
             'approvedModules' => $approvedModules,
             'rejectedModules' => $rejectedModules

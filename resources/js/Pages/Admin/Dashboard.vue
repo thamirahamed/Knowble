@@ -247,21 +247,23 @@ const deleteTutor = id => {
                                 No Modules
                             </template>
                         </td>
-                        <TutorDetailsModel
-                            :is-visible="TdshowModal"
-                            :modal-data="TdmodalData"
-                            :name="tutor.name"
-                            :cbnumber="tutor.cbNumber"
-                            :tutorid="tutor.id"
-                            @close="closeTdModal"
-                        />
                         <td class="border-b px-4 py-2">
                             <button class="text-red-500 hover:text-red-700 underline" @click="deleteTutor(tutor.id)">Delete</button>
                         </td>
                     </tr>
-                    </tbody>
-                </table>
-            </div>
+                </tbody>
+            </table>
+        </div>
+        <div v-for="(tutor, index) in processedTutors" :key="tutor.id">
+            <TutorDetailsModel
+                :is-visible="TdshowModal"
+                :modal-data="TdmodalData"
+                :name="tutor.name"
+                :cbnumber="tutor.cbNumber"
+                :tutorid="tutor.id"
+                @close="closeTdModal"
+            />
+        </div>
         </div>
     </AdminLayout>
 </template>

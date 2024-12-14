@@ -189,7 +189,7 @@ const removeProfilePic = async () => {
 
                     <!-- School Dropdown -->
                     <div>
-                        <InputLabel for="school"/>
+                        <InputLabel for="school" value="School of Study"/>
                         <DynamicDropdown
                             label="School of Study"
                             id="school"
@@ -201,7 +201,7 @@ const removeProfilePic = async () => {
 
                     <!-- Degree Dropdown -->
                     <div>
-                        <InputLabel for="degree" />
+                        <InputLabel for="degree" value="Degree Program"/>
                         <DynamicDropdown
                             label="Degree Program"
                             id="degree"
@@ -212,7 +212,7 @@ const removeProfilePic = async () => {
                     </div>
                     <!-- Level Dropdown -->
                     <div>
-                        <InputLabel for="level" />
+                        <InputLabel for="level" value="Level"/>
                         <DynamicDropdown
                             label="Level"
                             id="level"
@@ -223,7 +223,7 @@ const removeProfilePic = async () => {
                     </div>
                     <!-- Semester Dropdown -->
                     <div>
-                        <InputLabel for="semester" />
+                        <InputLabel for="semester" value="Semester"/>
                         <DynamicDropdown
                             label="Semester"
                             id="semester"

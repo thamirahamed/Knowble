@@ -1,6 +1,25 @@
 <script setup>
+import DynamicDropdown from "@/Components/DynamicDropdown.vue";
+import TextInput from "@/Components/TextInput.vue";
+import TutorCard from "@/Components/TutorCard.vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head } from "@inertiajs/vue3";
+import { ref } from "vue";
+
+// Define the state for the selected value
+const selectedModule = ref("");
+
+// Define options for the dropdown
+const modules = [
+    { id: 1, module_name: "Software Development and Application Modelling 1" },
+    { id: 2, module_name: "Digital Technologies 1" },
+    { id: 3, module_name: "Web Development and Operating Systems 1" },
+    { id: 4, module_name: "Networking Concepts and Cyber Security 1" },
+];
+
+// Error message for validation
+const moduleError = ref("");
+
 </script>
 
 <template>
@@ -8,10 +27,43 @@ import { Head } from "@inertiajs/vue3";
 
     <AuthenticatedLayout>
 
-        <div class="py-12">
-            <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-                    <div class="p-6 text-gray-900">You're logged in!</div>
+        <div class="pt-12 flex justify-center">
+            <div class="container flex flex-col lg:flex-row gap-10 h-auto">
+                
+                <!-- Tutor Listings -->
+                <div class="flex flex-col flex-1 bg-white rounded-md shadow-sm py-6 px-8 gap-5 max-h-[85vh]" >
+                    <div class="flex flex-col gap-2">
+                        <h1 class="text-xl font-semibold">Tutors</h1>
+                        <DynamicDropdown
+                            label="Module"
+                            id="module-dropdown"
+                            :options="modules"
+                            v-model="selectedModule"
+                            :error="moduleError"
+                        />
+                        <TextInput
+                            id="searchTutor"
+                            type="text"
+                            class="mt-1 block w-full"
+                            placeholder="Search Tutor"
+                        />
+                    </div>
+                    <div class="flex flex-col overflow-y-auto gap-2">
+                        <TutorCard />
+                        <TutorCard />
+                        <TutorCard />
+                        <TutorCard />
+                        <TutorCard />
+                        <TutorCard />
+                        <TutorCard />
+                        <TutorCard />
+                        <TutorCard />
+                    </div>
+                </div>
+
+                <!-- Upcoming Sessions -->
+                <div class="flex flex-1 bg-white rounded-md shadow-sm py-2 px-4 max-w-[30rem]">
+                    <h1>Upcoming Sessions</h1>
                 </div>
             </div>
         </div>

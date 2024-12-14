@@ -1,6 +1,5 @@
 <script setup>
 import { ref, watch } from "vue";
-import InputLabel from "@/Components/InputLabel.vue";
 
 const props = defineProps({
     label: {
@@ -47,21 +46,25 @@ watch(selectedValue, (newValue) => {
 <template>
     <div>
         <!-- Label -->
-        <InputLabel :for="id" :value="label" />
+        <!-- <InputLabel :for="id" :value="label" /> -->
 
         <!-- Dropdown -->
         <select
             :id="id"
             v-model="selectedValue"
-            class="cursor-pointer mt-1 block w-full text-lg shadow-sm border-gray-300 rounded-md hover:border-slate-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-accent"
+            :class="[
+                'cursor-pointer mt-1 block w-full text-lg shadow-sm border-gray-300 rounded-md hover:border-slate-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-slate-500',
+                selectedValue === '' ? 'text-gray-500' : 'text-black'
+            ]"
         >
-            <option disabled value="">Select {{ label }}</option>
+            <option disabled value="" >Select {{ label }}</option>
             <option
                 v-for="option in options"
                 :key="option.id"
                 :value="option.id"
+                class="text-black"
             >
-                {{ option.level_name || option.degree_name || option.school_name || option.semester_name }}
+                {{ option.level_name || option.degree_name || option.school_name || option.semester_name || option.module_name}}
             </option>
         </select>
 

@@ -37,8 +37,8 @@ const closeModal = () => {
             <nav class="border-b border-gray-100 bg-white">
                 <!-- Primary Navigation Menu -->
                 <div class="w-full px-4 sm:px-6 lg:px-8 flex justify-center">
-                    <div class=" container flex h-16 justify-between">
-                        <div class="flex align-baseline">
+                    <div class="container flex h-14 justify-between">
+                        <div class="flex">
                             <!-- Logo -->
                             <div class="flex shrink-0 items-center">
                                 <Link :href="route('dashboard')">
@@ -50,7 +50,7 @@ const closeModal = () => {
 
                             <!-- Navigation Links -->
                             <div
-                                class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex"
+                                class="hidden sm:-my-px sm:ms-10 sm:flex"
                             >
                                 <NavLink
                                     :href="route('dashboard')"
@@ -286,11 +286,11 @@ const closeModal = () => {
             </nav>
 
             <!-- Page Heading -->
-            <header class="bg-white shadow" v-if="$slots.header">
+            <!-- <header class="bg-white shadow" v-if="$slots.header">
                 <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
                     <slot name="header" />
                 </div>
-            </header>
+            </header> -->
 
             <!-- Page Content -->
             <main>

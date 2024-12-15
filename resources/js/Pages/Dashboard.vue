@@ -27,11 +27,11 @@ const moduleError = ref("");
 
     <AuthenticatedLayout>
 
-        <div class="pt-12 flex justify-center">
-            <div class="container flex flex-col lg:flex-row gap-10 h-auto">
+        <div class="pt-8 flex justify-center">
+            <div class="container flex flex-col lg:flex-row gap-10 h-[85vh]">
                 
                 <!-- Tutor Listings -->
-                <div class="flex flex-col flex-1 bg-white rounded-md shadow-sm py-6 px-8 gap-5 max-h-[85vh]" >
+                <div class="flex flex-col flex-1 bg-white rounded-md shadow-sm py-6 px-8 gap-5 " >
                     <div class="flex flex-col gap-2">
                         <h1 class="text-xl font-semibold">Tutors</h1>
                         <DynamicDropdown

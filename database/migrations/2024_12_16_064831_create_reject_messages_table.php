@@ -11,8 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('tutor_modules_rejected', function (Blueprint $table) {
-            $table->string('rejection_reason')->nullable();
+        Schema::create('reject_messages', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('tutor_id')->constrained();
+            $table->string('message');
+            $table->timestamps();
         });
     }
 
@@ -21,8 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('tutor_rejection', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('reject_message');
     }
 };

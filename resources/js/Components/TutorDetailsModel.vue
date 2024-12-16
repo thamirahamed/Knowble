@@ -63,7 +63,6 @@ const closeTdModal = () => {
                     <ul>
                         <li class="my-1" v-for="module in props.modalData.rejectedModules" :key="module.id">
                             {{ module.module_name }}
-                            <p>{{ module.rejection_reason }}</p>
                         </li>
                     </ul>
                 </div>

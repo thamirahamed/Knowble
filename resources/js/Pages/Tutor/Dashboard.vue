@@ -17,6 +17,10 @@ const props = defineProps({
         type: Array,
         required: true,
     },
+    rejectedReason: {
+        type: Object,
+        required: true,
+    }
 });
 
 const TutorRequest = (id) => {
@@ -47,7 +51,7 @@ const TutorRequest = (id) => {
                             </SidebarLink>
                         </li>
                         <li>
-                            <SidebarLink 
+                            <SidebarLink
                                 @click.prevent="activeContent = 'Sessions'"
                                 :active="activeContent === 'Sessions'"
                             >
@@ -95,14 +99,14 @@ const TutorRequest = (id) => {
                             </div>
                             <div class="mb-4">
                                 <h1 class="text-xl font-semibold">Reason for Rejection</h1>
-                                
+                                <p class="text-gray-700 text-lg">{{props.rejectedReason.message}}</p>
                             </div>
                         </div>
                     </template>
 
                     <template v-else-if="activeContent === 'Sessions'">
                         <h1 class="text-2xl font-semibold">Sessions</h1>
-                        
+
                     </template>
                 </div>
             </div>

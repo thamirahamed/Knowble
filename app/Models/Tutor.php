@@ -24,5 +24,8 @@ class Tutor extends Model
         return $this->belongsToMany(Module::class, 'tutor_modules_rejected', 'tutor_id', 'module_id');
     }
 
-
+    public function rejectMessage()
+    {
+        return $this->hasOne(RejectMessage::class);
+    }
 }

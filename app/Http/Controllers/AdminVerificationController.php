@@ -85,24 +85,21 @@ class AdminVerificationController extends Controller
 
         $tutor = Tutor::find($request['tutor_id']);
 
-        if ($tutor) {
-            $modulesWithReason = [];
+        $tutor->status = 'rejected';
+        $tutor->rejectedModules()->attach($request['module_ids']);
 
-            foreach ($request['module_ids'] as $moduleId) {
-                $modulesWithReason[$moduleId] = ['rejection_reason' => $request['reason']];
-            }
-
-            // Attach all module IDs with the reason
-            $tutor->rejectedModules()->attach($modulesWithReason);
-
-            return redirect()->route('admin.dashboard');
-        }
+        $tutor->rejectMessage()->create([
+            'message' => $request['reason']
+        ]);
 
         return redirect()->back()->with('error' , 404);
     }
     public function deleteTutor($id)
     {
         $tutor = Tutor::find($id);
+        $tutor->approvedModules()->detach();
+        $tutor->rejectedModules()->detach();
+        $tutor->rejectMessage()->delete();
         $tutor->delete();
 
         return redirect()->route('admin.dashboard');
@@ -143,6 +140,30 @@ class AdminVerificationController extends Controller
                 $modules[] = [$levelname => $subjects];
             }
         }
+        for ($i =1; $i < $semesterid; $i++) {
+            $levelname = Level::where('id', $levelid)->first()->level_name;
+            $subjects = [];
+
+                $module = Module::where('level_id', $levelid)
+                    ->where('degree_program_id', $degreeid)
+                    ->where('semester_id', $i)
+                    ->get();
+
+                $semestername = Semester::where('id', $i)->first()->semester_name;
+                $sub = []; // Initialize as an empty array
+
+                foreach ($module as $mod) {
+                    $sub[] = $mod; // Add module names
+                }
+
+                if (!empty($sub)) { // Only include non-empty semester data
+                    $subjects[] = [$semestername => $sub];
+                }
+
+            if (!empty($subjects)) { // Only include non-empty level data
+                $modules[] = [$levelname => $subjects];
+            }
+        }
 
         return response()->json($modules);
 
@@ -156,7 +177,6 @@ class AdminVerificationController extends Controller
         $rejectedModules = $tutor->rejectedModules()->get();
 
 
-        dd($rejectedModules);
         return response()->json([
             'approvedModules' => $approvedModules,
             'rejectedModules' => $rejectedModules

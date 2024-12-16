@@ -19,10 +19,12 @@ class TutorController extends Controller
 
         $approvedModules = $tutor->approvedModules()->get();
         $rejectedModules = $tutor->rejectedModules()->get();
+        $rejectedReason = $tutor->rejectMessage()->first();
         return Inertia::render('Tutor/Dashboard',
         [
             'approvedModules' => $approvedModules,
-            'rejectedModules' => $rejectedModules
+            'rejectedModules' => $rejectedModules,
+            'rejectedReason' => $rejectedReason
         ]);
     }
 }

@@ -68,6 +68,7 @@ const closeModal = () => {
                                     <NavLink
                                         :href="route('tutor.dashboard')"
                                         :active="route().current('tutor.dashboard')"
+                                        id="tutorDashboard"
                                     >
                                         Tutor Dashboard
                                     </NavLink>
@@ -80,8 +81,9 @@ const closeModal = () => {
                             <div class="relative ms-3">
                                 <Dropdown align="right" width="48">
                                     <template #trigger>
-                                        <span class="inline-flex rounded-md">
+                                        <span id="profileDropdownMenu" class="inline-flex rounded-md">
                                             <button
+                                                
                                                 type="button"
                                                 class="inline-flex align-baseline rounded-md border border-transparent bg-white px-3 py-2 text-lg font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none"
                                             >
@@ -112,19 +114,19 @@ const closeModal = () => {
 
                                         <!-- Tutor Status -->
                                         <template v-if="tutor === null">
-                                            <button class="block w-full px-4 py-2 text-start text-sm leading-5 text-gray-700 transition duration-150 ease-in-out hover:bg-gray-100 focus:bg-gray-100 focus:outline-none" @click="confirmTutorRequest">
+                                            <button id="requestTutor" class="block w-full px-4 py-2 text-start text-sm leading-5 text-gray-700 transition duration-150 ease-in-out hover:bg-gray-100 focus:bg-gray-100 focus:outline-none" @click="confirmTutorRequest">
                                                 Request to be a Tutor
                                             </button>
                                         </template>
 
                                         <template v-if="tutor === 'pending'">
-                                            <DropdownLink class="pointer-events-none !text-gray-400">
+                                            <DropdownLink id="requestSent" class="pointer-events-none !text-gray-400">
                                                 Tutor Request Sent
                                             </DropdownLink>
                                         </template>
 
                                         <template v-else-if="tutor === 'rejected'">
-                                            <DropdownLink class="pointer-events-none !text-red-400">
+                                            <DropdownLink id="requestRejected" class="pointer-events-none !text-red-400">
                                                 Tutor Request Rejected
                                             </DropdownLink>
                                         </template>
@@ -133,6 +135,7 @@ const closeModal = () => {
                                             :href="route('logout')"
                                             method="post"
                                             as="button"
+                                            id="logoutBtn"
                                         >
                                             Log Out
                                         </DropdownLink>
@@ -202,6 +205,7 @@ const closeModal = () => {
 
                             <PrimaryButton
                                 @click="TutorRequest"
+                                id="confirmTutorRequest"
                             >
                                 Send Request
                             </PrimaryButton>
@@ -234,6 +238,7 @@ const closeModal = () => {
                             <ResponsiveNavLink
                                 :href="route('tutor.dashboard')"
                                 :active="route().current('tutor.dashboard')"
+                                id="tutorDashboard"
                             >
                                 Tutor Dashboard
                             </ResponsiveNavLink>
@@ -257,19 +262,19 @@ const closeModal = () => {
                             </ResponsiveNavLink>
                             <!-- Tutor Status -->
                             <template v-if="tutor === null">
-                                <button class="block w-full ps-3 pe-4 py-2 border-l-4 border-transparent text-start text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 focus:outline-none focus:text-gray-800 focus:bg-gray-50 focus:border-gray-300 transition duration-150 ease-in-out" @click="confirmTutorRequest">
+                                <button id="requestTutor" class="block w-full ps-3 pe-4 py-2 border-l-4 border-transparent text-start text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 focus:outline-none focus:text-gray-800 focus:bg-gray-50 focus:border-gray-300 transition duration-150 ease-in-out" @click="confirmTutorRequest">
                                     Request to be a Tutor
                                 </button>
                             </template>
 
                             <template v-if="tutor === 'pending'">
-                                <ResponsiveNavLink class="pointer-events-none !text-gray-400">
+                                <ResponsiveNavLink id="requestSent" class="pointer-events-none !text-gray-400">
                                     Tutor Request Sent
                                 </ResponsiveNavLink>
                             </template>
 
                             <template v-else-if="tutor === 'rejected'">
-                                <ResponsiveNavLink class="pointer-events-none !text-red-400">
+                                <ResponsiveNavLink id="requestRejected" class="pointer-events-none !text-red-400">
                                     Tutor Request Rejected
                                 </ResponsiveNavLink>
                             </template>

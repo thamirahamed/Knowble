@@ -114,6 +114,7 @@ const closeModal = () => {
 const closeTdModal = () => {
     TdshowModal.value = false;
 };
+
 // Approve Tutor
 const approveTutor = id => {
     router.post(`/approve-tutor/${id}`, {}, {
@@ -185,15 +186,6 @@ const deleteTutor = id => {
                                 Reject
                             </DangerButton>
                         </td>
-                        <TutorVerificationModel
-                            :is-visible="showModal"
-                            :modal-data="modalData"
-                            :name="tutor.name"
-                            :cbnumber="tutor.cbNumber"
-                            :tutorid="tutor.id"
-                            @close="closeModal"
-                        />
-
                         <td class="border-b px-4 py-2">
                             <button @click="deleteTutor(tutor.id)" class="text-red-500 hover:text-red-700 underline">
                                 Delete
@@ -202,6 +194,17 @@ const deleteTutor = id => {
                     </tr>
                     </tbody>
                 </table>
+                <div v-for="tutor in pendingTutors" :key="tutor.id">
+                    <TutorVerificationModel
+                        :is-visible="showModal"
+                        :modal-data="modalData"
+                        :name="tutor.name"
+                        :cbnumber="tutor.cbNumber"
+                        :tutorid="tutor.id"
+                        :degree="tutor.course" 
+                        @close="closeModal"
+                    />
+                </div>
             </div>
 
             <!-- Completed Tutor Requests -->
@@ -261,6 +264,7 @@ const deleteTutor = id => {
                 :name="tutor.name"
                 :cbnumber="tutor.cbNumber"
                 :tutorid="tutor.id"
+                :degree="tutor.course" 
                 @close="closeTdModal"
             />
         </div>

@@ -36,8 +36,6 @@ class AdminVerificationController extends Controller
         return Inertia::render(route('profile.show'));
     }
 
-
-
     public function adminDashboard()
     {
         $tutors = Tutor::all();
@@ -81,11 +79,10 @@ class AdminVerificationController extends Controller
 
     public function rejectTutor(Request $request)
     {
-
-
         $tutor = Tutor::find($request['tutor_id']);
 
         $tutor->status = 'rejected';
+        $tutor->save();
         $tutor->rejectedModules()->attach($request['module_ids']);
 
         $tutor->rejectMessage()->create([
@@ -94,6 +91,7 @@ class AdminVerificationController extends Controller
 
         return redirect()->back()->with('error' , 404);
     }
+
     public function deleteTutor($id)
     {
         $tutor = Tutor::find($id);
@@ -186,20 +184,14 @@ class AdminVerificationController extends Controller
         ]);
     }
 
-    public function singleModule($module_id)
-    {
+    // public function rejectTutorFully($id)
+    // {
+    //     $tutor = Tutor::find($id);
+    //     $tutor->status = 'rejected';
+    //     $tutor->save();
 
+    //     return redirect()->route('admin.dashboard');
 
-    }
-
-    public function rejectTutorFully($id)
-    {
-        $tutor = Tutor::find($id);
-        $tutor->status = 'rejected';
-        $tutor->save();
-
-        return redirect()->route('admin.dashboard');
-
-    }
+    // }
 
 }

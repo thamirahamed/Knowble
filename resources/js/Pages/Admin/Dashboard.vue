@@ -66,27 +66,24 @@ const processedTutors = computed(() => {
             };
         });
 });
-const showModal = ref(false);
-const modalData = ref('');
-const mdlTutorId = ref('');
+const showModal = ref(null);
+const modalData = ref({});
 
 const TdshowModal = ref(false);
 const TdmodalData = ref('');
 const modalTutorId = ref('');
 
 const openModal = async (id) => {
-    showModal.value = true;
+    showModal.value = id;
     modalData.value = {}; // Clear previous data
 
     try {
         const response = await axios.get(`/admin/data/${id}`);
         // Merge the response data with modalData but do not overwrite tutor-related information
-        // modalData.value = {
-        //     ...modalData.value,
-        //     ...response.data,
-        // };
-
-        console.log('Response data:', response.data)
+        modalData.value = {
+            ...modalData.value,
+            ...response.data,
+        };
 
     } catch (error) {
         console.error('Error fetching data:', error);
@@ -106,9 +103,8 @@ const openTdModal = async (id) => {
         };
 
         // Fetch tutor ID from the first approved module
-        if (response.data && response.data.approvedModules && response.data.approvedModules.length > 0) {
-            modalTutorId.value = response.data.approvedModules[0].pivot.tutor_id;
-            console.log('Tutor ID:', modalTutorId);  // Store and log the tutor ID
+        if (response.data && response.data.rejectedModules && response.data.rejectedModules.length > 0) {
+            modalTutorId.value = response.data.rejectedModules[0].pivot.tutor_id;
         } else {
             console.error ('Error fetching Tutor ID:', error)
         }
@@ -172,12 +168,12 @@ const deleteTutor = id => {
                 <table class="min-w-full table-auto border-collapse">
                     <thead class="text-lg bg-secondary text-white">
                     <tr>
-                        <th class="border-b font-semibold px-4 py-2 text-left">Request#</th>
+                        <th class="border-b font-semibold px-4 py-2 text-left">Tutor#</th>
                         <th class="border-b font-semibold px-4 py-2 text-left">Date</th>
                         <th class="border-b font-semibold px-4 py-2 text-left">Name</th>
                         <th class="border-b font-semibold px-4 py-2 text-left">CB Number</th>
                         <th class="border-b font-semibold px-4 py-2 text-left">Course</th>
-                        <th class="border-b font-semibold px-4 py-2 text-left">Year</th>
+                        <th class="border-b font-semibold px-4 py-2 text-left">Level</th>
                         <th class="border-b font-semibold px-4 py-2 text-left">Actions</th>
                         <th class="border-b font-semibold px-4 py-2 text-left">Delete</th>
                     </tr>
@@ -191,15 +187,12 @@ const deleteTutor = id => {
                         <td class="border-b px-4 py-2">{{ tutor.course }}</td>
                         <td class="border-b px-4 py-2">{{ tutor.year }}</td>
                         <td class="border-b px-4 py-2 space-x-4">
-                            <SecondaryButton @click="openModal(tutor.id)">
-                                Approve
-                            </SecondaryButton>
-                            <DangerButton @click="rejectTutor(tutor.id)">
-                                Reject
-                            </DangerButton>
+                            <button :id="`reviewBtn-${tutor.id}`"  @click="openModal(tutor.id)" class="text-blue-500 hover:text-blue-700 underline">
+                                Review
+                            </button>
                         </td>
                         <td class="border-b px-4 py-2">
-                            <button @click="deleteTutor(tutor.id)" class="text-red-500 hover:text-red-700 underline">
+                            <button :id="`deleteBtn-${tutor.id}`"  @click="deleteTutor(tutor.id)" class="text-red-500 hover:text-red-700 underline">
                                 Delete
                             </button>
                         </td>
@@ -208,7 +201,7 @@ const deleteTutor = id => {
                 </table>
                 <div v-for="tutor in pendingTutors" :key="tutor.id">
                     <TutorVerificationModel
-                        :is-visible="showModal"
+                        :is-visible="showModal === tutor.id"
                         :modal-data="modalData"
                         :name="tutor.name"
                         :cbnumber="tutor.cbNumber"
@@ -228,20 +221,20 @@ const deleteTutor = id => {
                 <table class="min-w-full table-auto border-collapse">
                     <thead class="text-lg bg-secondary text-white">
                     <tr>
-                        <th class="border-b font-semibold px-4 py-2 text-left">Request#</th>
-                        <th class="border-b font-semibold px-4 py-2 text-left">date</th>
+                        <th class="border-b font-semibold px-4 py-2 text-left">Tutor#</th>
+                        <th class="border-b font-semibold px-4 py-2 text-left">Date</th>
                         <th class="border-b font-semibold px-4 py-2 text-left">Name</th>
                         <th class="border-b font-semibold px-4 py-2 text-left">CB Number</th>
                         <th class="border-b font-semibold px-4 py-2 text-left">Course</th>
-                        <th class="border-b font-semibold px-4 py-2 text-left">Year</th>
+                        <th class="border-b font-semibold px-4 py-2 text-left">Level</th>
                         <th class="border-b font-semibold px-4 py-2 text-left">Status</th>
-                        <th class="border-b font-semibold px-4 py-2 text-left">Module</th>
+                        <th class="border-b font-semibold px-4 py-2 text-left">Modules</th>
                         <th class="border-b font-semibold px-4 py-2 text-left">Delete</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr v-for="(tutor, index) in processedTutors" :key="tutor.id" class="even:bg-secondary/15">
-                        <td class="border-b px-4 py-2">{{ index + 1 }}</td>
+                        <td class="border-b px-4 py-2">{{ tutor.id }}</td>
                         <td class="border-b px-4 py-2">{{ tutor.date }}</td>
                         <td class="border-b px-4 py-2">{{ tutor.name }}</td>
                         <td class="border-b px-4 py-2">{{ tutor.cbNumber.toUpperCase() }}</td>
@@ -249,21 +242,18 @@ const deleteTutor = id => {
                         <td class="border-b px-4 py-2">{{ tutor.year }}</td>
                         <td class="border-b px-4 py-2">
                             <span :class="{ 'text-green-600': tutor.status === 'approved', 'text-red-600': tutor.status === 'rejected' }">
-                                 {{ tutor.status }}
-                             </span>
+                                 {{ tutor.status.charAt(0).toUpperCase() + tutor.status.slice(1) }}
+                            </span>
                         </td>
                         <td class="border-b px-4 py-2">
-                            <template v-if="tutor.status === 'approved'">
-                                <button @click="openTdModal(tutor.id)" class="text-blue-500 hover:text-blue-700 justify-center">
-                                    View
-                                </button>
-                            </template>
-                            <template v-else>
-                                No Modules
-                            </template>
+                            <button :id="`viewBtn-${tutor.id}`" @click="openTdModal(tutor.id)" class="text-blue-500 hover:text-blue-700 underline">
+                                View
+                            </button>
                         </td>
                         <td class="border-b px-4 py-2">
-                            <button class="text-red-500 hover:text-red-700 underline" @click="deleteTutor(tutor.id)">Delete</button>
+                            <button :id="`deleteBtn-${tutor.id}`" class="text-red-500 hover:text-red-700 underline" @click="deleteTutor(tutor.id)">
+                                Delete
+                            </button>
                         </td>
                     </tr>
                 </tbody>

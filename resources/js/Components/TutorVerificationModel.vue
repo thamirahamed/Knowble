@@ -70,8 +70,9 @@ const submitModal = () => {
     }
 
     console.log(approvedModuleIds.length > 0);
+    console.log(unapprovedModuleIds.length > 0);
     if (approvedModuleIds.length > 0) {
-        approveModule(approvedModuleIds, props.tutorid);
+        // approveModule(approvedModuleIds, props.tutorid);
     }
     if (unapprovedModuleIds.length > 0) {
         rejectAllModules(unapprovedModuleIds, props.tutorid, rejectionReason.value);
@@ -117,7 +118,7 @@ const rejectAllModules = (moduleIds, tutorId, reason) => {
         <div class="bg-white rounded-lg max-w-2xl w-full shadow-lg overflow-hidden">
             <div class="flex justify-between items-center py-2 px-6 bg-primary">
                 <h2 class="text-lg text-white font-light">Tutor Details</h2>
-                <button @click="closeModal" class="p-1 rounded-full bg-red-500 text-white"><XMarkIcon class="w-4" /></button>
+                <button id="closeModal" @click="closeModal" class="p-1 rounded-full bg-red-500 text-white"><XMarkIcon class="w-4" /></button>
             </div>
             <div class="px-6 pb-4">
                 <div class="my-3 text-lg">
@@ -141,6 +142,7 @@ const rejectAllModules = (moduleIds, tutorId, reason) => {
                                 >
                                     <span class="text-gray-800">{{ subject.module_name }}</span>
                                     <button
+                                        :id="`approveBtn-module-${subject.id}`" 
                                         :class="subject.approved ? 'bg-accent hover:bg-accentdark' : 'bg-gray-300 hover:bg-accent/50'"
                                         class="text-white p-1.5 rounded-full transition duration-200"
                                         @click="toggleApproval(subject, tutorid)"
@@ -157,6 +159,7 @@ const rejectAllModules = (moduleIds, tutorId, reason) => {
                 <div class="my-2 flex flex-col items-center">
                     <p class="italic text-sm text-gray-600 mb-3">Unticked modules will be considered as rejected for tutoring by default when submitted.</p>
                     <textarea
+                        id="rejectionReasonInput"
                         v-model="rejectionReason"
                         :class="rejectionError ? 'border-red-300 hover:border-red-500 focus:ring-red-500' : 'border-gray-300 hover:border-slate-500 focus:ring-slate-500'"
                         class="w-full px-2 -py-2 rounded-md  text-lg shadow-sm focus:border-transparent focus:outline-none focus:ring-2"
@@ -170,6 +173,7 @@ const rejectAllModules = (moduleIds, tutorId, reason) => {
                 <!-- Close Button -->
                 <div class="text-right">
                     <PrimaryButton
+                        id="submitApproval"
                         @click="submitModal"
                     >
                         Submit

@@ -51,7 +51,7 @@ const showRejectedReason = ref(false);
         <div class="bg-white rounded-lg shadow-md max-w-lg w-full overflow-hidden">
             <div class="flex justify-between items-center py-2 px-6 bg-primary">
                 <h2 class="text-lg  font-light text-white">Tutor Details</h2>
-                <button @click="closeTdModal" class="p-1 rounded-full bg-red-500 text-white"><XMarkIcon class="w-4" /></button>
+                <button id="closeModal" @click="closeTdModal" class="p-1 rounded-full bg-red-500 text-white"><XMarkIcon class="w-4" /></button>
             </div>
 
             <div class="px-6 pb-4">
@@ -63,8 +63,9 @@ const showRejectedReason = ref(false);
 
                 <div>
                     <!-- Approved Modules Section -->
-                    <div class="overflow-y-auto max-h-96 border-t border-gray-300 px-1">
+                    <div class="max-h-96 border-t border-gray-300 px-1">
                         <h3
+                            id="approvedModulesList"
                             class="my-2 font-medium cursor-pointer flex justify-between"
                             @click="showApprovedModules = !showApprovedModules"
                         >
@@ -82,23 +83,29 @@ const showRejectedReason = ref(false);
                         <ul
                             :class="{
                                 'max-h-0 overflow-hidden': !showApprovedModules,
-                                'max-h-96 overflow-auto pb-1': showApprovedModules,
+                                'max-h-80 overflow-auto pb-1': showApprovedModules,
                             }"
                             class="transition-all duration-300 ease-in-out px-2 text-gray-700"
                         >
-                            <li
-                                class="mb-2"
-                                v-for="module in modalData.approvedModules"
-                                :key="module.id"
-                            >
-                                {{ module.module_name }}
-                            </li>
+                            <template v-if="modalData.approvedModules && modalData.approvedModules.length">
+                                <li
+                                    class="mb-2"
+                                    v-for="module in modalData.approvedModules"
+                                    :key="module.id"
+                                >
+                                    {{ module.module_name }}
+                                </li>
+                            </template>
+                            <template v-else>
+                                <li class="mb-2 italic text-gray-500">No approved modules</li>
+                            </template>
                         </ul>
                     </div>
 
                     <!-- Rejected Modules Section -->
-                    <div class="overflow-y-auto max-h-96 border-t border-gray-300 px-1">
+                    <div class="max-h-96 border-t border-gray-300 px-1">
                         <h3
+                            id="rejectedModulesList"
                             class="my-2 font-medium cursor-pointer flex justify-between"
                             @click="showRejectedModules = !showRejectedModules"
                         >
@@ -116,23 +123,29 @@ const showRejectedReason = ref(false);
                         <ul
                             :class="{
                                 'max-h-0 overflow-hidden': !showRejectedModules,
-                                'max-h-96 overflow-auto pb-1': showRejectedModules,
+                                'max-h-80 overflow-y-auto pb-1': showRejectedModules,
                             }"
                             class="transition-all duration-300 ease-in-out px-2 text-gray-700"
                         >
-                            <li
-                                class="mb-2"
-                                v-for="module in modalData.rejectedModules"
-                                :key="module.id"
-                            >
-                                {{ module.module_name }}
-                            </li>
+                            <template v-if="modalData.rejectedModules && modalData.rejectedModules.length">
+                                <li
+                                    class="mb-2"
+                                    v-for="module in modalData.rejectedModules"
+                                    :key="module.id"
+                                >
+                                    {{ module.module_name }}
+                                </li>
+                            </template>
+                            <template v-else>
+                                <li class="mb-2 italic text-gray-500">No rejected modules</li>
+                            </template>
                         </ul>
                     </div>
 
                     <!-- Rejected Reason Section -->
-                    <div class="overflow-y-auto max-h-96 border-t border-gray-300 px-1">
+                    <div class="max-h-48 border-t border-gray-300 px-1">
                         <h3
+                            id="rejectedReasonLbl"
                             class="my-2 font-medium cursor-pointer flex justify-between"
                             @click="showRejectedReason = !showRejectedReason"
                         >
@@ -150,11 +163,12 @@ const showRejectedReason = ref(false);
                         <p
                             :class="{
                                 'max-h-0 overflow-hidden': !showRejectedReason,
-                                'max-h-96 overflow-auto pb-2': showRejectedReason,
+                                'max-h-40 overflow-y-auto pb-2': showRejectedReason,
                             }"
                             class="transition-all duration-300 ease-in-out px-2 text-gray-700"
                         >
-                            {{ modalData.rejectedreason[0].message }}
+                            <!-- {{ modalData.rejectedreason[0].message }} -->
+                            blank
                         </p>
                     </div>
                 </div>

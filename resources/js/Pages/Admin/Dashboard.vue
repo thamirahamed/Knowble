@@ -71,6 +71,7 @@ const modalData = ref('');
 
 const TdshowModal = ref(false);
 const TdmodalData = ref('');
+const modalTutorId = ref('');
 
 const openModal = async (id) => {
     showModal.value = true;
@@ -91,15 +92,22 @@ const openModal = async (id) => {
 
 const openTdModal = async (id) => {
     TdshowModal.value = true;
+    TdmodalData.value = {}; // Clear previous data
 
     try {
         const response = await axios.get(`/admin/tutordata/${id}`);
-        // Merge the response data with modalData but do not overwrite tutor-related information
         TdmodalData.value = {
             ...TdmodalData.value,
             ...response.data,
         };
-        console.log(TdmodalData.value);
+
+        // Fetch tutor ID from the first approved module
+        if (response.data && response.data.approvedModules && response.data.approvedModules.length > 0) {
+            modalTutorId.value = response.data.approvedModules[0].pivot.tutor_id;
+            console.log('Tutor ID:', modalTutorId);  // Store and log the tutor ID
+        } else {
+            console.error ('Error fetching Tutor ID:', error)
+        }
 
     } catch (error) {
         console.error('Error fetching data:', error);
@@ -259,6 +267,7 @@ const deleteTutor = id => {
         </div>
         <div v-for="(tutor, index) in processedTutors" :key="tutor.id">
             <TutorDetailsModel
+                v-if="TdshowModal && modalTutorId === tutor.id"
                 :is-visible="TdshowModal"
                 :modal-data="TdmodalData"
                 :name="tutor.name"

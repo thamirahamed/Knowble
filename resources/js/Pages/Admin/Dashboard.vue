@@ -68,6 +68,7 @@ const processedTutors = computed(() => {
 });
 const showModal = ref(false);
 const modalData = ref('');
+const mdlTutorId = ref('');
 
 const TdshowModal = ref(false);
 const TdmodalData = ref('');
@@ -75,14 +76,17 @@ const modalTutorId = ref('');
 
 const openModal = async (id) => {
     showModal.value = true;
+    modalData.value = {}; // Clear previous data
 
     try {
         const response = await axios.get(`/admin/data/${id}`);
         // Merge the response data with modalData but do not overwrite tutor-related information
-        modalData.value = {
-            ...modalData.value,
-            ...response.data,
-        };
+        // modalData.value = {
+        //     ...modalData.value,
+        //     ...response.data,
+        // };
+
+        console.log('Response data:', response.data)
 
     } catch (error) {
         console.error('Error fetching data:', error);

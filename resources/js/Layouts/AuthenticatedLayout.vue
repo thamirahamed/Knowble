@@ -33,7 +33,7 @@ const closeModal = () => {
 
 <template>
     <div>
-        <div class="min-h-screen bg-gray-100">
+        <div class="min-h-screen bg-gray-200">
             <nav class="border-b border-gray-100 bg-white">
                 <!-- Primary Navigation Menu -->
                 <div class="w-full px-4 sm:px-6 lg:px-8 flex justify-center">

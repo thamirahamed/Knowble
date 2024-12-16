@@ -28,7 +28,7 @@ const pendingTutors = computed(() => {
         .map(tutor => {
             const user = props.users[tutor.user_id - 1] || {};
             const profile = Object.values(props.profiles).find(p => p.user_id === tutor.user_id) || {};
-            const degree = props.degrees[profile.degree_id] || {};
+            const degree = props.degrees[profile.degree_id - 1] || {};
             const year = props.levels[profile.level_id - 1] || {};
 
             const formattedDate = tutor.created_at ? format(new Date(tutor.created_at), "dd/MM/yyyy") : "N/A";
@@ -174,7 +174,7 @@ const deleteTutor = id => {
                         <td class="border-b px-4 py-2">{{ tutor.id }}</td>
                         <td class="border-b px-4 py-2">{{ tutor.date }}</td>
                         <td class="border-b px-4 py-2">{{ tutor.name }}</td>
-                        <td class="border-b px-4 py-2">{{ tutor.cbNumber }}</td>
+                        <td class="border-b px-4 py-2">{{ tutor.cbNumber.toUpperCase() }}</td>
                         <td class="border-b px-4 py-2">{{ tutor.course }}</td>
                         <td class="border-b px-4 py-2">{{ tutor.year }}</td>
                         <td class="border-b px-4 py-2 space-x-4">
@@ -229,7 +229,7 @@ const deleteTutor = id => {
                         <td class="border-b px-4 py-2">{{ index + 1 }}</td>
                         <td class="border-b px-4 py-2">{{ tutor.date }}</td>
                         <td class="border-b px-4 py-2">{{ tutor.name }}</td>
-                        <td class="border-b px-4 py-2">{{ tutor.cbNumber }}</td>
+                        <td class="border-b px-4 py-2">{{ tutor.cbNumber.toUpperCase() }}</td>
                         <td class="border-b px-4 py-2">{{ tutor.course }}</td>
                         <td class="border-b px-4 py-2">{{ tutor.year }}</td>
                         <td class="border-b px-4 py-2">

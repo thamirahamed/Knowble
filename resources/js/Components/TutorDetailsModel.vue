@@ -64,8 +64,8 @@ const showRejectedReason = ref(false);
                 <div>
                     <!-- Approved Modules Section -->
                     <div class="overflow-y-auto max-h-96 border-t border-gray-300 px-1">
-                        <h3 
-                            class="my-2 font-medium cursor-pointer flex justify-between" 
+                        <h3
+                            class="my-2 font-medium cursor-pointer flex justify-between"
                             @click="showApprovedModules = !showApprovedModules"
                         >
                             <span>
@@ -79,16 +79,16 @@ const showRejectedReason = ref(false);
                                 <ChevronDownIcon class="w-4" />
                             </template>
                         </h3>
-                        <ul 
+                        <ul
                             :class="{
                                 'max-h-0 overflow-hidden': !showApprovedModules,
                                 'max-h-96 overflow-auto pb-1': showApprovedModules,
                             }"
                             class="transition-all duration-300 ease-in-out px-2 text-gray-700"
                         >
-                            <li 
-                                class="mb-2" 
-                                v-for="module in modalData.approvedModules" 
+                            <li
+                                class="mb-2"
+                                v-for="module in modalData.approvedModules"
                                 :key="module.id"
                             >
                                 {{ module.module_name }}
@@ -98,8 +98,8 @@ const showRejectedReason = ref(false);
 
                     <!-- Rejected Modules Section -->
                     <div class="overflow-y-auto max-h-96 border-t border-gray-300 px-1">
-                        <h3 
-                            class="my-2 font-medium cursor-pointer flex justify-between" 
+                        <h3
+                            class="my-2 font-medium cursor-pointer flex justify-between"
                             @click="showRejectedModules = !showRejectedModules"
                         >
                             <span>
@@ -113,16 +113,16 @@ const showRejectedReason = ref(false);
                                 <ChevronDownIcon class="w-4" />
                             </template>
                         </h3>
-                        <ul 
+                        <ul
                             :class="{
                                 'max-h-0 overflow-hidden': !showRejectedModules,
                                 'max-h-96 overflow-auto pb-1': showRejectedModules,
                             }"
                             class="transition-all duration-300 ease-in-out px-2 text-gray-700"
                         >
-                            <li 
-                                class="mb-2" 
-                                v-for="module in modalData.rejectedModules" 
+                            <li
+                                class="mb-2"
+                                v-for="module in modalData.rejectedModules"
                                 :key="module.id"
                             >
                                 {{ module.module_name }}
@@ -132,8 +132,8 @@ const showRejectedReason = ref(false);
 
                     <!-- Rejected Reason Section -->
                     <div class="overflow-y-auto max-h-96 border-t border-gray-300 px-1">
-                        <h3 
-                            class="my-2 font-medium cursor-pointer flex justify-between" 
+                        <h3
+                            class="my-2 font-medium cursor-pointer flex justify-between"
                             @click="showRejectedReason = !showRejectedReason"
                         >
                             <span>
@@ -147,19 +147,19 @@ const showRejectedReason = ref(false);
                                 <ChevronDownIcon class="w-4" />
                             </template>
                         </h3>
-                        <p 
+                        <p
                             :class="{
                                 'max-h-0 overflow-hidden': !showRejectedReason,
                                 'max-h-96 overflow-auto pb-2': showRejectedReason,
                             }"
                             class="transition-all duration-300 ease-in-out px-2 text-gray-700"
                         >
-                            Reason Rejected Here
+                            {{ modalData.rejectedreason[0].message }}
                         </p>
                     </div>
                 </div>
             </div>
-            
+
         </div>
     </div>
 </template>

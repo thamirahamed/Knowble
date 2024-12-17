@@ -68,10 +68,10 @@ Route::middleware(['auth','adminportal'])->group(function () {
 
 
 Route::middleware(['auth'])->group(function (){
-    // Approve tutor
-    Route::post('/approve-tutor', [AdminVerificationController::class, 'approveTutor'])->name('approve.tutor');
-    // Reject tutor
-    Route::post('/reject-tutor', [AdminVerificationController::class, 'rejectTutor'])->name('reject.tutor');
+    // Approve/reject tutor
+    Route::post('/process-tutor', [AdminVerificationController::class, 'processTutor'])->name('process.tutor');
+    // Route::post('/approve-tutor', [AdminVerificationController::class, 'approveTutor'])->name('approve.tutor');
+    // Route::post('/reject-tutor', [AdminVerificationController::class, 'rejectTutor'])->name('reject.tutor');
     // Delete tutor
     Route::delete('/tutors/{id}', [AdminVerificationController::class, 'deleteTutor'])->name('delete.tutor');
     Route::get('admin/data/{id}',[AdminVerificationController::class, 'getData'])->name('tutor.data');

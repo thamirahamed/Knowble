@@ -20,7 +20,7 @@ const props = defineProps({
     levels: Object, // Levels data
     semesters: Object, // Semesters data
 });
-console.log(props.levels);
+
 // Filter tutors with status 'pending'
 const pendingTutors = computed(() => {
     return props.tutors
@@ -106,7 +106,7 @@ const openTdModal = async (id) => {
         if (response.data && response.data.rejectedModules && response.data.rejectedModules.length > 0) {
             modalTutorId.value = response.data.rejectedModules[0].pivot.tutor_id;
         } else {
-            console.error ('Error fetching Tutor ID:', error)
+            modalTutorId.value = response.data.approvedModules[0].pivot.tutor_id;
         }
 
     } catch (error) {
@@ -121,24 +121,6 @@ const closeModal = () => {
 
 const closeTdModal = () => {
     TdshowModal.value = false;
-};
-
-// Approve Tutor
-const approveTutor = id => {
-    router.post(`/approve-tutor/${id}`, {}, {
-        onSuccess: () => {
-            console.log("Tutor approved successfully!");
-        }
-    });
-};
-
-// Reject Tutor
-const rejectTutor = id => {
-    router.post(`/reject-tutor/${id}`, {}, {
-        onSuccess: () => {
-            console.log("Tutor rejected successfully!");
-        }
-    });
 };
 
 // Delete Tutor

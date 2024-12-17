@@ -142,7 +142,7 @@ const showRejectedReason = ref(false);
                         </ul>
                     </div>
 
-                    <!-- Rejected Reason Section -->
+                    <!-- Feedback Section -->
                     <div class="max-h-48 border-t border-gray-300 px-1">
                         <h3
                             id="rejectedReasonLbl"
@@ -150,7 +150,7 @@ const showRejectedReason = ref(false);
                             @click="showRejectedReason = !showRejectedReason"
                         >
                             <span>
-                                Reason for Rejection
+                                Feedback
                             </span>
                             <!-- Conditionally render Chevron icon -->
                             <template v-if="showRejectedReason">

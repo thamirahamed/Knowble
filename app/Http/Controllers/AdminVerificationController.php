@@ -59,38 +59,87 @@ class AdminVerificationController extends Controller
         );
     }
 
-    public function approveTutor(Request $request)
+    // public function approveTutor(Request $request)
+    // {
+    //     $tutor_id = $request->tutor_id;
+    //     $subjectId = $request->subject_ids;
+
+    //     // $tutor = Tutor::find($tutor_id);
+    //     $tutor = Tutor::find($request['tutor_id']);
+    //     $tutor->status = 'approved';
+    //     $tutor->save();
+
+    //     $tutor->approvedModules()->attach($subjectId);
+
+    //     $tutor->rejectMessage()->create([
+    //         'message' => $request['reason']
+    //     ]);
+
+    //     return Inertia::render('Admin/Dashboard',
+    //     [
+    //         'showModal' => false,
+    //     ]);
+    // }
+
+    public function processTutor(Request $request)
     {
-        $tutor_id = $request->tutor_id;
-        $subjectId = $request->subject_ids;
-        $tutor = Tutor::find($tutor_id);
-        $tutor->status = 'approved';
+        $tutor = Tutor::find($request->tutor_id);
+
+        if (!$tutor) {
+            return redirect()->back()->with('error', 'Tutor not found.');
+        }
+
+        // Process approved modules
+        if (!empty($request->approved_module_ids)) {
+            $tutor->approvedModules()->syncWithoutDetaching($request->approved_module_ids);
+
+            // Save rejection message if provided
+            if ($request->rejection_reason) {
+                $tutor->rejectMessage()->create([
+                    'message' => $request->rejection_reason,
+                ]);
+            }
+
+            $tutor->status = 'approved';
+        }
+
+        // Process rejected modules
+        if (!empty($request->unapproved_module_ids)) {
+            $tutor->rejectedModules()->attach($request->unapproved_module_ids);
+
+            // Save rejection message if provided
+            if ($request->rejection_reason) {
+                $tutor->rejectMessage()->create([
+                    'message' => $request->rejection_reason,
+                ]);
+            }
+        }
+
+        // If only rejections exist and no approvals, set status to 'approved'
+        if (!empty($request->unapproved_module_ids) && empty($request->approved_module_ids)) {
+            $tutor->status = 'rejected';
+        }
+
+        // Save tutor status
         $tutor->save();
 
-
-        $tutor->approvedModules()->attach($subjectId);
-
-
-        return Inertia::render('Admin/Dashboard',
-        [
-            'showModal' => true,
-        ]);
+        return redirect()->back()->with('success', 'Modules processed successfully.');
     }
 
-    public function rejectTutor(Request $request)
-    {
-        $tutor = Tutor::find($request['tutor_id']);
+    // public function rejectTutor(Request $request)
+    // {
+    //     $tutor = Tutor::find($request['tutor_id']);
 
-        $tutor->status = 'rejected';
-        $tutor->save();
-        $tutor->rejectedModules()->attach($request['module_ids']);
+    //     $tutor->status = 'rejected';
+    //     $tutor->save();
+    //     $tutor->rejectedModules()->attach($request['module_ids']);
 
-        $tutor->rejectMessage()->create([
-            'message' => $request['reason']
-        ]);
+    //     $tutor->rejectMessage()->create([
+    //         'message' => $request['reason']
+    //     ]);
 
-        return redirect()->back()->with('error' , 404);
-    }
+    //     return redirect()->back()->with('error' , 404);
+    // }
 
     public function deleteTutor($id)
     {

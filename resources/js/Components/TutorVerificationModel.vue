@@ -44,7 +44,7 @@ const closeModal = () => {
     emit('close');
 }
 
-const submitModal = () => {
+const submitModal = async () => {
     const unapprovedModuleIds = [];
     const approvedModuleIds = [];
 
@@ -69,48 +69,27 @@ const submitModal = () => {
         return; // Stop further execution
     }
 
-    console.log(approvedModuleIds.length > 0);
-    console.log(unapprovedModuleIds.length > 0);
-    if (approvedModuleIds.length > 0) {
-        approveModule(approvedModuleIds, props.tutorid);
-    }
-    if (unapprovedModuleIds.length > 0) {
-        rejectAllModules(unapprovedModuleIds, props.tutorid, rejectionReason.value);
-    }
+    try {
+        // Send combined request for approval and rejection
+        await router.post('/process-tutor', {
+            approved_module_ids: approvedModuleIds,
+            unapproved_module_ids: unapprovedModuleIds,
+            tutor_id: props.tutorid,
+            rejection_reason: rejectionReason.value, // Include reason if modules are rejected
+        });
 
-
-    emit('close'); // Close the modal
+        // Clear error and close modal on success
+        rejectionError.value = false;
+        emit('close');
+    } catch (error) {
+        console.error('Error processing modules:', error);
+    }
 };
 
 const toggleApproval = (subject, tutorId) => {
     subject.approved = !subject.approved;
 };
 
-const approveModule = (subjectIds, tutorId) => {
-    console.log('Calling API with:', { subject_ids: subjectIds, tutor_id: tutorId });
-
-    Inertia.post('/approve-tutor', { subject_ids: subjectIds, tutor_id: tutorId }, {
-        onSuccess: () => {
-            console.log('API Call Successful');
-        },
-        onError: (error) => {
-            console.error('API Call Failed:', error);
-        },
-    });
-};
-
-
-const rejectAllModules = (moduleIds, tutorId, reason) => {
-    router.post('/reject-tutor', { module_ids: moduleIds, tutor_id: tutorId, reason }, {
-
-        onSuccess: () => {
-            console.log(`Modules rejected successfully with reason: "${reason}".`);
-        },
-        onError: (error) => {
-            console.error('Error rejecting modules:', error);
-        },
-    });
-};
 </script>
 
 <template>
@@ -163,11 +142,11 @@ const rejectAllModules = (moduleIds, tutorId, reason) => {
                         v-model="rejectionReason"
                         :class="rejectionError ? 'border-red-300 hover:border-red-500 focus:ring-red-500' : 'border-gray-300 hover:border-slate-500 focus:ring-slate-500'"
                         class="w-full px-2 -py-2 rounded-md  text-lg shadow-sm focus:border-transparent focus:outline-none focus:ring-2"
-                        placeholder="Enter reason for rejection..."
+                        placeholder="Enter feedback..."
                         rows="2"
                     ></textarea>
                     <!-- Error Message -->
-                    <p v-if="rejectionError" class="text-red-500 text-base mt-1">Rejection reason is required.</p>
+                    <p v-if="rejectionError" class="text-red-500 text-sm mt-1">Feedback is required.</p>
                 </div>
 
                 <!-- Close Button -->

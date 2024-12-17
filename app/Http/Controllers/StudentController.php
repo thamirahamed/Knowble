@@ -28,14 +28,14 @@ class StudentController extends Controller
         //get the tutors who have selected the modules in the semester
         $tutors = Tutor::whereHas('selectedModules', function ($query) use ($semesterModulesId) {
             $query->whereIn('module_id', $semesterModulesId);
-        })->get();
+        })->where('user_id', '!=', $userid) // Exclude current user
+        ->get();
 
         //get tutors profile
         $tutorIds = [];
         foreach ($tutors as $tutor) {
             $tutorIds[] = $tutor->user_id;
         }
-
 
         //send the tutors with the user details and profile details
         $allDegree = DegreeProgram::where('school_id', $profile->school_id)->get();
@@ -57,21 +57,21 @@ class StudentController extends Controller
         // get the tutor who have selected the modules
         $degreeModulesId = [];
         foreach ($degreeModules as $module) {
-            $degreeModulesId[] = $module->id;
+            foreach ($module as $mod) {
+                $degreeModulesId[] = $mod->id;
+            }
         }
-
-        dd($degreeModulesId);
-
-
 
         $degreetutors = Tutor::whereHas('selectedModules', function ($query) use ($degreeModulesId) {
             $query->whereIn('module_id', $degreeModulesId);
-        })->get();
+        })->whereNotIn('user_id', $tutorIds) // Exclude tutors from the first set
+        ->where('user_id', '!=', $userid) // Exclude current user
+        ->get();
+
         $degreetutorIds = [];
         foreach ($degreetutors as $tutor) {
             $degreetutorIds[] = $tutor->user_id;
         }
-
 
         $degreetutordetails = [];
         foreach ($degreetutorIds as $tutor) {
@@ -87,7 +87,6 @@ class StudentController extends Controller
             'semstertutors' => $tutordetails,
             'allDegree' => $allDegree,
             'tutors' => $degreetutordetails,
-
         ]);
     }
 }

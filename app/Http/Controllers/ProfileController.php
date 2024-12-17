@@ -186,7 +186,7 @@ class ProfileController extends Controller
         $userdetails = auth()->user();
         $userschool = SchoolOfStudy::find($profile->school_id);
         $userlevel  = Level::find($profile->level_id);
-        $usersemster = Semester::find($profile->semester_id);
+        $usersemester = Semester::find($profile->semester_id);
         $usercourse = DegreeProgram::find($profile->degree_id);
 
         if($tutor){
@@ -198,7 +198,7 @@ class ProfileController extends Controller
                 'user' => $userdetails,
                 'school' => $userschool,
                 'level' => $userlevel,
-                'semester' => $usersemster,
+                'semester' => $usersemester,
                 'course' => $usercourse,
                 'tutoravailabletime' => $tutoravailabletime,
                 'tutorselectedmodules' => $tutorselectedmodules,
@@ -211,7 +211,7 @@ class ProfileController extends Controller
             'user' => $userdetails,
             'school' => $userschool,
             'level' => $userlevel,
-            'semester' => $usersemster,
+            'semester' => $usersemester,
             'course' => $usercourse,
         ]);
     }

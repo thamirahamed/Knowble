@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminVerificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TutorController;
 use App\Models\Tutor;
 use Illuminate\Foundation\Application;
@@ -25,10 +26,6 @@ Route::get('/', function () {
         'canRegister' => Route::has('register')
     ]);
 });
-
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
 
 // Route::middleware('auth')->group(function () {
 //
@@ -99,7 +96,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::middleware(['auth' ,'studentportal'])->group(function () {
     Route::post('/admin/request',[AdminVerificationController::class, 'index'])->name('admin.tutor.request');
     Route::post('/admin/request/{module_id}',[AdminVerificationController::class, 'singleModule'])->name('admin.tutor.single.request');
-
+    Route::get('/dashboard',[StudentController::class, 'dashboard'])->name('dashboard');
 });
 
 

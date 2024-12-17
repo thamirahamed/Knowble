@@ -6,6 +6,20 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head } from "@inertiajs/vue3";
 import { ref } from "vue";
 
+const props = defineProps({
+    semstertutors: Array,
+    allDegree: Array,
+    tutors: Array,
+});
+
+function getDegreeName(schoolId) {
+    console.log(schoolId);
+    console.log(props.allDegree);
+    const school = props.allDegree.find((deg) => deg.id === schoolId);
+    return school ? school.degree_name : 'Not Found';
+}
+console.log(props.semstertutors);
+console.log(props.tutors);
 // Define the state for the selected value
 const selectedModule = ref("");
 
@@ -29,7 +43,7 @@ const moduleError = ref("");
 
         <div class="pt-8 flex justify-center">
             <div class="container flex flex-col lg:flex-row gap-10 h-[85vh]">
-                
+
                 <!-- Tutor Listings -->
                 <div class="flex flex-col flex-1 bg-white rounded-md shadow-sm py-6 px-8 gap-5 " >
                     <div class="flex flex-col gap-2">
@@ -49,15 +63,26 @@ const moduleError = ref("");
                         />
                     </div>
                     <div class="flex flex-col overflow-y-auto gap-2">
-                        <TutorCard />
-                        <TutorCard />
-                        <TutorCard />
-                        <TutorCard />
-                        <TutorCard />
-                        <TutorCard />
-                        <TutorCard />
-                        <TutorCard />
-                        <TutorCard />
+                        <div v-for="tutor in semstertutors" :key="tutor.id">
+
+                            <TutorCard
+                                :tutorname="tutor.user.name"
+                                :cbnumber="tutor.profile.cb_number"
+                                :profile_pic="tutor.profile.profile_pic"
+                                :tutor_id="tutor.id"
+                                :school="getDegreeName(tutor.profile.degree_id)"
+                            />
+                        </div>
+                        <div v-for="tutor in tutors" :key="tutor.id">
+                            <TutorCard
+                                :tutorname="tutor.user.name"
+                                :cbnumber="tutor.profile.cb_number"
+                                :profile_pic="tutor.profile.profile_pic"
+                                :tutor_id="tutor.id"
+                                :school="getDegreeName(tutor.profile.degree_id)"
+                            />
+                        </div>
+
                     </div>
                 </div>
 

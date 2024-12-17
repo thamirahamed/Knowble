@@ -1,17 +1,30 @@
 <script setup>
 import { UserCircleIcon } from '@heroicons/vue/24/solid';
 import PrimaryButton from './PrimaryButton.vue';
+import ProfilePicture from "@/Components/ProfilePicture.vue";
+
+const props = defineProps({
+    tutorname: String,
+    cbnumber: String,
+    profile_pic: String,
+    tutor_id: Number,
+    school: String,
+});
 </script>
 
 <template>
     <div class="flex w-full h-auto items-center px-4 py-2 rounded-md border border-gray-200 shadow-md space-x-4">
         <div class="flex">
-            <UserCircleIcon class="w-20" />
+            <img
+                :src="props.profile_pic || defaultImageUrl"
+                alt="Profile Picture"
+                class="w-16 h-16 rounded-full object-cover"
+            />
         </div>
         <div class="flex flex-1 flex-col text-lg">
-            <h1 class="text-slate-900 font-bold">Name</h1>
-            <h2 class="text-slate-500 font-light">CB Number</h2>
-            <h2 class="text-slate-500 font-light">School of Study</h2>
+            <h1 class="text-slate-900 font-bold">{{ props.tutorname }}</h1>
+            <h2 class="text-slate-500 font-light">{{ props.cbnumber }}</h2>
+            <h2 class="text-slate-500 font-light">{{props.school}}</h2>
         </div>
         <div>
             <PrimaryButton class="!text-sm">View Profile</PrimaryButton>

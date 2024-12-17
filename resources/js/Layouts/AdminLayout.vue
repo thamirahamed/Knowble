@@ -46,7 +46,7 @@ const showingNavigationDropdown = ref(false);
                             <div class="relative ms-3">
                                 <Dropdown align="right" width="48">
                                     <template #trigger>
-                                        <span class="inline-flex rounded-md">
+                                        <span id="profileDropdownMenu" class="inline-flex rounded-md">
                                             <button
                                                 type="button"
                                                 class="inline-flex align-baseline rounded-md border border-transparent bg-white px-3 py-2 text-lg font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none"
@@ -71,6 +71,7 @@ const showingNavigationDropdown = ref(false);
 
                                     <template #content>
                                         <DropdownLink
+                                            id="logoutBtn"
                                             :href="route('logout')"
                                             method="post"
                                             as="button"

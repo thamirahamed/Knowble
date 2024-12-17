@@ -108,15 +108,12 @@ const requestTutor = (id) => {
                 class="my-2 flex justify-between items-center"
             >
                 <p class="text-gray-700 text-lg">{{ module.module_name }}</p>
-                <SecondaryButton @click="requestTutor(module.id)">
-                    Request Again
-                </SecondaryButton>
             </div>
         </div>
 
         <!-- Reason for Rejection -->
         <div class="mb-4">
-            <h1 class="text-xl font-semibold">Reason for Rejection</h1>
+            <h1 class="text-xl font-semibold">Feedback Notes</h1>
             <p class="text-gray-700 text-lg">{{ rejectedReason.message }}</p>
         </div>
     </div>

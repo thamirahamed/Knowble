@@ -121,7 +121,7 @@ const toggleApproval = (subject, tutorId) => {
                                 >
                                     <span class="text-gray-800">{{ subject.module_name }}</span>
                                     <button
-                                        :id="`approveBtn-module-${subject.id}`" 
+                                        :id="`approveBtn-module-${subject.id}`"
                                         :class="subject.approved ? 'bg-accent hover:bg-accentdark' : 'bg-gray-300 hover:bg-accent/50'"
                                         class="text-white p-1.5 rounded-full transition duration-200"
                                         @click="toggleApproval(subject, tutorid)"
@@ -159,7 +159,7 @@ const toggleApproval = (subject, tutorId) => {
                     </PrimaryButton>
                 </div>
             </div>
-            
+
         </div>
     </div>
 </template>

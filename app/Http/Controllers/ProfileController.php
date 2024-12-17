@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\AvailableTime;
 use App\Models\Course;
 use App\Models\CourseLevel;
 use App\Models\DegreeProgram;
@@ -180,11 +181,29 @@ class ProfileController extends Controller
     public function show()
     {
         $profile = Profile::where('user_id', auth()->id())->firstOrFail();
+        $tutor = Tutor::where('user_id', auth()->id())->first();
+
         $userdetails = auth()->user();
         $userschool = SchoolOfStudy::find($profile->school_id);
         $userlevel  = Level::find($profile->level_id);
         $usersemster = Semester::find($profile->semester_id);
         $usercourse = DegreeProgram::find($profile->degree_id);
+
+        if($tutor){
+            $tutoravailabletime = AvailableTime::where('tutor_id', $tutor->id)->get();
+            $tutorselectedmodules = $tutor->selectedModules()->get();
+
+            return Inertia::render('Profile/View',[
+                'profile' => $profile,
+                'user' => $userdetails,
+                'school' => $userschool,
+                'level' => $userlevel,
+                'semester' => $usersemster,
+                'course' => $usercourse,
+                'tutoravailabletime' => $tutoravailabletime,
+                'tutorselectedmodules' => $tutorselectedmodules,
+            ]);
+        }
 
 
         return Inertia::render('Profile/View',[

@@ -223,13 +223,13 @@ class AdminVerificationController extends Controller
         $approvedModules = $tutor->approvedModules()->get();
         $rejectedModules = $tutor->rejectedModules()->get();
         $rejectedreason = $tutor->rejectMessage()->get();
-        $reason = $rejectedreason->pluck('message');
+
 
 
         return response()->json([
             'approvedModules' => $approvedModules,
             'rejectedModules' => $rejectedModules,
-            'rejectedreason' => $reason
+            'rejectedreason' => $rejectedreason
         ]);
     }
 

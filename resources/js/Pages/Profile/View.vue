@@ -10,7 +10,10 @@ const props = defineProps({
     course: Object,
     level: Object,
     tutor: [String, null],
+    tutoravailabletime: [Array, null],
+    tutorselectedmodules: [Array, null],
 });
+console.log(props.tutoravailabletime);
 </script>
 
 <template>
@@ -21,9 +24,9 @@ const props = defineProps({
             <div class="flex flex-col md:flex-row max-w-7xl w-full bg-white rounded-md mt-4 shadow" >
                 <!-- Profile Section -->
                 <div class="flex py-8 px-8 justify-center w-full md:w-fit">
-                    <ProfilePicture 
-                        :profile="profile" 
-                        class="w-80 shadow-[rgba(50,_50,_105,_0.15)_0px_2px_5px_0px,_rgba(0,_0,_0,_0.05)_0px_1px_1px_0px]" 
+                    <ProfilePicture
+                        :profile="profile"
+                        class="w-80 shadow-[rgba(50,_50,_105,_0.15)_0px_2px_5px_0px,_rgba(0,_0,_0,_0.05)_0px_1px_1px_0px]"
                     />
                 </div>
                 <!-- User Information Section -->
@@ -35,8 +38,8 @@ const props = defineProps({
                         <p class="text-3xl font-subh text-gray-700 mb-1">{{ level.level}}</p>
                     </div>
                     <div class="flex justify-end">
-                        <a 
-                            :href="route('profile.edit')" 
+                        <a
+                            :href="route('profile.edit')"
                             class="rounded-lg bg-accent px-5 py-2.5 text-center font-semibold tracking-wide text-white relative z-0 overflow-hidden transition-all duration-200 after:absolute after:inset-0 after:-z-10 after:translate-x-[-150%] after:translate-y-[150%] after:scale-[2.5] after:rounded-[100%] after:bg-gradient-to-l from-accentdark after:transition-transform after:duration-550  hover:after:translate-x-[0%] hover:after:translate-y-[0%]"
                         >
                             Edit Profile

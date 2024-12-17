@@ -72,7 +72,7 @@ const submitModal = () => {
     console.log(approvedModuleIds.length > 0);
     console.log(unapprovedModuleIds.length > 0);
     if (approvedModuleIds.length > 0) {
-        // approveModule(approvedModuleIds, props.tutorid);
+        approveModule(approvedModuleIds, props.tutorid);
     }
     if (unapprovedModuleIds.length > 0) {
         rejectAllModules(unapprovedModuleIds, props.tutorid, rejectionReason.value);

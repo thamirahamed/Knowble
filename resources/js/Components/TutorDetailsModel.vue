@@ -167,8 +167,7 @@ const showRejectedReason = ref(false);
                             }"
                             class="transition-all duration-300 ease-in-out px-2 text-gray-700"
                         >
-                            <!-- {{ modalData.rejectedreason[0].message }} -->
-                            blank
+                            {{ modalData.rejectedreason[0].message }}
                         </p>
                     </div>
                 </div>

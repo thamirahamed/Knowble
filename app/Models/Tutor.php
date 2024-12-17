@@ -28,4 +28,13 @@ class Tutor extends Model
     {
         return $this->hasOne(RejectMessage::class);
     }
+
+    public function selectedModules()
+    {
+        return $this->belongsToMany(Module::class, 'tutor_selected_modules', 'tutor_id', 'module_id');
+    }
+    public function availableTimes()
+    {
+        return $this->hasMany(AvailableTime::class);        
+    }
 }

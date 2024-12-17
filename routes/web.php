@@ -89,6 +89,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::prefix('tutor')->group(function () {
         Route::get('/dashboard',[TutorController::class, 'index'])->name('tutor.dashboard');
+        Route::post('select/{id}',[TutorController::class, 'selectModule'])->name('tutor.select.module');
+        Route::post('remove/{id}',[TutorController::class, 'removeModule'])->name('tutor.remove.module');
+        Route::post('/available-times', [TutorController::class, 'storeAvailableTimes'])->name('tutor.available.times');
     });
 
 });

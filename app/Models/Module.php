@@ -42,5 +42,10 @@ class Module extends Model
         return $this->belongsToMany(Tutor::class, 'tutor_modules_rejected', 'module_id', 'tutor_id');
     }
 
+    public function selectedTutors()
+    {
+        return $this->belongsToMany(Tutor::class, 'tutor_selected_modules', 'module_id', 'tutor_id');
+    }
+
 
 }

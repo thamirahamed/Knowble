@@ -71,14 +71,12 @@ const submitModal = () => {
 
     console.log(approvedModuleIds.length > 0);
     console.log(unapprovedModuleIds.length > 0);
-    if (approvedModuleIds.length > 0) {
-        approveModule(approvedModuleIds, props.tutorid);
-    }
     if (unapprovedModuleIds.length > 0) {
         rejectAllModules(unapprovedModuleIds, props.tutorid, rejectionReason.value);
     }
-
-
+    if (approvedModuleIds.length > 0) {
+        approveModule(approvedModuleIds, props.tutorid);
+    }
     emit('close'); // Close the modal
 };
 
@@ -142,7 +140,7 @@ const rejectAllModules = (moduleIds, tutorId, reason) => {
                                 >
                                     <span class="text-gray-800">{{ subject.module_name }}</span>
                                     <button
-                                        :id="`approveBtn-module-${subject.id}`" 
+                                        :id="`approveBtn-module-${subject.id}`"
                                         :class="subject.approved ? 'bg-accent hover:bg-accentdark' : 'bg-gray-300 hover:bg-accent/50'"
                                         class="text-white p-1.5 rounded-full transition duration-200"
                                         @click="toggleApproval(subject, tutorid)"
@@ -180,7 +178,7 @@ const rejectAllModules = (moduleIds, tutorId, reason) => {
                     </PrimaryButton>
                 </div>
             </div>
-            
+
         </div>
     </div>
 </template>

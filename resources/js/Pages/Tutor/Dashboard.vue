@@ -3,12 +3,11 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head, router } from "@inertiajs/vue3";
 import SidebarLink from "@/Components/SidebarLink.vue";
 import { ref } from "vue";
-import Modules from "@/Pages/Tutor/Modules.vue";
-import Sessions from "@/Pages/Tutor/Sessions.vue";
+import Overview from "@/Pages/Tutor/Overview.vue";
 import Requests from "@/Pages/Tutor/Requests.vue";
 
 // Track the currently active content
-const activeContent = ref("Modules");
+const activeContent = ref("Overview");
 
 const props = defineProps({
     approvedModules: {
@@ -34,7 +33,6 @@ const props = defineProps({
     availableTimes: {
         type: Array,
         required: true,
-
     },
 });
 console.log(props.availableTimes);
@@ -59,24 +57,16 @@ const TutorRequest = (id) => {
                     <ul class="text-lg">
                         <li>
                             <SidebarLink
-                                @click.prevent="activeContent = 'Modules'"
-                                :active="activeContent === 'Modules'"
+                                @click.prevent="activeContent = 'Overview'"
+                                :active="activeContent === 'Overview'"
                             >
-                                Modules
+                                Overview
                             </SidebarLink>
                         </li>
                         <li>
                             <SidebarLink
-                                @click.prevent="activeContent = 'Sessions'"
-                                :active="activeContent === 'Sessions'"
-                            >
-                                Sessions
-                            </SidebarLink>
-                        </li>
-                        <li>
-                            <SidebarLink
-                                @click.prevent="activeContent = 'Requests.vue'"
-                                :active="activeContent === 'Requests.vue'"
+                                @click.prevent="activeContent = 'Requests'"
+                                :active="activeContent === 'Requests'"
                             >
                                 Requests
                             </SidebarLink>
@@ -86,20 +76,18 @@ const TutorRequest = (id) => {
 
                 <!-- Main Content -->
                 <div class="flex flex-col w-full px-10 py-8 overflow-y-auto">
-                    <template v-if="activeContent === 'Modules'">
-                        <Modules
+                    <template v-if="activeContent === 'Overview'">
+                        <Overview
                             :approvedModules="props.approvedModules"
                             :rejectedModules="props.rejectedModules"
                             :rejectedReason="props.rejectedReason"
                             :tutorsSelectedModules="props.tutorsSelectedModules"
+                            :tutorsAvailableTimes="props.availableTimes"
                             @tutorRequest="TutorRequest"
                         />
                     </template>
 
-                    <template v-else-if="activeContent === 'Sessions'">
-                    </template>
-
-                    <template v-else-if="activeContent === 'Requests.vue'">
+                    <template v-else-if="activeContent === 'Requests'">
                         <Requests
                             :approvals="props.approvals"
                         />

@@ -22,9 +22,15 @@ const props = defineProps({
         type: Array,
         required: true,
     },
+    tutorsAvailableTimes: {
+        type: Array,
+        required: true,
+    },
+
 });
 
 const showRejectedModules = ref(false);
+const successMessage = ref(""); // State to track the success message
 
 // Days of the week
 const daysOfWeek = [
@@ -47,6 +53,18 @@ const timeSlots = ref(
     }))
 );
 
+// Prefill time slots on mount
+onMounted(() => {
+    props.tutorsAvailableTimes.forEach((prefilled) => {
+        const slot = timeSlots.value.find((s) => s.day === prefilled.day);
+        if (slot) {
+            slot.isActive = true;
+            slot.fromTime = prefilled.start_time || "";
+            slot.toTime = prefilled.end_time || "";
+        }
+    });
+});
+
 // Keep track of days that need deletion
 const removedDays = ref([]);
 
@@ -59,21 +77,36 @@ const toggleDay = (slot) => {
     }
 };
 
-// Validate time inputs
-const validateTimes = (slot) => {
-    const fromTime = slot.fromTime ? new Date(`1970-01-01T${slot.fromTime}:00`) : null;
-    const toTime = slot.toTime ? new Date(`1970-01-01T${slot.toTime}:00`) : null;
+// State to keep track of validation results for each day
+const validateResult = ref({});
 
-    if (fromTime && toTime) {
-        const diff = (toTime - fromTime) / (1000 * 60 * 60); // Difference in hours
-        return diff >= 1; // Ensure at least 1 hour difference
-    }
-    return true;
+// Function to validate each time slot when From or To time inputs are blurred
+const validateAndUpdate = (slot) => {
+    // Only validate toggled (active) slots
+    if (!slot.isActive) return;
+
+    const { isValid, errorMessage } = validateTimes(slot);
+    validateResult.value[slot.day] = { isValid, errorMessage };
 };
 
-
-// Function to submit available times
 const submitSessions = () => {
+    let allValid = true;
+    
+    // Validate only active slots
+    timeSlots.value.forEach((slot) => {
+        if (slot.isActive) {
+            const { isValid, errorMessage } = validateTimes(slot);
+            validateResult.value[slot.day] = { isValid, errorMessage };
+            if (!isValid) allValid = false;
+        }
+    });
+
+    if (!allValid) {
+        console.log("Form contains errors. Please fix them before submitting.");
+        return;
+    }
+
+    // Proceed with submission if all validations are passed
     const payload = timeSlots.value
         .filter((slot) => slot.isActive)
         .map((slot) => ({
@@ -81,12 +114,40 @@ const submitSessions = () => {
             start_time: slot.fromTime,
             end_time: slot.toTime,
         }));
-    // Send active days to store
     router.post("/tutor/available-times", { sessions: payload }, {
-        onSuccess: () => console.log("Available times saved successfully!"),
+        onSuccess: () => {
+            console.log("Available times saved successfully!");
+            successMessage.value = "Available times have been saved successfully!"; // Set success message
+        },
     });
-
 };
+
+const validateTimes = (slot) => {
+    // Only validate if the slot is active
+    if (!slot.isActive) return { isValid: true, errorMessage: "" };
+
+    const fromTime = slot.fromTime ? new Date(`1970-01-01T${slot.fromTime}:00`) : null;
+    const toTime = slot.toTime ? new Date(`1970-01-01T${slot.toTime}:00`) : null;
+    let isValid = true;
+    let errorMessage = "";
+
+    if (!fromTime || !toTime) {
+        isValid = false;
+        errorMessage = "Both 'From' and 'To' times must be filled.";
+    } else {
+        const diffHours = (toTime - fromTime) / (1000 * 60 * 60);
+        if (diffHours < 1) {
+            isValid = false;
+            errorMessage = "Time frame must be at least 1 hour.";
+        } else if (diffHours > 6) {
+            isValid = false;
+            errorMessage = "Time frame cannot exceed 6 hours.";
+        }
+    }
+
+    return { isValid, errorMessage };
+};
+
 
 // Emits
 const emit = defineEmits(["tutorRequest", "selectionChange"]);
@@ -148,7 +209,7 @@ const removeSelectedModule = (id) => {
             >
                 <p class="text-gray-800 text-lg">{{ module.module_name }}</p>
                 <div
-                    id="selectBtn-module-${subject.id}"
+                    :id="'toggleBtn-module-' + module.id"
                     :class="selectedModules.has(module.id) ? 'bg-accent hover:bg-accentdark' : 'bg-gray-300 hover:bg-accent/50'"
                     class="relative inline-block w-12 h-6 rounded-full transition duration-200 cursor-pointer shadow-[inset_rgba(50,50,93,0.15)_0px_30px_60px_-12px,_inset_rgba(0,0,0,0.2)_0px_18px_36px_-18px]"
                     @click="toggleApproval(module.id)"
@@ -176,6 +237,7 @@ const removeSelectedModule = (id) => {
                     /> -->
                     <!-- Switch Button -->
                     <button
+                        :id="'toggleBtn-slot-' + slot.day" 
                         :class="slot.isActive ? 'bg-accent hover:bg-accentdark' : 'bg-gray-300 hover:bg-accent/50'"
                         class="relative inline-block w-12 h-6 rounded-full transition duration-200 shadow-[inset_rgba(50,50,93,0.15)_0px_30px_60px_-12px,_inset_rgba(0,0,0,0.2)_0px_18px_36px_-18px] cursor-pointer"
                         @click="slot.isActive = !slot.isActive; toggleDay(slot)"
@@ -194,31 +256,44 @@ const removeSelectedModule = (id) => {
                     <div :class="!slot.isActive ? 'text-gray-400 cursor-not-allowed' : ''">
                         <label class="text-sm block">From</label>
                         <input
+                            :id="'from-time-' + slot.day"
                             type="time"
                             v-model="slot.fromTime"
                             class="border p-1 rounded"
                             :disabled="!slot.isActive"
                             :class="!slot.isActive ? 'border-gray-400' : ''"
                         />
+                        <!-- Show error message only for active slots -->
+                        <div v-if="slot.isActive && validateResult[slot.day] && !validateResult[slot.day].isValid" class="text-red-500 text-xs">
+                            {{ validateResult[slot.day].errorMessage }}
+                        </div>
                     </div>
 
                     <div :class="!slot.isActive ? 'text-gray-400 cursor-not-allowed' : ''">
                         <label class="text-sm block">To</label>
                         <input
+                            :id="'to-time-' + slot.day"
                             type="time"
                             v-model="slot.toTime"
                             class="border p-1 rounded"
                             :disabled="!slot.isActive"
                             :class="!slot.isActive ? 'border-gray-400' : ''"
-                            @blur="validateTimes(slot) || (slot.toTime = '')"
                         />
+                        <!-- Show error message only for active slots -->
+                        <div v-if="slot.isActive && validateResult[slot.day] && !validateResult[slot.day].isValid" class="text-red-500 text-xs">
+                            {{ validateResult[slot.day].errorMessage }}
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- Submit Button -->
-            <div class="mt-6 text-right px-8">
+            <div class="mt-6 px-8 flex gap-3 items-center justify-end">
+                <div v-if="successMessage" class="text-green-500 text-sm">
+                    {{ successMessage }}
+                </div>
                 <PrimaryButton
+                    id="saveTimeBtn"
                     @click="submitSessions"
                 >
                     Save Available Times

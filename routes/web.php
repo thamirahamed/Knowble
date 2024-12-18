@@ -1,10 +1,12 @@
 <?php
 
 use App\Http\Controllers\AdminVerificationController;
+use App\Http\Controllers\MeetingController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TutorController;
+use App\Http\Controllers\VideoRoomController;
 use App\Models\Tutor;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -99,6 +101,8 @@ Route::middleware(['auth' ,'studentportal'])->group(function () {
     Route::get('/dashboard',[StudentController::class, 'dashboard'])->name('dashboard');
     Route::get('/tutor/profile/{id}',[StudentController::class, 'tutorProfile'])->name('tutor.profile');
     Route::get('/tutor/session/request/{id}',[StudentController::class, 'requestSession'])->name('tutor.session.request');
+    Route::get('/meetings', [MeetingController::class, 'index'])->name('meetings.index');
+    Route::post('/meetings/create', [MeetingController::class, 'create'])->name('meetings.create');
 });
 
 

@@ -12,6 +12,8 @@
         <link rel="manifest" href="/images/webmanifest/manifest.json" />
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <title inertia>{{ config('app.name', 'Laravel') }}</title>
+        <script src="https://meet.jit.si/external_api.js"></script>
+
 
         <!-- Fonts -->
         <link href="https://api.fontshare.com/v2/css?f[]=satoshi@1&f[]=clash-display@1&display=swap" rel="stylesheet">

@@ -81,9 +81,6 @@ const moduleError = ref("");
 
                     </div>
                 </div>
-
-                 Upcoming Sessions
-
                     <div class="flex flex-1 bg-white rounded-md shadow-sm py-4 px-6 max-w-[30rem]">
                         <div class="w-full">
                             <!-- Section Header -->

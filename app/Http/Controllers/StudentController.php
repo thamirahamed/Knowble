@@ -131,16 +131,20 @@ class StudentController extends Controller
         ]);
     }
 
-    public function requestSession($id)
+    public function requestSession(Request $request)
     {
         $userid = auth()->user()->id;
 
         TutorSession::create([
             'user_id' => $userid,
-            'tutor_id' => $id,
+            'tutor_id' => $request->tutorId,
+            'date' => $request->date,
+            'startTime' => $request->startTime,
+            'endTime' => $request->endTime,
+            'notes' => $request->notes,
             'status' => 'pending',
         ]);
 
-        return Inertia::render('Dashboard');
+        return Inertia::render('/dashboard');
     }
 }

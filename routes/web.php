@@ -103,6 +103,8 @@ Route::middleware(['auth' ,'studentportal'])->group(function () {
     Route::get('/tutor/session/request/{id}',[StudentController::class, 'requestSession'])->name('tutor.session.request');
     Route::get('/meetings', [MeetingController::class, 'index'])->name('meetings.index');
     Route::post('/meetings/create', [MeetingController::class, 'create'])->name('meetings.create');
+
+    Route::post('/tutor/sessions/request', [StudentController::class, 'requestSession'])->name('tutor.session.request');
 });
 
 

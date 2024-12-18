@@ -1,8 +1,10 @@
 <script setup>
-import { defineProps } from 'vue';
+import { defineProps, ref } from "vue";
 import ProfilePicture from "@/Components/ProfilePicture.vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { PencilIcon, CheckBadgeIcon, AcademicCapIcon, CalendarDateRangeIcon } from "@heroicons/vue/24/solid";
+import { router } from "@inertiajs/vue3";
+import RequestSession from "@/Components/RequestSession.vue";
 
 const props = defineProps({
     tutor: Array,
@@ -15,7 +17,18 @@ const props = defineProps({
     user: Array,
     sessions: Array,
 });
-console.log(props.sessions);
+
+const openModal = ref(null);
+const modalData = ref({});
+
+const closeModal = () => {
+    openModal.value = null;
+};
+
+const openModalWithData = () => {
+    openModal.value = true;
+};
+
 </script>
 <template>
     <AuthenticatedLayout>
@@ -31,7 +44,11 @@ console.log(props.sessions);
                         class="w-full h-auto shadow-[rgba(50,_50,_105,_0.15)_0px_2px_5px_0px,_rgba(0,_0,_0,_0.05)_0px_1px_1px_0px]"
                     />
                 </div>
-
+                <RequestSession
+                    :openModal="openModal"
+                    :tutorid="tutor.id"
+                    :closeModal="closeModal"
+                />
                 <!-- User Information Section -->
                 <div class="flex flex-col flex-1 pb-6 px-6">
                     <div class="border-t border-gray-300 py-3">
@@ -50,14 +67,11 @@ console.log(props.sessions);
                         <p class="text-gray-700">{{ degree.degree_name }}</p>
                         <p class="text-gray-700">{{ level.level_name }}</p>
                     </div>
-                    <div v-if="sessions">
-                        <!-- Request TutorSession Button -->
-                        <div v-if="sessions.status === null" class="flex justify-evenly">
-                            <a :href="route('tutor.session.request', tutor.id)" class="bg-accent text-white px-4 py-1 rounded-md font-semibold">Request Session</a>
-                        </div>
-                        <div v-if="sessions.status === 'pending'" class="flex justify-evenly">
-                            <a href="#" class="bg-red-800 text-white px-4 py-1 rounded-md font-semibold" aria-disabled="true">Session Requested</a>
-                        </div>
+
+                    <div v-if="sessions === null">
+                        <button class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md" @click="openModalWithData(tutor.id)">
+                              Book a Session
+                        </button>
                     </div>
 
 

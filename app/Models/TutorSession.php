@@ -10,6 +10,10 @@ class TutorSession extends Model
         'user_id',
         'tutor_id',
         'status',
+        'date',
+        'startTime',
+        'endTime',
+        'notes',
     ];
 
     public function user()

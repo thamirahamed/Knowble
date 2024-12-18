@@ -106,7 +106,7 @@ const closeModal = () => {
                                     </template>
 
                                     <template #content>
-                                        <DropdownLink
+                                        <DropdownLink id="profileBtn"
                                             :href="route('profile.show')"
                                         >
                                             Profile

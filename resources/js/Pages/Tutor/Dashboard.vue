@@ -4,7 +4,6 @@ import { Head, router } from "@inertiajs/vue3";
 import SidebarLink from "@/Components/SidebarLink.vue";
 import { ref } from "vue";
 import Modules from "@/Pages/Tutor/Modules.vue";
-import Sessions from "@/Pages/Tutor/Sessions.vue";
 
 // Track the currently active content
 const activeContent = ref("Modules");
@@ -67,7 +66,7 @@ const TutorRequest = (id) => {
                 </div>
 
                 <!-- Main Content -->
-                <div class="flex w-full p-4 overflow-y-auto">
+                <div class="flex flex-col w-full px-10 py-8 overflow-y-auto">
                     <template v-if="activeContent === 'Modules'">
                         <Modules
                             :approvedModules="props.approvedModules"
@@ -79,7 +78,6 @@ const TutorRequest = (id) => {
                     </template>
 
                     <template v-else-if="activeContent === 'Sessions'">
-                        <Sessions />
                     </template>
                 </div>
             </div>

@@ -117,16 +117,27 @@ const toggleApproval = (subject, tutorId) => {
                                 <li
                                     v-for="subject in semester[Object.keys(semester)[0]]"
                                     :key="subject.id"
-                                    class="mb-1 flex justify-between items-center"
+                                    class="mb-2 flex justify-between items-center"
                                 >
                                     <span class="text-gray-800">{{ subject.module_name }}</span>
-                                    <button
+                                    <!-- <button
                                         :id="`approveBtn-module-${subject.id}`"
                                         :class="subject.approved ? 'bg-accent hover:bg-accentdark' : 'bg-gray-300 hover:bg-accent/50'"
                                         class="text-white p-1.5 rounded-full transition duration-200"
                                         @click="toggleApproval(subject, tutorid)"
                                     >
                                         <CheckIcon class="w-4" />
+                                    </button> -->
+                                    <button
+                                        :id="`approveBtn-module-${subject.id}`"
+                                        :class="subject.approved ? 'bg-accent hover:bg-accentdark' : 'bg-gray-300 hover:bg-accent/50'"
+                                        class="relative inline-block w-12 h-6 rounded-full transition duration-200 shadow-[inset_rgba(50,50,93,0.15)_0px_30px_60px_-12px,_inset_rgba(0,0,0,0.2)_0px_18px_36px_-18px] cursor-pointer"
+                                        @click="toggleApproval(subject, tutorid)"
+                                    >
+                                        <div
+                                            class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform duration-200"
+                                            :class="subject.approved ? 'transform translate-x-6' : 'transform translate-x-0'"
+                                        ></div>
                                     </button>
                                 </li>
                             </ul>

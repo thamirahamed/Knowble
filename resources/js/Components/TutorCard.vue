@@ -28,7 +28,7 @@ const props = defineProps({
             <h2 class="text-slate-500 font-light">{{props.school}}</h2>
         </div>
         <div>
-            <PrimaryButton class="!text-sm"><a :href="route('tutor.profile', props.tutor_id)">View Profile</a></PrimaryButton>
+            <PrimaryButton id="viewProfileBtn" class="!text-sm"><a :href="route('tutor.profile', props.tutor_id)">View Profile</a></PrimaryButton>
         </div>
     </div>
 </template>

@@ -2,6 +2,7 @@
 import { UserCircleIcon } from '@heroicons/vue/24/solid';
 import PrimaryButton from './PrimaryButton.vue';
 import ProfilePicture from "@/Components/ProfilePicture.vue";
+import { ref } from "vue";
 
 const props = defineProps({
     tutorname: String,
@@ -27,7 +28,7 @@ const props = defineProps({
             <h2 class="text-slate-500 font-light">{{props.school}}</h2>
         </div>
         <div>
-            <PrimaryButton class="!text-sm">View Profile</PrimaryButton>
+            <PrimaryButton class="!text-sm"><a :href="route('tutor.profile', props.tutor_id)">View Profile</a></PrimaryButton>
         </div>
     </div>
 </template>

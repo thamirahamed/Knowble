@@ -97,6 +97,8 @@ Route::middleware(['auth' ,'studentportal'])->group(function () {
     Route::post('/admin/request',[AdminVerificationController::class, 'index'])->name('admin.tutor.request');
     Route::post('/admin/request/{module_id}',[AdminVerificationController::class, 'singleModule'])->name('admin.tutor.single.request');
     Route::get('/dashboard',[StudentController::class, 'dashboard'])->name('dashboard');
+    Route::get('/tutor/profile/{id}',[StudentController::class, 'tutorProfile'])->name('tutor.profile');
+    Route::get('/tutor/session/request/{id}',[StudentController::class, 'requestSession'])->name('tutor.session.request');
 });
 
 

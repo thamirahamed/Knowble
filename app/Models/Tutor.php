@@ -35,6 +35,11 @@ class Tutor extends Model
     }
     public function availableTimes()
     {
-        return $this->hasMany(AvailableTime::class);        
+        return $this->hasMany(AvailableTime::class);
+    }
+
+    public function sessions()
+    {
+        return $this->hasMany(TutorSession::class);
     }
 }

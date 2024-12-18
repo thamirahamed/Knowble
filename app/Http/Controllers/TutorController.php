@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AvailableTime;
 use App\Models\Tutor;
+use App\Models\TutorSession;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -22,12 +23,25 @@ class TutorController extends Controller
         $rejectedModules = $tutor->rejectedModules()->get();
         $rejectedReason = $tutor->rejectMessage()->first();
         $tutorsSelectedModules = $tutor->selectedModules()->get();
+
+        $tutorsessions = TutorSession::where('tutor_id', $tutor->id)->get();
+        $sessionuserdetails = [];
+        foreach ($tutorsessions as $session) {
+            $sessionuserdetails[] = $session->user()->first();
+        }
+
+        $approval = [
+            'userdetails' => $sessionuserdetails,
+            'tutorsessions' => $tutorsessions,
+        ];
+
         return Inertia::render('Tutor/Dashboard',
         [
             'approvedModules' => $approvedModules,
             'rejectedModules' => $rejectedModules,
             'rejectedReason' => $rejectedReason,
             'tutorsSelectedModules' => $tutorsSelectedModules,
+            'approvals' => $approval,
         ]);
     }
 

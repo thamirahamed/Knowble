@@ -23,6 +23,7 @@ class TutorController extends Controller
         $rejectedModules = $tutor->rejectedModules()->get();
         $rejectedReason = $tutor->rejectMessage()->first();
         $tutorsSelectedModules = $tutor->selectedModules()->get();
+        $availableTimes = AvailableTime::where('tutor_id', $tutor->id)->get();
 
         $tutorsessions = TutorSession::where('tutor_id', $tutor->id)->get();
         $sessionuserdetails = [];
@@ -41,6 +42,7 @@ class TutorController extends Controller
             'rejectedModules' => $rejectedModules,
             'rejectedReason' => $rejectedReason,
             'tutorsSelectedModules' => $tutorsSelectedModules,
+            'availableTimes' => $availableTimes,
             'approvals' => $approval,
         ]);
     }

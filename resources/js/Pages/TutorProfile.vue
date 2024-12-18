@@ -50,14 +50,16 @@ console.log(props.sessions);
                         <p class="text-gray-700">{{ degree.degree_name }}</p>
                         <p class="text-gray-700">{{ level.level_name }}</p>
                     </div>
+                    <div v-if="sessions">
+                        <!-- Request TutorSession Button -->
+                        <div v-if="sessions.status === null" class="flex justify-evenly">
+                            <a :href="route('tutor.session.request', tutor.id)" class="bg-accent text-white px-4 py-1 rounded-md font-semibold">Request Session</a>
+                        </div>
+                        <div v-if="sessions.status === 'pending'" class="flex justify-evenly">
+                            <a href="#" class="bg-red-800 text-white px-4 py-1 rounded-md font-semibold" aria-disabled="true">Session Requested</a>
+                        </div>
+                    </div>
 
-                    <!-- Request TutorSession Button -->
-                    <div v-if="sessions.status === null" class="flex justify-evenly">
-                        <a :href="route('tutor.session.request', tutor.id)" class="bg-accent text-white px-4 py-1 rounded-md font-semibold">Request Session</a>
-                    </div>
-                    <div v-if="sessions.status === 'pending'" class="flex justify-evenly">
-                        <a href="#" class="bg-red-800 text-white px-4 py-1 rounded-md font-semibold" aria-disabled="true">Session Requested</a>
-                    </div>
 
                 </div>
             </div>

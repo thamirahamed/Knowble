@@ -31,8 +31,13 @@ const props = defineProps({
         type: Array,
         required: true,
     },
-});
+    availableTimes: {
+        type: Array,
+        required: true,
 
+    },
+});
+console.log(props.availableTimes);
 const TutorRequest = (id) => {
     router.post(`/admin/request/${id}`, {}, {
         onSuccess: () => {

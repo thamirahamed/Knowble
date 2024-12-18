@@ -13,24 +13,17 @@ const props = defineProps({
     sessions: Array,
 });
 console.log(props.sessions);
+console.log(props.tutors);
+console.log(props.semstertutors);
+console.log(props.allDegree);
+
 function getDegreeName(schoolId) {
-    console.log(schoolId);
-    console.log(props.allDegree);
     const school = props.allDegree.find((deg) => deg.id === schoolId);
     return school ? school.degree_name : 'Not Found';
 }
-console.log(props.semstertutors);
-console.log(props.tutors);
+
 // Define the state for the selected value
 const selectedModule = ref("");
-
-// Define options for the dropdown
-const modules = [
-    { id: 1, module_name: "Software Development and Application Modelling 1" },
-    { id: 2, module_name: "Digital Technologies 1" },
-    { id: 3, module_name: "Web Development and Operating Systems 1" },
-    { id: 4, module_name: "Networking Concepts and Cyber Security 1" },
-];
 
 // Error message for validation
 const moduleError = ref("");
@@ -63,22 +56,25 @@ const moduleError = ref("");
                             placeholder="Search Tutor"
                         />
                     </div>
+
                     <div class="flex flex-col overflow-y-auto gap-2">
                         <div v-for="tutor in semstertutors" :key="tutor.id">
                             <TutorCard
+                                v-if="tutor.tutor"
                                 :tutorname="tutor.user.name"
                                 :cbnumber="tutor.profile.cb_number"
                                 :profile_pic="tutor.profile.profile_pic"
-                                :tutor_id="tutor.tutor.id"
+                                :tutor_id="tutor.tutor"
                                 :school="getDegreeName(tutor.profile.degree_id)"
                             />
                         </div>
                         <div v-for="tutor in tutors" :key="tutor.id">
                             <TutorCard
+                                v-if="tutor.tutor"
                                 :tutorname="tutor.user.name"
                                 :cbnumber="tutor.profile.cb_number"
                                 :profile_pic="tutor.profile.profile_pic"
-                                :tutor_id="tutor.tutor.id"
+                                :tutor_id="tutor.tutor"
                                 :school="getDegreeName(tutor.profile.degree_id)"
                             />
                         </div>
@@ -86,7 +82,7 @@ const moduleError = ref("");
                     </div>
                 </div>
 
-                <!-- Upcoming Sessions -->
+                 Upcoming Sessions
 
                     <div class="flex flex-1 bg-white rounded-md shadow-sm py-4 px-6 max-w-[30rem]">
                         <div class="w-full">

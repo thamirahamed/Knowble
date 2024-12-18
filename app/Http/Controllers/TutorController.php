@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\AvailableTime;
+use App\Models\Profile;
 use App\Models\Tutor;
 use App\Models\TutorSession;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -31,10 +33,19 @@ class TutorController extends Controller
             $sessionuserdetails[] = $session->user()->first();
         }
 
-        $approval = [
-            'userdetails' => $sessionuserdetails,
-            'tutorsessions' => $tutorsessions,
-        ];
+        $requests = $tutor->sessions()->get();
+        //User details of the students who have requested the tutor
+        $userdetails = [];
+        foreach ($requests as $request) {
+            $user = User::where('id', $request->user_id)->first();
+            //profile details also
+            $profiles = Profile::where('user_id', $request->user_id)->first();
+
+            $userdetails[] = [
+                'user' => $user,
+                'profile' => $profiles,
+                      ];
+        }
 
         return Inertia::render('Tutor/Dashboard',
         [
@@ -43,7 +54,8 @@ class TutorController extends Controller
             'rejectedReason' => $rejectedReason,
             'tutorsSelectedModules' => $tutorsSelectedModules,
             'availableTimes' => $availableTimes,
-            'approvals' => $approval,
+            'requests' => $requests,
+            'userdetails' => $userdetails,
         ]);
     }
 

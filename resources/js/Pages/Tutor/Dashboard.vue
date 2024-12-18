@@ -26,7 +26,7 @@ const props = defineProps({
         type: Array,
         required: true,
     },
-    approvals: {
+    requests: {
         type: Array,
         required: true,
     },
@@ -34,8 +34,11 @@ const props = defineProps({
         type: Array,
         required: true,
     },
+    userdetails: {
+        type: Object,
+        required: true,
+    },
 });
-console.log(props.availableTimes);
 const TutorRequest = (id) => {
     router.post(`/admin/request/${id}`, {}, {
         onSuccess: () => {
@@ -89,7 +92,8 @@ const TutorRequest = (id) => {
 
                     <template v-else-if="activeContent === 'Requests'">
                         <Requests
-                            :approvals="props.approvals"
+                            :userdetails="props.userdetails"
+                            :requests="props.requests"
                         />
                     </template>
                 </div>

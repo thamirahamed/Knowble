@@ -91,7 +91,7 @@ const validateAndUpdate = (slot) => {
 
 const submitSessions = () => {
     let allValid = true;
-    
+
     // Validate only active slots
     timeSlots.value.forEach((slot) => {
         if (slot.isActive) {
@@ -160,10 +160,6 @@ onMounted(() => {
     const uniqueModules = new Set(props.tutorsSelectedModules.map((module) => module.id));
     selectedModules.value = uniqueModules; // Set filtered module IDs
 });
-
-// Log the unique modules for debugging
-console.log("Unique Selected Modules:", Array.from(selectedModules.value));
-
 // Function to toggle module selection
 const toggleApproval = (moduleId) => {
     if (selectedModules.value.has(moduleId)) {
@@ -237,7 +233,7 @@ const removeSelectedModule = (id) => {
                     /> -->
                     <!-- Switch Button -->
                     <button
-                        :id="'toggleBtn-slot-' + slot.day" 
+                        :id="'toggleBtn-slot-' + slot.day"
                         :class="slot.isActive ? 'bg-accent hover:bg-accentdark' : 'bg-gray-300 hover:bg-accent/50'"
                         class="relative inline-block w-12 h-6 rounded-full transition duration-200 shadow-[inset_rgba(50,50,93,0.15)_0px_30px_60px_-12px,_inset_rgba(0,0,0,0.2)_0px_18px_36px_-18px] cursor-pointer"
                         @click="slot.isActive = !slot.isActive; toggleDay(slot)"
@@ -319,8 +315,8 @@ const removeSelectedModule = (id) => {
                     </template>
                 </h3>
                 <p class="text-gray-500 mb-2">View your rejected modules</p>
-                
-    
+
+
                 <!-- Rejected Modules List -->
                 <div
                     :class="{

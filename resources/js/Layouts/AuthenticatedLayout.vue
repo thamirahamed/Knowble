@@ -52,7 +52,7 @@ const closeModal = () => {
                             <div
                                 class="hidden sm:-my-px sm:ms-10 sm:flex"
                             >
-                                <NavLink
+                                <NavLink id="homeBtn"
                                     :href="route('dashboard')"
                                     :active="route().current('dashboard')"
                                 >

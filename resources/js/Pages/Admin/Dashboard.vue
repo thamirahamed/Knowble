@@ -140,7 +140,7 @@ const deleteTutor = id => {
         <Head title="Admin Dashboard" />
 
         <div class="flex flex-col gap-10 items-center mt-10">
-            <!-- Upcoming Tutor Requests -->
+            <!-- Upcoming Tutor Requests.vue -->
             <div class="flex flex-col container bg-white px-10 py-6 rounded-md shadow">
                 <h1 class="text-3xl mb-1 tracking-wide font-bold">Upcoming Tutor Requests</h1>
                 <p class="text-md mb-6 text-gray-500">
@@ -188,13 +188,13 @@ const deleteTutor = id => {
                         :name="tutor.name"
                         :cbnumber="tutor.cbNumber"
                         :tutorid="tutor.id"
-                        :degree="tutor.course" 
+                        :degree="tutor.course"
                         @close="closeModal"
                     />
                 </div>
             </div>
 
-            <!-- Completed Tutor Requests -->
+            <!-- Completed Tutor Requests.vue -->
             <div class="flex flex-col container bg-white px-10 py-6 rounded-md shadow">
                 <h1 class="text-3xl mb-1 tracking-wide font-bold">Completed Tutor Requests</h1>
                 <p class="text-md mb-6 text-gray-500">
@@ -249,7 +249,7 @@ const deleteTutor = id => {
                 :name="tutor.name"
                 :cbnumber="tutor.cbNumber"
                 :tutorid="tutor.id"
-                :degree="tutor.course" 
+                :degree="tutor.course"
                 @close="closeTdModal"
             />
         </div>

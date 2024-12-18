@@ -10,8 +10,9 @@ const props = defineProps({
     semstertutors: Array,
     allDegree: Array,
     tutors: Array,
+    sessions: Array,
 });
-
+console.log(props.sessions);
 function getDegreeName(schoolId) {
     console.log(schoolId);
     console.log(props.allDegree);
@@ -64,12 +65,11 @@ const moduleError = ref("");
                     </div>
                     <div class="flex flex-col overflow-y-auto gap-2">
                         <div v-for="tutor in semstertutors" :key="tutor.id">
-
                             <TutorCard
                                 :tutorname="tutor.user.name"
                                 :cbnumber="tutor.profile.cb_number"
                                 :profile_pic="tutor.profile.profile_pic"
-                                :tutor_id="tutor.id"
+                                :tutor_id="tutor.tutor.id"
                                 :school="getDegreeName(tutor.profile.degree_id)"
                             />
                         </div>
@@ -78,7 +78,7 @@ const moduleError = ref("");
                                 :tutorname="tutor.user.name"
                                 :cbnumber="tutor.profile.cb_number"
                                 :profile_pic="tutor.profile.profile_pic"
-                                :tutor_id="tutor.id"
+                                :tutor_id="tutor.tutor.id"
                                 :school="getDegreeName(tutor.profile.degree_id)"
                             />
                         </div>
@@ -87,9 +87,41 @@ const moduleError = ref("");
                 </div>
 
                 <!-- Upcoming Sessions -->
-                <div class="flex flex-1 bg-white rounded-md shadow-sm py-2 px-4 max-w-[30rem]">
-                    <h1>Upcoming Sessions</h1>
-                </div>
+
+                    <div class="flex flex-1 bg-white rounded-md shadow-sm py-4 px-6 max-w-[30rem]">
+                        <div class="w-full">
+                            <!-- Section Header -->
+                            <h1 class="text-2xl font-bold mb-4 text-gray-700">Upcoming Sessions</h1>
+
+                            <!-- Session List -->
+                            <div class="flex flex-col gap-3">
+                                <div
+                                    v-for="(session, index) in sessions"
+                                    :key="index"
+                                    class="flex justify-between items-center bg-gray-100 p-3 rounded-md shadow-sm"
+                                >
+                                    <!-- Tutor Name -->
+                                    <div>
+                                        <p class="text-lg font-semibold text-gray-800">{{ session.tutor_name }}</p>
+                                    </div>
+
+                                    <!-- Session Status -->
+                                    <div>
+                        <span
+                            class="text-sm font-medium px-2 py-1 rounded-full"
+                            :class="{
+                                'bg-green-200 text-green-700': session.status === 'approved',
+                                'bg-yellow-200 text-yellow-700': session.status === 'pending',
+                                'bg-red-200 text-red-700': session.status === 'cancelled'
+                            }"
+                        >
+                            {{ session.status }}
+                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
             </div>
         </div>
     </AuthenticatedLayout>

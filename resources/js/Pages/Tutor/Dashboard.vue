@@ -4,6 +4,8 @@ import { Head, router } from "@inertiajs/vue3";
 import SidebarLink from "@/Components/SidebarLink.vue";
 import { ref } from "vue";
 import Modules from "@/Pages/Tutor/Modules.vue";
+import Sessions from "@/Pages/Tutor/Sessions.vue";
+import Requests from "@/Pages/Tutor/Requests.vue";
 
 // Track the currently active content
 const activeContent = ref("Modules");
@@ -22,6 +24,10 @@ const props = defineProps({
         required: true,
     },
     tutorsSelectedModules: {
+        type: Array,
+        required: true,
+    },
+    approvals: {
         type: Array,
         required: true,
     },
@@ -62,6 +68,14 @@ const TutorRequest = (id) => {
                                 Sessions
                             </SidebarLink>
                         </li>
+                        <li>
+                            <SidebarLink
+                                @click.prevent="activeContent = 'Requests.vue'"
+                                :active="activeContent === 'Requests.vue'"
+                            >
+                                Requests
+                            </SidebarLink>
+                        </li>
                     </ul>
                 </div>
 
@@ -78,6 +92,12 @@ const TutorRequest = (id) => {
                     </template>
 
                     <template v-else-if="activeContent === 'Sessions'">
+                    </template>
+
+                    <template v-else-if="activeContent === 'Requests.vue'">
+                        <Requests
+                            :approvals="props.approvals"
+                        />
                     </template>
                 </div>
             </div>

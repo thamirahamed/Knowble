@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\DegreeProgram;
+use App\Models\Level;
 use App\Models\Module;
 use App\Models\Profile;
 use App\Models\SchoolOfStudy;
 use App\Models\Tutor;
+use App\Models\TutorSession;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -28,14 +30,14 @@ class StudentController extends Controller
         //get the tutors who have selected the modules in the semester
         $tutors = Tutor::whereHas('selectedModules', function ($query) use ($semesterModulesId) {
             $query->whereIn('module_id', $semesterModulesId);
-        })->get();
+        })->where('user_id', '!=', $userid) // Exclude current user
+        ->get();
 
         //get tutors profile
         $tutorIds = [];
         foreach ($tutors as $tutor) {
             $tutorIds[] = $tutor->user_id;
         }
-
 
         //send the tutors with the user details and profile details
         $allDegree = DegreeProgram::where('school_id', $profile->school_id)->get();
@@ -45,6 +47,7 @@ class StudentController extends Controller
                 'user' => $tutor->user,
                 'profile' => Profile::where('user_id', $tutor->user_id)->first(),
                 'modules' => $tutor->selectedModules,
+                'tutor' => $tutor->id,
             ];
         }
 
@@ -57,21 +60,21 @@ class StudentController extends Controller
         // get the tutor who have selected the modules
         $degreeModulesId = [];
         foreach ($degreeModules as $module) {
-            $degreeModulesId[] = $module->id;
+            foreach ($module as $mod) {
+                $degreeModulesId[] = $mod->id;
+            }
         }
-
-        dd($degreeModulesId);
-
-
 
         $degreetutors = Tutor::whereHas('selectedModules', function ($query) use ($degreeModulesId) {
             $query->whereIn('module_id', $degreeModulesId);
-        })->get();
+        })->whereNotIn('user_id', $tutorIds) // Exclude tutors from the first set
+        ->where('user_id', '!=', $userid) // Exclude current user
+        ->get();
+
         $degreetutorIds = [];
         foreach ($degreetutors as $tutor) {
             $degreetutorIds[] = $tutor->user_id;
         }
-
 
         $degreetutordetails = [];
         foreach ($degreetutorIds as $tutor) {
@@ -80,6 +83,18 @@ class StudentController extends Controller
                 'user' => $degreetutordetail->user,
                 'profile' => Profile::where('user_id', $degreetutordetail->user_id)->first(),
                 'modules' => $degreetutordetail->selectedModules,
+                'tutor' => $degreetutordetail,
+            ];
+        }
+
+        //upcomming sessions and status of the user
+        $sessions = TutorSession::where('user_id', $userid)->get();
+        $sessionDetails = [];
+        foreach ($sessions as $session) {
+            $tutor = Tutor::where('id', $session->tutor_id)->with('user')->first();
+            $sessionDetails[] = [
+                'tutor_name' => $tutor ? $tutor->user->name : 'Unknown Tutor',
+                'status' => $session->status,
             ];
         }
 
@@ -87,7 +102,45 @@ class StudentController extends Controller
             'semstertutors' => $tutordetails,
             'allDegree' => $allDegree,
             'tutors' => $degreetutordetails,
-
+            'sessions' => $sessionDetails,
         ]);
+    }
+
+    public function tutorProfile($id)
+    {
+        $tutor = Tutor::where('id', $id)->first();
+        $profile = Profile::where('user_id', $tutor->user_id)->first();
+        $tutorSchool = SchoolOfStudy::find($profile->school_id);
+        $tutorDegree = DegreeProgram::find($profile->degree_id);
+        $tutorLevel = Level::find($profile->level_id);
+        $tutorSelectedModules = $tutor->selectedModules()->get();
+        $tutorAvailableTime = $tutor->availableTimes()->get();
+        $user = $tutor->user;
+        $tutoeSessions = TutorSession::where('tutor_id', $id)->first();
+
+        return Inertia::render('TutorProfile', [
+            'tutor' => $tutor,
+            'profile' => $profile,
+            'school' => $tutorSchool,
+            'degree' => $tutorDegree,
+            'level' => $tutorLevel,
+            'modules' => $tutorSelectedModules,
+            'availableTime' => $tutorAvailableTime,
+            'user' => $user,
+            'sessions' => $tutoeSessions,
+        ]);
+    }
+
+    public function requestSession($id)
+    {
+        $userid = auth()->user()->id;
+
+        TutorSession::create([
+            'user_id' => $userid,
+            'tutor_id' => $id,
+            'status' => 'pending',
+        ]);
+
+        return Inertia::render('Dashboard');
     }
 }

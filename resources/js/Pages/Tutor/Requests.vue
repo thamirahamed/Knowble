@@ -47,6 +47,11 @@ const approveRequest = async (id, tutorName) => {
     }
 };
 
+// Redirect to Join Meeting
+const joinMeeting = (meetingUrl) => {
+    router.visit(route("meetings.index", { meetingUrl }));
+};
+
 // Reject Request
 const rejectRequest = (id) => {
     router.post(route("request.session.cancel", { id }), {}, {
@@ -58,7 +63,6 @@ const rejectRequest = (id) => {
     });
 };
 </script>
-
 
 <template>
     <div class="min-h-screen bg-gray-100 flex justify-center items-start py-6">
@@ -90,19 +94,18 @@ const rejectRequest = (id) => {
 
                     <div class="flex items-center gap-2">
                         <span
-                            v-if="request.status === 'approved' && request.meeting_url"
+                            v-if="request.status === 'accepted' && request.meeting_url"
                             class="font-semibold text-green-500"
                         >
                             Approved
                         </span>
-                        <a
+                        <button
                             v-if="request.status === 'accepted' && request.meeting_url"
-                            :href="request.meeting_url"
-                            target="_blank"
-                            class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition"
+                            @click="joinMeeting(request.meeting_url)"
+                            class="px-4 py-2 bg-blue-600 text-white rounded-md"
                         >
                             Join Meeting
-                        </a>
+                        </button>
 
                         <button
                             v-if="request.status === 'pending'"
@@ -128,4 +131,3 @@ const rejectRequest = (id) => {
         </div>
     </div>
 </template>
-

@@ -1,39 +1,39 @@
 <template>
-    <div>
-        <h1 class="text-2xl font-bold mb-4">Jitsi Meetings</h1>
-        <button
-            @click="createMeeting"
-            class="px-4 py-2 bg-blue-600 text-white rounded-md"
-        >
-            Create Meeting
-        </button>
-
-        <div v-if="meetingUrl" class="mt-4">
-            <VideoCall :meetingUrl="meetingUrl" />
+    <AuthenticatedLayout>
+        <div>
+            <div id="jitsi-container" style="height: 600px; width: 100%;"></div>
         </div>
-    </div>
+    </AuthenticatedLayout>
+
 </template>
 
 <script>
-import VideoCall from './VideoCall.vue';
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 
 export default {
-    components: { VideoCall },
-    data() {
-        return {
-            meetingUrl: null,
-        };
+    components: { AuthenticatedLayout },
+    props: {
+        meetingUrl: String, // Meeting URL passed from the parent component
+    },
+    mounted() {
+        console.log(this.meetingUrl);
+        this.startJitsi();
     },
     methods: {
-        async createMeeting() {
-            try {
-                const response = await axios.post(route('meetings.create'), {
-                    host_name: 'Your Name',
-                });
-                this.meetingUrl = response.data.meeting_url;
-            } catch (error) {
-                console.error('Error creating meeting:', error);
-            }
+        startJitsi() {
+            const domain = "meet.jit.si"; // Use your Jitsi domain if self-hosted
+            const options = {
+                roomName: this.meetingUrl.split("/").pop(),
+                width: "100%",
+                height: "100%",
+                parentNode: document.getElementById("jitsi-container"),
+                userInfo: {
+                    displayName: "Your Name", // Customize the user's display name
+                },
+            };
+
+            // Initialize Jitsi Meet External API
+            new JitsiMeetExternalAPI(domain, options);
         },
     },
 };

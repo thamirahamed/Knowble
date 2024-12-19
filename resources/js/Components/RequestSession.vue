@@ -4,7 +4,7 @@
             <!-- Modal Header -->
             <div class="flex justify-between items-center border-b pb-3">
                 <h2 class="text-xl font-semibold">Request a Session</h2>
-                <button @click="closeModal" class="text-gray-400 hover:text-gray-600">&times;</button>
+                <button id="clickCloseBtn" @click="closeModal" class="text-gray-400 hover:text-gray-600">&times;</button>
             </div>
 
             <!-- Modal Body -->

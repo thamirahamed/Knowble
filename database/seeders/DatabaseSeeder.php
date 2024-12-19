@@ -624,6 +624,184 @@ class DatabaseSeeder extends Seeder
                     }
                 }
             }
+        };
+
+        $tutors = [
+            [
+                'name' => 'John Doe',
+                'email' => 'cb012345@students.apiit.lk',
+                'password' => bcrypt('password'), // Default password
+                'cb_number' => 'CB012345',
+                'profile_pic' => 'https://knowblestorage.s3.ap-southeast-1.amazonaws.com/profile_pic/default.jpg', // Replace with actual file if necessary
+                'status' => 'approved',
+                'approved_modules' => [33, 34, 35, 45, 46, 39, 40],
+                'rejected_modules' => [36, 47, 48, 37, 38],
+                'reject_reason' => 'Well done',
+                'degree' => 10,
+                'school_of_study' => 1,
+                'level' => 3,
+                'semester' => 2,
+            ],
+            [
+                'name' => 'Jane Smith',
+                'email' => 'cb054321@students.apiit.lk',
+                'password' => bcrypt('password'),
+                'cb_number' => 'CB054321',
+                'profile_pic' => 'https://knowblestorage.s3.ap-southeast-1.amazonaws.com/profile_pic/default.jpg',
+                'status' => 'approved',
+                'approved_modules' => [57, 59, 61, 63, 80, 81],
+                'rejected_modules' => [58, 60, 62, 64, 78, 79],
+                'reject_reason' => 'Well done',
+                'degree' => 11,
+                'school_of_study' => 1,
+                'level' => 3,
+                'semester' => 2,
+            ],
+            [
+                'name' => 'Alice Johnson',
+                'email' => 'cb098765@students.apiit.lk',
+                'password' => bcrypt('password'),
+                'cb_number' => 'CB098765',
+                'profile_pic' => 'https://knowblestorage.s3.ap-southeast-1.amazonaws.com/profile_pic/default.jpg',
+                'status' => 'approved',
+                'approved_modules' => [57, 59, 61, 63, 80, 81],
+                'rejected_modules' => [58, 60, 62, 64, 78, 79],
+                'reject_reason' => 'Well done',
+                'degree' => 11,
+                'school_of_study' => 1,
+                'level' => 3,
+                'semester' => 2,
+            ],
+            [
+                'name' => 'Mark Brown',
+                'email' => 'cb076543@students.apiit.lk',
+                'password' => bcrypt('password'),
+                'cb_number' => 'CB076543',
+                'profile_pic' => 'https://knowblestorage.s3.ap-southeast-1.amazonaws.com/profile_pic/default.jpg',
+                'status' => 'approved',
+                'approved_modules' => [33, 34, 35, 45, 46, 39, 40],
+                'rejected_modules' => [36, 47, 48, 37, 38],
+                'reject_reason' => 'Well done',
+                'degree' => 10,
+                'school_of_study' => 1,
+                'level' => 3,
+                'semester' => 2,
+            ],
+            [
+                'name' => 'Emily Davis',
+                'email' => 'cb064321@students.apiit.lk',
+                'password' => bcrypt('password'),
+                'cb_number' => 'CB064321',
+                'profile_pic' => 'https://knowblestorage.s3.ap-southeast-1.amazonaws.com/profile_pic/default.jpg',
+                'status' => 'approved',
+                'approved_modules' => [101, 102, 112, 113, 103, 104, 105],
+                'rejected_modules' => [103, 104, 111, 114, 106],
+                'reject_reason' => 'Well done',
+                'degree' => 12,
+                'school_of_study' => 1,
+                'level' => 3,
+                'semester' => 2,
+            ],
+            [
+                'name' => 'Ben Doe',
+                'email' => 'cb064325@students.apiit.lk',
+                'password' => bcrypt('password'),
+                'cb_number' => 'CB064325',
+                'profile_pic' => 'https://knowblestorage.s3.ap-southeast-1.amazonaws.com/profile_pic/default.jpg',
+                'status' => 'approved',
+                'approved_modules' => [101, 102, 112, 113, 103, 104, 105],
+                'rejected_modules' => [103, 104, 111, 114, 106],
+                'reject_reason' => 'Well done',
+                'degree' => 12,
+                'school_of_study' => 1,
+                'level' => 3,
+                'semester' => 2,
+            ]
+        ];
+
+        foreach ($tutors as $tutor) {
+            // Insert user into users table
+            $userId = DB::table('users')->insertGetId([
+                'name' => $tutor['name'],
+                'email' => $tutor['email'],
+                'email_verified_at' => now(),
+                'password' => $tutor['password'],
+                'remember_token' => Str::random(10),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        
+            // Insert tutor profile into profiles table
+            DB::table('profiles')->insert([
+                'user_id' => $userId,
+                'cb_number' => $tutor['cb_number'],
+                'profile_pic' => $tutor['profile_pic'],
+                'degree_id' => $tutor['degree'],
+                'school_id' => $tutor['school_of_study'],
+                'level_id' => $tutor['level'],
+                'semester_id' => $tutor['semester'],
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        
+            // Insert tutor-specific data into tutors table
+            $tutorId = DB::table('tutors')->insertGetId([
+                'user_id' => $userId,
+                'status' => $tutor['status'],
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        
+            // Insert approved modules
+            foreach ($tutor['approved_modules'] as $moduleId) {
+                DB::table('tutor_modules_approved')->insert([
+                    'tutor_id' => $tutorId,
+                    'module_id' => $moduleId,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        
+            // Insert rejected modules with reasons
+            foreach ($tutor['rejected_modules'] as $moduleId) {
+                DB::table('tutor_modules_rejected')->insert([
+                    'tutor_id' => $tutorId,
+                    'module_id' => $moduleId,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+
+            // Insert rejected modules with reasons
+            DB::table('reject_messages')->insert([
+                'tutor_id' => $tutorId,
+                'message' => $tutor['reject_reason'],
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+                    
+            // Insert default availability (customize as needed)
+            $days = ['Monday', 'Wednesday', 'Friday'];
+            foreach ($days as $day) {
+                DB::table('available_times')->insert([
+                    'tutor_id' => $tutorId,
+                    'day' => $day,
+                    'start_time' => '10:00:00',
+                    'end_time' => '12:00:00',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+
+            // Insert approved modules into tutor_selected_modules table
+            foreach ($tutor['approved_modules'] as $moduleId) {
+                DB::table('tutor_selected_modules')->insert([
+                    'tutor_id' => $tutorId,
+                    'module_id' => $moduleId,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
         }
     }
 }

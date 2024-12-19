@@ -67,7 +67,7 @@ const TutorRequest = (id) => {
                             </SidebarLink>
                         </li>
                         <li>
-                            <SidebarLink
+                            <SidebarLink id="requestsBtn"
                                 @click.prevent="activeContent = 'Requests'"
                                 :active="activeContent === 'Requests'"
                             >

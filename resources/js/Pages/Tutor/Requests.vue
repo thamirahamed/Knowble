@@ -110,14 +110,14 @@ const rejectRequest = (id) => {
                         <button
                             v-if="request.status === 'pending'"
                             @click="approveRequest(request.id, request.tutor_name)"
-                            class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded transition"
+                            id="requestApproveBtn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded transition"
                         >
                             Approve
                         </button>
                         <button
                             v-if="request.status === 'pending'"
                             @click="rejectRequest(request.id)"
-                            class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition"
+                            id="requestRejectBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition"
                         >
                             Reject
                         </button>

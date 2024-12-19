@@ -95,6 +95,7 @@ class StudentController extends Controller
             $sessionDetails[] = [
                 'tutor_name' => $tutor ? $tutor->user->name : 'Unknown Tutor',
                 'status' => $session->status,
+                'meeting_url' => $session->meeting_url,
             ];
         }
 
@@ -155,17 +156,23 @@ class StudentController extends Controller
         $session->status = 'Rejected';
         $session->save();
 
-        return Inertia::render(route('tutor.dashboard'));
+        return redirect()->back();
     }
 
     public function acceptSession($id)
     {
         $session = TutorSession::where('id', $id)->first();
-        $session->status = 'Accepted';
+        $session->status = 'accepted';
+
+        // Generate a meeting link
+        $meetingId = uniqid('meet_');
+        $meetingUrl = "https://meet.jit.si/$meetingId";
+
+        // Save meeting URL to the session
+        $session->meeting_url = $meetingUrl;
         $session->save();
 
-
-
-        return Inertia::render(route('tutor.dashboard'));
+        return redirect()->back();
     }
+
 }

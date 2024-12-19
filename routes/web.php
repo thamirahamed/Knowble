@@ -105,6 +105,8 @@ Route::middleware(['auth' ,'studentportal'])->group(function () {
     Route::post('/meetings/create', [MeetingController::class, 'create'])->name('meetings.create');
 
     Route::post('/tutor/sessions/request', [StudentController::class, 'requestSession'])->name('tutor.session.request');
+    Route::post('/tutor/sessions/cancel/{id}', [StudentController::class, 'cancelSession'])->name('request.session.cancel');
+    Route::post('/tutor/sessions/accept/{id}', [StudentController::class, 'acceptSession'])->name('request.session.accept');
 });
 
 

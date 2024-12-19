@@ -147,4 +147,25 @@ class StudentController extends Controller
 
         return Inertia::render('/dashboard');
     }
+
+    public function cancelSession($id)
+    {
+
+        $session = TutorSession::where('id', $id)->first();
+        $session->status = 'Rejected';
+        $session->save();
+
+        return Inertia::render(route('tutor.dashboard'));
+    }
+
+    public function acceptSession($id)
+    {
+        $session = TutorSession::where('id', $id)->first();
+        $session->status = 'Accepted';
+        $session->save();
+
+
+
+        return Inertia::render(route('tutor.dashboard'));
+    }
 }

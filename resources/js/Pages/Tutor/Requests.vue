@@ -25,7 +25,7 @@ const enhancedRequests = ref(
 
 // Approve Request
 const approveRequest = (id) => {
-    router.post(route("requests.approve", { id }), {}, {
+    router.post(route("request.session.accept", { id }), {}, {
         onSuccess: () => {
             enhancedRequests.value = enhancedRequests.value.map((request) =>
                 request.id === id ? { ...request, status: "approved" } : request
@@ -36,7 +36,7 @@ const approveRequest = (id) => {
 
 // Reject Request
 const rejectRequest = (id) => {
-    router.post(route("requests.reject", { id }), {}, {
+    router.post(route("request.session.cancel", { id }), {}, {
         onSuccess: () => {
             enhancedRequests.value = enhancedRequests.value.map((request) =>
                 request.id === id ? { ...request, status: "rejected" } : request

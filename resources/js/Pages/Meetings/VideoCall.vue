@@ -1,5 +1,6 @@
 <template>
     <div>
+        <h1 class="text-2xl font-bold mb-4">Join Meeting</h1>
         <div id="jitsi-container" style="height: 600px; width: 100%;"></div>
     </div>
 </template>
@@ -7,7 +8,7 @@
 <script>
 export default {
     props: {
-        meetingUrl: String,
+        meetingUrl: String, // Meeting URL passed from the tutor dashboard
     },
     mounted() {
         this.startJitsi();
@@ -16,7 +17,7 @@ export default {
         startJitsi() {
             const domain = "meet.jit.si"; // Use your Jitsi domain if self-hosted
             const options = {
-                roomName: this.meetingUrl.split('/').pop(),
+                roomName: this.meetingUrl.split("/").pop(),
                 width: "100%",
                 height: "100%",
                 parentNode: document.getElementById("jitsi-container"),
@@ -24,6 +25,7 @@ export default {
                     displayName: "Your Name", // Customize user display name
                 },
             };
+
             new JitsiMeetExternalAPI(domain, options);
         },
     },

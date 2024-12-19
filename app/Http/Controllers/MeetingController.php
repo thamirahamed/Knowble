@@ -9,9 +9,13 @@ use Inertia\Inertia;
 class MeetingController extends Controller
 {
     // Show meeting dashboard
-    public function index()
+    public function index(Request $request)
     {
-        return Inertia::render('Meetings/Index');
+
+        return Inertia::render('Meetings/Index',
+        [
+            'meetingUrl' => $request->get('meetingUrl')
+        ]);
     }
 
     // Create a new meeting

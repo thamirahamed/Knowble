@@ -3,7 +3,7 @@ import DynamicDropdown from "@/Components/DynamicDropdown.vue";
 import TextInput from "@/Components/TextInput.vue";
 import TutorCard from "@/Components/TutorCard.vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { Head } from "@inertiajs/vue3";
+import { Head, router } from "@inertiajs/vue3";
 import { ref } from "vue";
 
 const props = defineProps({
@@ -27,7 +27,9 @@ const selectedModule = ref("");
 
 // Error message for validation
 const moduleError = ref("");
-
+const joinMeeting = (meetingUrl) => {
+    router.visit(route("meetings.index", { meetingUrl }));
+};
 </script>
 
 <template>
@@ -113,14 +115,13 @@ const moduleError = ref("");
                     </span>
 
                                     <!-- Join Meeting Button -->
-                                    <a
+                                    <button
                                         v-if="session.status === 'accepted' && session.meeting_url"
-                                        :href="route('meetings.index')"
-                                        target="_blank"
-                                        class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full transition"
+                                        @click="joinMeeting(session.meeting_url)"
+                                        class="px-4 py-2 bg-blue-600 text-white rounded-md"
                                     >
                                         Join Meeting
-                                    </a>
+                                    </button>
                                 </div>
                             </div>
                         </div>

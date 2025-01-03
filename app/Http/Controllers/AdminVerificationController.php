@@ -59,28 +59,6 @@ class AdminVerificationController extends Controller
         );
     }
 
-    // public function approveTutor(Request $request)
-    // {
-    //     $tutor_id = $request->tutor_id;
-    //     $subjectId = $request->subject_ids;
-
-    //     // $tutor = Tutor::find($tutor_id);
-    //     $tutor = Tutor::find($request['tutor_id']);
-    //     $tutor->status = 'approved';
-    //     $tutor->save();
-
-    //     $tutor->approvedModules()->attach($subjectId);
-
-    //     $tutor->rejectMessage()->create([
-    //         'message' => $request['reason']
-    //     ]);
-
-    //     return Inertia::render('Admin/Dashboard',
-    //     [
-    //         'showModal' => false,
-    //     ]);
-    // }
-
     public function processTutor(Request $request)
     {
         $tutor = Tutor::find($request->tutor_id);
@@ -125,21 +103,6 @@ class AdminVerificationController extends Controller
 
         return redirect()->back()->with('success', 'Modules processed successfully.');
     }
-
-    // public function rejectTutor(Request $request)
-    // {
-    //     $tutor = Tutor::find($request['tutor_id']);
-
-    //     $tutor->status = 'rejected';
-    //     $tutor->save();
-    //     $tutor->rejectedModules()->attach($request['module_ids']);
-
-    //     $tutor->rejectMessage()->create([
-    //         'message' => $request['reason']
-    //     ]);
-
-    //     return redirect()->back()->with('error' , 404);
-    // }
 
     public function deleteTutor($id)
     {
@@ -216,6 +179,7 @@ class AdminVerificationController extends Controller
 
     }
 
+    // Tutor Details Modal Data
     public function tutordata($id)
     {
         $tutor = Tutor::find($id);
@@ -232,15 +196,5 @@ class AdminVerificationController extends Controller
             'rejectedreason' => $rejectedreason
         ]);
     }
-
-    // public function rejectTutorFully($id)
-    // {
-    //     $tutor = Tutor::find($id);
-    //     $tutor->status = 'rejected';
-    //     $tutor->save();
-
-    //     return redirect()->route('admin.dashboard');
-
-    // }
 
 }

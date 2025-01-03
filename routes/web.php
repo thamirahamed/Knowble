@@ -29,12 +29,6 @@ Route::get('/', function () {
     ]);
 });
 
-// Route::middleware('auth')->group(function () {
-//
-//     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-//     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-// });
-
 // Ensure only authenticated users can access the profile routes
 Route::middleware(['auth','studentportal'])->group(function () {
     // Route to view the profile
@@ -65,18 +59,17 @@ Route::middleware(['auth','adminportal'])->group(function () {
     });
 });
 
-
 Route::middleware(['auth'])->group(function (){
     // Approve/reject tutor
     Route::post('/process-tutor', [AdminVerificationController::class, 'processTutor'])->name('process.tutor');
-    // Route::post('/approve-tutor', [AdminVerificationController::class, 'approveTutor'])->name('approve.tutor');
-    // Route::post('/reject-tutor', [AdminVerificationController::class, 'rejectTutor'])->name('reject.tutor');
     // Delete tutor
     Route::delete('/tutors/{id}', [AdminVerificationController::class, 'deleteTutor'])->name('delete.tutor');
+
     Route::get('admin/data/{id}',[AdminVerificationController::class, 'getData'])->name('tutor.data');
-    Route::post('/reject-tutor/{id}', [AdminVerificationController::class, 'rejectTutorFully'])->name('reject.tutor.full');
+
     Route::get('/admin/tutordata/{id}', [AdminVerificationController::class, 'tutordata'])->name('get.tutor.data');
 });
+
 //chat
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/chat', [ChatController::class, 'index'])->name('chatpage');
@@ -86,20 +79,27 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/api/chat/messages/{chatId}', [ChatController::class, 'getMessages']);
 
+    // tutor dashboard overview
     Route::prefix('tutor')->group(function () {
         Route::get('/dashboard',[TutorController::class, 'index'])->name('tutor.dashboard');
         Route::post('select/{id}',[TutorController::class, 'selectModule'])->name('tutor.select.module');
         Route::post('remove/{id}',[TutorController::class, 'removeModule'])->name('tutor.remove.module');
-        Route::post('/available-times', [TutorController::class, 'storeAvailableTimes'])->name('tutor.available.times');
+        Route::post('/sessions/create', [TutorController::class, 'createSession'])->name('tutor.session.create');   
+        Route::post('/sessions/delete/{id}', [TutorController::class, 'deleteSession'])->name('tutor.session.delete');   
     });
-
 });
+
 // Admin Verification
 Route::middleware(['auth' ,'studentportal'])->group(function () {
-    Route::post('/admin/request',[AdminVerificationController::class, 'index'])->name('admin.tutor.request');
-    Route::post('/admin/request/{module_id}',[AdminVerificationController::class, 'singleModule'])->name('admin.tutor.single.request');
+    // Show all tutors in dashboard
     Route::get('/dashboard',[StudentController::class, 'dashboard'])->name('dashboard');
+
+    // Send Tutor Request
+    Route::post('/admin/request',[AdminVerificationController::class, 'index'])->name('admin.tutor.request');
+
+    // Show Tutor Profile Data
     Route::get('/tutor/profile/{id}',[StudentController::class, 'tutorProfile'])->name('tutor.profile');
+
     Route::get('/tutor/session/request/{id}',[StudentController::class, 'requestSession'])->name('tutor.session.request');
     Route::get('/meetings', [MeetingController::class, 'index'])->name('meetings.index');
     Route::post('/meetings/create', [MeetingController::class, 'create'])->name('meetings.create');

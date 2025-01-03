@@ -1,8 +1,10 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { router } from "@inertiajs/vue3";
-import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/vue/24/solid";
+import { ChevronDownIcon, ChevronUpIcon, ClockIcon, TrashIcon } from "@heroicons/vue/24/solid";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
+import DangerButton from "@/Components/DangerButton.vue";
+import InputLabel from "@/Components/InputLabel.vue";
 
 // Props
 const props = defineProps({
@@ -22,144 +24,129 @@ const props = defineProps({
         type: Array,
         required: true,
     },
-    tutorsAvailableTimes: {
+    sessionSlots: {
         type: Array,
         required: true,
-    },
-
+    }
 });
 
-const showRejectedModules = ref(false);
+const showRejectedModules = ref(false); // State to track dropdown menu for rejected modules
 const successMessage = ref(""); // State to track the success message
+const emit = defineEmits("selectionChange");
 
-// Days of the week
-const daysOfWeek = [
-    { id: 1, name: "Monday" },
-    { id: 2, name: "Tuesday" },
-    { id: 3, name: "Wednesday" },
-    { id: 4, name: "Thursday" },
-    { id: 5, name: "Friday" },
-    { id: 6, name: "Saturday" },
-    { id: 7, name: "Sunday" },
-];
-
-// State to track time slots
-const timeSlots = ref(
-    daysOfWeek.map((day) => ({
-        day: day.name,
-        isActive: false,
-        fromTime: "",
-        toTime: "",
-    }))
-);
-
-// Prefill time slots on mount
-onMounted(() => {
-    props.tutorsAvailableTimes.forEach((prefilled) => {
-        const slot = timeSlots.value.find((s) => s.day === prefilled.day);
-        if (slot) {
-            slot.isActive = true;
-            slot.fromTime = prefilled.start_time || "";
-            slot.toTime = prefilled.end_time || "";
-        }
-    });
+const sessionInputSlots = ref({
+  session_date: '',
+  start_time: '',
+  end_time: '',
 });
-
-// Keep track of days that need deletion
-const removedDays = ref([]);
-
-// Watch for checkbox uncheck to track removals
-const toggleDay = (slot) => {
-    if (!slot.isActive) {
-        removedDays.value.push(slot.day); // Add to removed days
-    } else {
-        removedDays.value = removedDays.value.filter((day) => day !== slot.day); // Remove if re-checked
-    }
-};
-
-// State to keep track of validation results for each day
-const validateResult = ref({});
-
-// Function to validate each time slot when From or To time inputs are blurred
-const validateAndUpdate = (slot) => {
-    // Only validate toggled (active) slots
-    if (!slot.isActive) return;
-
-    const { isValid, errorMessage } = validateTimes(slot);
-    validateResult.value[slot.day] = { isValid, errorMessage };
-};
-
-const submitSessions = () => {
-    let allValid = true;
-
-    // Validate only active slots
-    timeSlots.value.forEach((slot) => {
-        if (slot.isActive) {
-            const { isValid, errorMessage } = validateTimes(slot);
-            validateResult.value[slot.day] = { isValid, errorMessage };
-            if (!isValid) allValid = false;
-        }
-    });
-
-    if (!allValid) {
-        console.log("Form contains errors. Please fix them before submitting.");
-        return;
-    }
-
-    // Proceed with submission if all validations are passed
-    const payload = timeSlots.value
-        .filter((slot) => slot.isActive)
-        .map((slot) => ({
-            day: slot.day,
-            start_time: slot.fromTime,
-            end_time: slot.toTime,
-        }));
-    router.post("/tutor/available-times", { sessions: payload }, {
-        onSuccess: () => {
-            console.log("Available times saved successfully!");
-            successMessage.value = "Available times have been saved successfully!"; // Set success message
-        },
-    });
-};
-
-const validateTimes = (slot) => {
-    // Only validate if the slot is active
-    if (!slot.isActive) return { isValid: true, errorMessage: "" };
-
-    const fromTime = slot.fromTime ? new Date(`1970-01-01T${slot.fromTime}:00`) : null;
-    const toTime = slot.toTime ? new Date(`1970-01-01T${slot.toTime}:00`) : null;
-    let isValid = true;
-    let errorMessage = "";
-
-    if (!fromTime || !toTime) {
-        isValid = false;
-        errorMessage = "Both 'From' and 'To' times must be filled.";
-    } else {
-        const diffHours = (toTime - fromTime) / (1000 * 60 * 60);
-        if (diffHours < 1) {
-            isValid = false;
-            errorMessage = "Time frame must be at least 1 hour.";
-        } else if (diffHours > 6) {
-            isValid = false;
-            errorMessage = "Time frame cannot exceed 6 hours.";
-        }
-    }
-
-    return { isValid, errorMessage };
-};
-
-
-// Emits
-const emit = defineEmits(["tutorRequest", "selectionChange"]);
 
 // State to track selected modules
 const selectedModules = ref(new Set());
+
+// Error message for session availability
+const errorMessage = ref('');
+
+// validating minimum date selected should be tomorrow
+const tomorrowDate = computed(() => {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  return tomorrow.toISOString().split('T')[0];
+});
+
+// Validating time slots to be one hour minimum and six hours max
+const validateTime = () => {
+  const { start_time, end_time } = sessionInputSlots.value;
+  if (!start_time || !end_time) return;
+
+  const startTime = new Date(`1970-01-01T${start_time}:00`);
+  const endTime = new Date(`1970-01-01T${end_time}:00`);
+  const duration = (endTime - startTime) / (1000 * 60 * 60);
+
+  if (duration < 1) {
+    errorMessage.value = 'The session duration must be at least 1 hour.';
+  } else if (duration > 6) {
+    errorMessage.value = 'The session duration cannot exceed 6 hours.';
+  } else {
+    errorMessage.value = '';
+  }
+};
+
+// form submission for session creation
+const handleSubmit = () => {
+  validateTime();
+
+  if (errorMessage.value) {
+    return;
+  }
+
+  const payload = [
+    {
+      session_date: sessionInputSlots.value.session_date,
+      start_time: sessionInputSlots.value.start_time,
+      end_time: sessionInputSlots.value.end_time,
+    },
+  ];
+  // Submit form data 
+  router.post("/tutor/sessions/create", { sessions: payload }, {
+    onSuccess: () => {
+        successMessage.value = "New session added successfully!"; // Set success message
+
+        // Clear form values
+        sessionInputSlots.value = {
+            session_date: "",
+            start_time: "",
+            end_time: "",
+        };
+
+        // Sort sessions by session_date in ascending order
+        props.sessionSlots.sort((a, b) => new Date(a.session_date) - new Date(b.session_date));
+
+        // Scroll to the newly created session
+        setTimeout(() => {
+          const lastSessionIndex = props.sessionSlots.findIndex(
+            session => session.session_date === payload[0].session_date &&
+                    session.start_time === payload[0].start_time
+          );
+
+          const newSessionId = props.sessionSlots[lastSessionIndex]?.id;  // Get the ID of the last session
+          const newSessionElement = document.getElementById('sessionCard-' + newSessionId);
+
+          // Scroll to the session and add the pulse effect
+          if (newSessionElement) {
+            newSessionElement.scrollIntoView({ behavior: "smooth", block: "center" });
+
+            // Apply the pulse effect
+            newSessionElement.classList.add("pulse-green");
+          }
+        }, 100);
+    },
+  });
+};
+
+// delete available sessions
+const deleteSession = (sessionId) => {
+  // Send a delete request to the backend
+  router.post(`/tutor/sessions/delete/${sessionId}`, {}, {
+    onSuccess: () => {
+      // Sort the sessionSlots by session_date in ascending order after deleting
+      props.sessionSlots.sort((a, b) => new Date(a.session_date) - new Date(b.session_date));
+      
+      // Alert user after successful deletion
+      alert("Session deleted successfully!");
+    },
+    onError: (error) => {
+      console.error("Failed to delete session:", error);
+      alert("An error occurred while trying to delete the session.");
+    }
+  });
+};
 
 // Initialize selected modules based on unique `tutorsSelectedModules` IDs
 onMounted(() => {
     const uniqueModules = new Set(props.tutorsSelectedModules.map((module) => module.id));
     selectedModules.value = uniqueModules; // Set filtered module IDs
 });
+
 // Function to toggle module selection
 const toggleApproval = (moduleId) => {
     if (selectedModules.value.has(moduleId)) {
@@ -188,6 +175,33 @@ const removeSelectedModule = (id) => {
             console.log("Module removed:", id);
         },
     });
+};
+
+// Function to format date to words with suffix
+const formatDateToWords = (date) => {
+  const options = { year: 'numeric', month: 'long', day: 'numeric' };
+  const d = new Date(date);
+  const day = d.getDate();
+  const suffix = getDaySuffix(day);
+  
+  const formatter = new Intl.DateTimeFormat('en-US', options);
+  return `${formatter.format(d).replace(day, day + suffix)}`;
+};
+
+// Function to get the day suffix (st, nd, rd, th)
+const getDaySuffix = (day) => {
+  const j = day % 10;
+  const k = day % 100;
+  if (j === 1 && k !== 11) {
+    return 'st';
+  }
+  if (j === 2 && k !== 12) {
+    return 'nd';
+  }
+  if (j === 3 && k !== 13) {
+    return 'rd';
+  }
+  return 'th';
 };
 
 </script>
@@ -220,80 +234,104 @@ const removeSelectedModule = (id) => {
 
         <div class="mb-4">
             <h1 class="text-xl font-semibold">Session Availability</h1>
-            <p class="text-gray-500 mb-3">Select from a list of approved modules you're qualified to tutor and focus on what you do best.</p>
-            <!-- Day-wise Time Slots -->
-            <div v-for="(slot, index) in timeSlots" :key="index" class="flex items-center justify-between mb-3 px-8">
-                <div class="flex items-center">
-                    <!-- Checkbox -->
-                    <!-- <input
-                        id="selectBtn-module-${subject.id}"
-                        type="checkbox"
-                        v-model="slot.isActive"
-                        class="mr-4 w-5 h-5"
-                    /> -->
-                    <!-- Switch Button -->
-                    <button
-                        :id="'toggleBtn-slot-' + slot.day"
-                        :class="slot.isActive ? 'bg-accent hover:bg-accentdark' : 'bg-gray-300 hover:bg-accent/50'"
-                        class="relative inline-block w-12 h-6 rounded-full transition duration-200 shadow-[inset_rgba(50,50,93,0.15)_0px_30px_60px_-12px,_inset_rgba(0,0,0,0.2)_0px_18px_36px_-18px] cursor-pointer"
-                        @click="slot.isActive = !slot.isActive; toggleDay(slot)"
+            <p class="text-gray-500 mb-3">Easily create your available sessions, with the option to delete any unbooked slot as needed.</p>
+
+            <div class="flex flex-col lg:flex-row items-center">
+                <div class="px-6 py-0.5 w-full lg:max-w-sm">
+                    <h2 class="text-lg font-medium mb-2">Create Tutor Session</h2>
+                    <form @submit.prevent="handleSubmit">
+                        <div class="mb-4">
+                            <InputLabel for="session_date">
+                            Session Date
+                            </InputLabel>
+                            <input
+                            type="date"
+                            id="session_date"
+                            v-model="sessionInputSlots.session_date"
+                            class="rounded-md border-gray-300 text-lg shadow-sm hover:border-slate-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-slate-500 w-full"
+                            :min="tomorrowDate"
+                            required
+                            />
+                        </div>
+                        <div class="mb-4">
+                            <InputLabel for="start_time">
+                            Start Time
+                            </InputLabel>
+                            <input
+                            type="time"
+                            id="start_time"
+                            v-model="sessionInputSlots.start_time"
+                            class="rounded-md border-gray-300 text-lg shadow-sm hover:border-slate-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-slate-500 w-full"
+                            @change="validateTime"
+                            required
+                            />
+                        </div>
+                        <div class="mb-4">
+                            <InputLabel for="end_time">
+                            End Time
+                            </InputLabel>
+                            <input
+                            type="time"
+                            id="end_time"
+                            v-model="sessionInputSlots.end_time"
+                            class="rounded-md border-gray-300 text-lg shadow-sm hover:border-slate-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-slate-500 w-full"
+                            @change="validateTime"
+                            required
+                            />
+                        </div>
+                        <div v-if="errorMessage" class="mb-4 text-red-600 text-sm text-center">
+                            {{ errorMessage }}
+                        </div>
+                        <div v-if="successMessage" class="mb-4 text-green-600 text-sm text-center">
+                            {{ successMessage }}
+                        </div>
+                        <div class="flex justify-end">
+                            <PrimaryButton
+                                type="submit"
+                                id="createSessionBtn"
+                            >
+                                Create Session
+                            </PrimaryButton>
+                        </div>
+                    </form>
+                </div>
+    
+                <div class="space-y-3 overflow-y-auto lg:border-l lg:border-gray-300 max-h-[30rem] lg:min-h-80 mt-4 lg:mt-0 flex-1 px-6 py-0.5">
+                    <!-- Check if sessionSlots is empty -->
+                    <div v-if="sessionSlots.length === 0" class="text-center text-gray-500 h-auto">
+                    No sessions available.
+                    </div>
+    
+                    <!-- Loop through sessionSlots and display each session in a card -->
+                    <div 
+                        v-for="session in sessionSlots" 
+                        :key="session.id" 
+                        class="w-full shadow-md rounded-md p-4"
+                        :id="'sessionCard-' + session.id"
                     >
-                        <div
-                            class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform duration-200"
-                            :class="slot.isActive ? 'transform translate-x-6' : 'transform translate-x-0'"
-                        ></div>
-                    </button>
-
-                    <label class="w-24 ml-4">{{ slot.day }}</label>
-                </div>
-
-                <!-- Time Inputs -->
-                <div class="flex gap-4 items-center">
-                    <div :class="!slot.isActive ? 'text-gray-400 cursor-not-allowed' : ''">
-                        <label class="text-sm block">From</label>
-                        <input
-                            :id="'from-time-' + slot.day"
-                            type="time"
-                            v-model="slot.fromTime"
-                            class="border p-1 rounded"
-                            :disabled="!slot.isActive"
-                            :class="!slot.isActive ? 'border-gray-400' : ''"
-                        />
-                        <!-- Show error message only for active slots -->
-                        <div v-if="slot.isActive && validateResult[slot.day] && !validateResult[slot.day].isValid" class="text-red-500 text-xs">
-                            {{ validateResult[slot.day].errorMessage }}
-                        </div>
-                    </div>
-
-                    <div :class="!slot.isActive ? 'text-gray-400 cursor-not-allowed' : ''">
-                        <label class="text-sm block">To</label>
-                        <input
-                            :id="'to-time-' + slot.day"
-                            type="time"
-                            v-model="slot.toTime"
-                            class="border p-1 rounded"
-                            :disabled="!slot.isActive"
-                            :class="!slot.isActive ? 'border-gray-400' : ''"
-                        />
-                        <!-- Show error message only for active slots -->
-                        <div v-if="slot.isActive && validateResult[slot.day] && !validateResult[slot.day].isValid" class="text-red-500 text-xs">
-                            {{ validateResult[slot.day].errorMessage }}
+                        <div v-if="session.status === 'pending'">
+                            <div class="flex justify-between items-center">
+                                <h3 class="text-lg font-medium">Session on {{ formatDateToWords(session.session_date) }}</h3>
+                                <DangerButton
+                                    @click="deleteSession(session.id)"
+                                    class="!p-1.5"
+                                    :id="'deleteSessionBtn-' + session.id"
+                                >
+                                    <TrashIcon class="w-4" />
+                                </DangerButton>
+                            </div>
+                            
+                            <div class="text-gray-600">
+                                <p class="flex items-center">
+                                    <ClockIcon class="w-4 mr-1.5"/> <span class="font-medium mr-1">Start Time : </span> {{ session.start_time }}
+                                </p>
+                                <p class="flex items-center">
+                                    <ClockIcon class="w-4 mr-1.5"/> <span class="font-medium mr-1">End Time : </span> {{ session.end_time }}
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Submit Button -->
-            <div class="mt-6 px-8 flex gap-3 items-center justify-end">
-                <div v-if="successMessage" class="text-green-500 text-sm">
-                    {{ successMessage }}
-                </div>
-                <PrimaryButton
-                    id="saveTimeBtn"
-                    @click="submitSessions"
-                >
-                    Save Available Times
-                </PrimaryButton>
             </div>
         </div>
 

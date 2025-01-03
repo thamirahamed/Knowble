@@ -13,7 +13,6 @@ class Tutor extends Model
         return $this->belongsTo(User::class);
     }
 
-
     public function approvedModules()
     {
         return $this->belongsToMany(Module::class, 'tutor_modules_approved', 'tutor_id', 'module_id');
@@ -32,10 +31,6 @@ class Tutor extends Model
     public function selectedModules()
     {
         return $this->belongsToMany(Module::class, 'tutor_selected_modules', 'tutor_id', 'module_id');
-    }
-    public function availableTimes()
-    {
-        return $this->hasMany(AvailableTime::class);
     }
 
     public function sessions()

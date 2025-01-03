@@ -88,16 +88,33 @@ class StudentController extends Controller
         }
 
         //upcomming sessions and status of the user
-        $sessions = TutorSession::where('user_id', $userid)->get();
+        $sessions = TutorSession::where('user_id', $userid)
+                                ->where('status', 'booked') // Filter for "booked" status
+                                ->get();
         $sessionDetails = [];
         foreach ($sessions as $session) {
             $tutor = Tutor::where('id', $session->tutor_id)->with('user')->first();
+            $module = Module::where('id', $session->module_id)->first();
             $sessionDetails[] = [
                 'tutor_name' => $tutor ? $tutor->user->name : 'Unknown Tutor',
-                'status' => $session->status,
                 'meeting_url' => $session->meeting_url,
+                'module_name' => $module ? $module->module_name : 'Unknown Module',
+                'session_date' => $session->session_date,
+                'start_time' => $session->start_time,
+                'end_time' => $session->end_time,
             ];
         }
+
+        // Sort session details by session_date and then by start_time
+        usort($sessionDetails, function ($a, $b) {
+            // Compare session_date first
+            $dateComparison = strtotime($a['session_date']) - strtotime($b['session_date']);
+            if ($dateComparison === 0) {
+                // If session_date is the same, compare start_time
+                return strtotime($a['start_time']) - strtotime($b['start_time']);
+            }
+            return $dateComparison;
+        });
 
         return Inertia::render('Dashboard',[
             'semstertutors' => $tutordetails,
@@ -115,9 +132,26 @@ class StudentController extends Controller
         $tutorDegree = DegreeProgram::find($profile->degree_id);
         $tutorLevel = Level::find($profile->level_id);
         $tutorSelectedModules = $tutor->selectedModules()->get();
-        $tutorAvailableTime = $tutor->availableTimes()->get();
         $user = $tutor->user;
-        $tutoeSessions = TutorSession::where('tutor_id', $id)->first();
+        $tutorSessions = TutorSession::where('tutor_id', $id)
+                             ->where('status', 'pending')
+                             ->get();
+
+        // get students current modules
+        $userid = auth()->user()->id;
+        $studentprofile = Profile::where('user_id', $userid)->first();
+        $studentModules = Module::where('semester_id', $studentprofile->semester_id)->where('degree_program_id', $studentprofile->degree_id)->where('level_id', $studentprofile->level_id)->get();
+
+        // Find the common modules between student and tutor
+        $commonModules = $studentModules->intersect($tutorSelectedModules);
+
+        // Map to include only 'id' and 'module_name' if needed
+        $commonModules = $commonModules->map(function ($module) {
+            return [
+                'id' => $module->id,
+                'module_name' => $module->module_name,
+            ];
+        });
 
         return Inertia::render('TutorProfile', [
             'tutor' => $tutor,
@@ -125,28 +159,24 @@ class StudentController extends Controller
             'school' => $tutorSchool,
             'degree' => $tutorDegree,
             'level' => $tutorLevel,
-            'modules' => $tutorSelectedModules,
-            'availableTime' => $tutorAvailableTime,
+            'tutormodules' => $tutorSelectedModules,
             'user' => $user,
-            'sessions' => $tutoeSessions,
+            'sessions' => $tutorSessions,
+            'commonModules' => $commonModules,
         ]);
     }
 
     public function requestSession(Request $request)
     {
         $userid = auth()->user()->id;
+        $session = TutorSession::find($request->sessionSlot);
+        $session->status = 'booked';
+        $session->user_id = $userid;
+        $session->module_id = $request->module;
+        $session->notes = $request->notes;
+        $session->save();
 
-        TutorSession::create([
-            'user_id' => $userid,
-            'tutor_id' => $request->tutorId,
-            'date' => $request->date,
-            'startTime' => $request->startTime,
-            'endTime' => $request->endTime,
-            'notes' => $request->notes,
-            'status' => 'pending',
-        ]);
-
-        return Inertia::render('/dashboard');
+        return redirect()->route('tutor.profile', ['id' => $session->tutor_id]);
     }
 
     public function cancelSession($id)

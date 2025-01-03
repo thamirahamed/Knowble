@@ -7,12 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 class TutorSession extends Model
 {
     protected $fillable = [
-        'user_id',
         'tutor_id',
+        'session_date',
+        'start_time',
+        'end_time',
         'status',
         'date',
-        'startTime',
-        'endTime',
+        'user_id',
+        'module_id',
+        'meeting_url',
         'notes',
     ];
 
@@ -24,5 +27,10 @@ class TutorSession extends Model
     public function tutor()
     {
         return $this->belongsTo(Tutor::class);
+    }
+
+    public function modules()
+    {
+        return $this->belongsTo(Module::class);
     }
 }

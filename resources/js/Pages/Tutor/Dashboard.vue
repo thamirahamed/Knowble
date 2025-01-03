@@ -4,7 +4,7 @@ import { Head, router } from "@inertiajs/vue3";
 import SidebarLink from "@/Components/SidebarLink.vue";
 import { ref } from "vue";
 import Overview from "@/Pages/Tutor/Overview.vue";
-import Requests from "@/Pages/Tutor/Requests.vue";
+import UpcomingBookings from "@/Pages/Tutor/UpcomingBookings.vue";
 
 // Track the currently active content
 const activeContent = ref("Overview");
@@ -26,19 +26,16 @@ const props = defineProps({
         type: Array,
         required: true,
     },
-    requests: {
+    sessionSlots: {
         type: Array,
         required: true,
     },
-    availableTimes: {
-        type: Array,
-        required: true,
-    },
-    userdetails: {
+    bookings: {
         type: Object,
         required: true,
     },
 });
+
 const TutorRequest = (id) => {
     router.post(`/admin/request/${id}`, {}, {
         onSuccess: () => {
@@ -60,6 +57,7 @@ const TutorRequest = (id) => {
                     <ul class="text-lg">
                         <li>
                             <SidebarLink
+                                id="overviewBtn"
                                 @click.prevent="activeContent = 'Overview'"
                                 :active="activeContent === 'Overview'"
                             >
@@ -67,11 +65,21 @@ const TutorRequest = (id) => {
                             </SidebarLink>
                         </li>
                         <li>
-                            <SidebarLink id="requestsBtn"
-                                @click.prevent="activeContent = 'Requests'"
-                                :active="activeContent === 'Requests'"
+                            <SidebarLink 
+                                id="upcBookingsBtn"
+                                @click.prevent="activeContent = 'UpcomingBookings'"
+                                :active="activeContent === 'UpcomingBookings'"
                             >
-                                Requests
+                                Upcoming Bookings
+                            </SidebarLink>
+                        </li>
+                        <li>
+                            <SidebarLink 
+                                id="comBookingsBtn"
+                                @click.prevent="activeContent = 'CompletedBookings'"
+                                :active="activeContent === 'CompletedBookings'"
+                            >
+                                Completed Bookings
                             </SidebarLink>
                         </li>
                     </ul>
@@ -85,16 +93,18 @@ const TutorRequest = (id) => {
                             :rejectedModules="props.rejectedModules"
                             :rejectedReason="props.rejectedReason"
                             :tutorsSelectedModules="props.tutorsSelectedModules"
-                            :tutorsAvailableTimes="props.availableTimes"
+                            :sessionSlots="props.sessionSlots"
                             @tutorRequest="TutorRequest"
                         />
                     </template>
 
-                    <template v-else-if="activeContent === 'Requests'">
-                        <Requests
-                            :userdetails="props.userdetails"
-                            :requests="props.requests"
+                    <template v-else-if="activeContent === 'UpcomingBookings'">
+                        <UpcomingBookings
+                            :bookings="props.bookings"
                         />
+                    </template>
+                    <template v-else-if="activeContent === 'CompletedBookings'">
+                        <p>Completed / Cancelled Bookings here</p>
                     </template>
                 </div>
             </div>

@@ -3,6 +3,7 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head } from "@inertiajs/vue3";
 import ProfilePicture from "@/Components/ProfilePicture.vue";
 import { PencilIcon, CheckBadgeIcon, AcademicCapIcon, CalendarDateRangeIcon } from "@heroicons/vue/24/solid";
+import { onMounted, ref } from "vue";
 
 // Props
 const props = defineProps({
@@ -12,15 +13,48 @@ const props = defineProps({
     level: Object,
     semester: Object,
     tutor: [String, null],
-    tutoravailabletime: [Array, null],
+    tutorsessions: [Array, null],
     tutorselectedmodules: [Array, null],
 });
-console.log(props.tutoravailabletime);
-console.log(props.tutorselectedmodules);
-console.log(props.course);
-console.log(props.level);
-console.log(props.semester);
-console.log(props.tutor);
+
+// Create a reactive reference to store the filtered tutorsessions
+const filteredSessions = ref([]);
+
+// Sort sessionSlots by session_date in ascending order
+onMounted(() =>{
+    // Filter the tutorsessions to include only those with a 'pending' status
+    filteredSessions.value = props.tutorsessions.filter(session => session.status === 'pending');
+    
+    filteredSessions.value.sort((a, b) => new Date(a.session_date) - new Date(b.session_date));
+});
+
+// Function to format date to words with suffix
+const formatDateToWords = (date) => {
+  const options = { year: 'numeric', month: 'long', day: 'numeric' };
+  const d = new Date(date);
+  const day = d.getDate();
+  const suffix = getDaySuffix(day);
+  
+  const formatter = new Intl.DateTimeFormat('en-US', options);
+  return `${formatter.format(d).replace(day, day + suffix)}`;
+};
+
+// Function to get the day suffix (st, nd, rd, th)
+const getDaySuffix = (day) => {
+  const j = day % 10;
+  const k = day % 100;
+  if (j === 1 && k !== 11) {
+    return 'st';
+  }
+  if (j === 2 && k !== 12) {
+    return 'nd';
+  }
+  if (j === 3 && k !== 13) {
+    return 'rd';
+  }
+  return 'th';
+};
+
 </script>
 
 <template>
@@ -88,15 +122,19 @@ console.log(props.tutor);
                             </div>
 
                             <!-- Available Time -->
-                            <div v-if="tutoravailabletime && tutoravailabletime.length > 0" class="mt-4 flex flex-col flex-1">
+                            <div v-if="filteredSessions.length > 0" class="mt-4 flex flex-col flex-1">
                                 <h3 class="text-lg font-medium mb-2">Tutor Availability</h3>
                                 <ul>
-                                    <li v-for="time in tutoravailabletime" :key="time.id" class="flex justify-between even:bg-accent/5 px-4 py-2 text-gray-800" >
+                                    <li 
+                                        v-for="session in filteredSessions" 
+                                        :key="session.id" 
+                                        class="flex justify-between even:bg-accent/5 px-4 py-2 text-gray-800"
+                                    >
                                         <div class="flex items-center">
-                                            <CalendarDateRangeIcon class="mr-2 w-4 text-gray-700" /> {{ time.day }} 
+                                            <CalendarDateRangeIcon class="mr-2 w-4 text-gray-700" /> {{ formatDateToWords(session.session_date) }} 
                                         </div>
                                         <div class="flex items-center">
-                                             {{ time.start_time }} - {{ time.end_time }}
+                                             {{ session.start_time }} - {{ session.end_time }}
                                         </div>
                                     </li>
                                 </ul>

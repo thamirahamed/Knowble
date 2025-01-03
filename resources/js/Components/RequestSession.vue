@@ -1,112 +1,161 @@
-<template>
-    <div v-if="openModal" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
-        <div class="bg-white rounded-lg shadow-lg max-w-lg w-full p-6 relative">
-            <!-- Modal Header -->
-            <div class="flex justify-between items-center border-b pb-3">
-                <h2 class="text-xl font-semibold">Request a Session</h2>
-                <button id="clickCloseBtn" @click="closeModal" class="text-gray-400 hover:text-gray-600">&times;</button>
-            </div>
-
-            <!-- Modal Body -->
-            <div class="mt-4">
-                <div class="mb-4">
-                    <label for="session-date" class="block text-sm font-medium text-gray-700">Select Date</label>
-                    <input
-                        type="date"
-                        id="session-date"
-                        v-model="sessionDate"
-                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                    />
-                </div>
-
-                <div class="mb-4">
-                    <label for="start-time" class="block text-sm font-medium text-gray-700">Start Time</label>
-                    <input
-                        type="time"
-                        id="start-time"
-                        v-model="startTime"
-                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                    />
-                </div>
-
-                <div class="mb-4">
-                    <label for="end-time" class="block text-sm font-medium text-gray-700">End Time</label>
-                    <input
-                        type="time"
-                        id="end-time"
-                        v-model="endTime"
-                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                    />
-                </div>
-
-                <div class="mb-4">
-                    <label for="notes" class="block text-sm font-medium text-gray-700">Additional Notes
-                        (Optional)</label>
-                    <textarea
-                        id="notes"
-                        v-model="sessionNotes"
-                        rows="3"
-                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                        placeholder="Any additional details for the tutor"
-                    ></textarea>
-                </div>
-
-                <div class="mt-6">
-                    <button
-                        @click="submitSessionRequest" id="submitRequestBtn"
-                        class="w-full bg-blue-600 text-white py-2 px-4 rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                    >
-                        Submit Request
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-</template>
-
 <script setup>
 import { ref } from 'vue';
-import { router } from '@inertiajs/vue3';
+import { router, useForm } from '@inertiajs/vue3';
+import InputLabel from './InputLabel.vue';
+import PrimaryButton from './PrimaryButton.vue';
+import { XMarkIcon } from '@heroicons/vue/24/solid';
+import { onMounted } from 'vue';
 
 const props = defineProps({
     openModal: Boolean,
     tutorid: Number,
     closeModal: Function,
+    commonModules: Array,
+    sessionSlots: Array,
+});
+
+// Initialize the form
+const form = useForm({
+    module: '',
+    sessionSlot: '',
+    notes: '',
+});
+
+// Create a reactive reference to store the filtered tutorsessions
+const filteredSessions = ref([]);
+
+onMounted(() =>{
+    // Filter the tutorsessions to include only those with a 'pending' status
+    filteredSessions.value = props.sessionSlots.filter(session => session.status === 'pending');
+    
+    filteredSessions.value.sort((a, b) => new Date(a.session_date) - new Date(b.session_date));
 });
 
 
-const sessionDate = ref('');
-const startTime = ref('');
-const endTime = ref('');
-const sessionNotes = ref('');
-
 const submitSessionRequest = () => {
-    if (!sessionDate.value || !startTime.value || !endTime.value) {
-        alert('Please select date, start time, and end time for the session.');
-        return;
-    }
 
-    const requestData = {
-        tutorId: props.tutorid, // Assuming modalData contains tutor details
-        date: sessionDate.value,
-        startTime: startTime.value,
-        endTime: endTime.value,
-        notes: sessionNotes.value,
+    // Prepare the data to be sent
+    const payload = {
+        module: form.module,
+        sessionSlot: form.sessionSlot,
+        notes: form.notes,
     };
 
-    // Send the request (adjust according to your API setup)
-    router.post('/tutor/sessions/request', requestData, {
+    console.log (payload);
+
+    // Submit the form using router.post
+    router.post('/tutor/sessions/request', payload, {
         onSuccess: () => {
             alert('Session request submitted successfully!');
-            closeModal();
+            props.closeModal(); // Close the modal on success
+            form.reset(); // Reset the form fields
         },
-        onError: (error) => {
-            console.error('Failed to submit session request:', error);
+        onError: (errors) => {
+            console.error('Failed to submit session request:', errors);
         },
     });
 };
+
+// Function to format date to words with suffix
+const formatDateToWords = (date) => {
+  const options = { year: 'numeric', month: 'long', day: 'numeric' };
+  const d = new Date(date);
+  const day = d.getDate();
+  const suffix = getDaySuffix(day);
+  
+  const formatter = new Intl.DateTimeFormat('en-US', options);
+  return `${formatter.format(d).replace(day, day + suffix)}`;
+};
+
+// Function to get the day suffix (st, nd, rd, th)
+const getDaySuffix = (day) => {
+  const j = day % 10;
+  const k = day % 100;
+  if (j === 1 && k !== 11) {
+    return 'st';
+  }
+  if (j === 2 && k !== 12) {
+    return 'nd';
+  }
+  if (j === 3 && k !== 13) {
+    return 'rd';
+  }
+  return 'th';
+};
+
 </script>
 
-<style scoped>
-/* Add any custom styles if needed */
-</style>
+<template>
+    <div v-if="openModal" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
+        <div class="bg-white rounded-lg shadow-md max-w-lg w-full overflow-hidden">
+            <!-- Modal Header -->
+            <div class="flex justify-between items-center py-2 px-6 bg-primary">
+                <h2 class="text-lg  font-light text-white">Tutor Details</h2>
+                <button id="closeModal" @click="closeModal" class="p-1 rounded-full bg-red-500 text-white"><XMarkIcon class="w-4" /></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="mt-4 px-6 pb-4">
+                <form @submit.prevent="submitSessionRequest">
+                    <div class="mb-4">
+                        <InputLabel for="session_module" value="Module" />
+                        <select
+                            id="session_module"
+                            class="cursor-pointer mt-1 block w-full text-lg shadow-sm border-gray-300 rounded-md hover:border-slate-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-slate-500"
+                            required
+                            v-model="form.module"
+                        >
+                            <option value="">Select Level</option>
+                            <option
+                                v-for="cModule in commonModules"
+                                :key="cModule.id"
+                                :value="cModule.id"
+                            >
+                                {{ cModule.module_name }}
+                            </option>
+                        </select>
+                        <InputError class="mt-2" :message="form.errors.module" />
+                    </div>
+                    <div class="mb-4">
+                        <InputLabel for="session-slot" value="Session Slot" />
+                        <select
+                            id="session_slots"
+                            class="cursor-pointer mt-1 block w-full text-lg shadow-sm border-gray-300 rounded-md hover:border-slate-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-slate-500"
+                            required
+                            v-model="form.sessionSlot"
+                        >
+                            <option value="">Select Level</option>
+                            <option
+                                v-for="slots in filteredSessions"
+                                :key="slots.id"
+                                :value="slots.id"
+                            >
+                                {{ formatDateToWords(slots.session_date) }} - {{ slots.start_time }} to {{ slots.end_time }}
+                            </option>
+                            <InputError class="mt-2" :message="form.errors.sessionSlot" />
+                        </select>
+                    </div>
+    
+                    <div class="mb-4">
+                        <inputLabel for="notes" value="Additional Notes" />
+                        <textarea
+                            id="notes"
+                            rows="3"
+                            class="mt-1 block w-full text-lg shadow-sm border-gray-300 rounded-md hover:border-slate-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-slate-500"
+                            placeholder="Any additional details for the tutor"
+                            v-model="form.notes"
+                        ></textarea>
+                    </div>
+                    <div class="mt-2 text-right">
+                        <PrimaryButton
+                            type="submit"
+                            @click =submitSessionRequest
+                        >
+                            Submit Request
+                        </PrimaryButton>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</template>

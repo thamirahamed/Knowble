@@ -9,3 +9,19 @@
     --gradient-color-3: #167454;
     --gradient-color-4: #0b3d41;
 }
+
+@keyframes pulseGreen {
+    0% {
+      background-color: white;
+    }
+    50% {
+      background-color: rgba(27, 143, 103, 0.2); /* Green */
+    }
+    100% {
+      background-color: white;
+    }
+}
+  
+.pulse-green {
+    animation: pulseGreen 1s ease-in-out;
+}

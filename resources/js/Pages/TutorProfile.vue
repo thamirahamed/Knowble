@@ -1,22 +1,23 @@
 <script setup>
-import { defineProps, ref } from "vue";
+import { defineProps, ref, onMounted, computed } from "vue";
 import ProfilePicture from "@/Components/ProfilePicture.vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { PencilIcon, CheckBadgeIcon, AcademicCapIcon, CalendarDateRangeIcon } from "@heroicons/vue/24/solid";
-import { router } from "@inertiajs/vue3";
+import { CheckBadgeIcon, AcademicCapIcon, CalendarDateRangeIcon } from "@heroicons/vue/24/solid";
 import RequestSession from "@/Components/RequestSession.vue";
 
 const props = defineProps({
     tutor: Array,
     profile: Array,
     school: Array,
-    modules: Array,
+    tutormodules: Array,
     degree: Array,
     level: Array,
-    availableTime: Array,
     user: Array,
-    sessions: Array,
+    sessions: [Array, null],
+    commonModules: [Array, null],
 });
+
+console.log(props.commonModules)
 
 const openModal = ref(null);
 const modalData = ref({});
@@ -27,6 +28,39 @@ const closeModal = () => {
 
 const openModalWithData = () => {
     openModal.value = true;
+};
+
+
+// Sort sessionSlots by session_date in ascending order
+onMounted(() =>{    
+    props.sessions.sort((a, b) => new Date(a.session_date) - new Date(b.session_date));
+});
+
+// Function to format date to words with suffix
+const formatDateToWords = (date) => {
+  const options = { year: 'numeric', month: 'long', day: 'numeric' };
+  const d = new Date(date);
+  const day = d.getDate();
+  const suffix = getDaySuffix(day);
+  
+  const formatter = new Intl.DateTimeFormat('en-US', options);
+  return `${formatter.format(d).replace(day, day + suffix)}`;
+};
+
+// Function to get the day suffix (st, nd, rd, th)
+const getDaySuffix = (day) => {
+  const j = day % 10;
+  const k = day % 100;
+  if (j === 1 && k !== 11) {
+    return 'st';
+  }
+  if (j === 2 && k !== 12) {
+    return 'nd';
+  }
+  if (j === 3 && k !== 13) {
+    return 'rd';
+  }
+  return 'th';
 };
 
 </script>
@@ -48,6 +82,8 @@ const openModalWithData = () => {
                     :openModal="openModal"
                     :tutorid="tutor.id"
                     :closeModal="closeModal"
+                    :commonModules="commonModules"
+                    :sessionSlots="sessions"
                 />
                 <!-- User Information Section -->
                 <div class="flex flex-col flex-1 pb-6 px-6">
@@ -68,12 +104,9 @@ const openModalWithData = () => {
                         <p class="text-gray-700">{{ level.level_name }}</p>
                     </div>
 
-                    <div v-if="sessions === null">
-                        <button id="bookSessionBtn" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md" @click="openModalWithData(tutor.id)">
-                              Book a Session
-                        </button>
-                    </div>
-
+                    <button id="bookSessionBtn" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md" @click="openModalWithData(tutor.id)">
+                            Book a Session
+                    </button>
 
                 </div>
             </div>
@@ -87,10 +120,10 @@ const openModalWithData = () => {
 
                 <div class="flex gap-12">
                     <!-- Selected Modules -->
-                    <div v-if="modules && modules.length > 0" class="flex-1">
+                    <div v-if="tutormodules && tutormodules.length > 0" class="flex-1">
                         <h3 class="text-lg font-semibold mb-2">Modules</h3>
                         <ul>
-                            <li v-for="module in modules" :key="module.id" class="flex items-center px-4 py-2 even:bg-gray-100 text-gray-800">
+                            <li v-for="module in tutormodules" :key="module.id" class="flex items-center px-4 py-2 even:bg-gray-100 text-gray-800">
                                 <AcademicCapIcon class="mr-2 w-5 text-gray-500" />
                                 {{ module.module_name }}
                             </li>
@@ -98,16 +131,19 @@ const openModalWithData = () => {
                     </div>
 
                     <!-- Available Time -->
-                    <div v-if="availableTime && availableTime.length > 0" class="mt-4 flex flex-col flex-1">
-                        <h3 class="text-lg font-semibold mb-2">Tutor Availability</h3>
+                    <div v-if="sessions.length > 0" class="mt-4 flex flex-col flex-1">
+                        <h3 class="text-lg font-medium mb-2">Tutor Availability</h3>
                         <ul>
-                            <li v-for="time in availableTime" :key="time.id" class="flex justify-between even:bg-accent/5 px-4 py-2 text-gray-800">
+                            <li 
+                                v-for="session in sessions" 
+                                :key="session.id" 
+                                class="flex justify-between even:bg-accent/5 px-4 py-2 text-gray-800"
+                            >
                                 <div class="flex items-center">
-                                    <CalendarDateRangeIcon class=" w-5 text-gray-500" />
-                                    {{ time.day }}
+                                    <CalendarDateRangeIcon class="mr-2 w-4 text-gray-700" /> {{ formatDateToWords(session.session_date) }} 
                                 </div>
                                 <div class="flex items-center">
-                                    {{ time.start_time }} - {{ time.end_time }}
+                                        {{ session.start_time }} - {{ session.end_time }}
                                 </div>
                             </li>
                         </ul>

@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\AvailableTime;
 use App\Models\Profile;
 use App\Models\Tutor;
 use App\Models\TutorSession;
 use App\Models\User;
+use App\Models\Module;
+use App\Models\DegreeProgram;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -25,27 +26,63 @@ class TutorController extends Controller
         $rejectedModules = $tutor->rejectedModules()->get();
         $rejectedReason = $tutor->rejectMessage()->first();
         $tutorsSelectedModules = $tutor->selectedModules()->get();
-        $availableTimes = AvailableTime::where('tutor_id', $tutor->id)->get();
 
-        $tutorsessions = TutorSession::where('tutor_id', $tutor->id)->get();
-        $sessionuserdetails = [];
-        foreach ($tutorsessions as $session) {
-            $sessionuserdetails[] = $session->user()->first();
+        // Pending sessions created by the tutor
+        $tutorsessions = TutorSession::where('tutor_id', $tutor->id)
+                             ->where('status', 'pending')
+                             ->get();
+        // Convert the collection to an array for sorting
+        $tutorsessionsArray = $tutorsessions->toArray();
+
+        // Sort the array by session_date and then start_time
+        usort($tutorsessionsArray, function ($a, $b) {
+            // Compare session_date first
+            $dateComparison = strtotime($a['session_date']) - strtotime($b['session_date']);
+            if ($dateComparison === 0) {
+                // If session_date is the same, compare start_time
+                return strtotime($a['start_time']) - strtotime($b['start_time']);
+            }
+            return $dateComparison;
+        });
+
+        // You can convert the sorted array back to a collection if needed
+        $tutorsessions = collect($tutorsessionsArray);
+
+        //User details of the students who have booked a session with the tutor
+        $bookings = TutorSession::where('tutor_id', $tutor->id)
+                                ->where('status', 'booked')
+                                ->get();
+        $bookingdetails = [];
+        foreach ($bookings as $booking) {
+            $user = User::where('id', $booking->user_id)->first();
+            $module = Module::where('id', $booking->module_id)->first();
+            $profiles = Profile::where('user_id', $booking->user_id)->first();
+            $degree = DegreeProgram::where('id', $profiles->degree_id)->first();
+
+            $bookingdetails[] = [
+                'id' => $booking->id,
+                'user' => $user->name,
+                'profile_pic' => $profiles->profile_pic,
+                'degree' => $degree->degree_name,
+                'meeting_url' => $booking->meeting_url,
+                'notes' => $booking->notes,
+                'module_name' => $module ? $module->module_name : 'Unknown Module',
+                'session_date' => $booking->session_date,
+                'start_time' => $booking->start_time,
+                'end_time' => $booking->end_time,
+            ];
         }
 
-        $requests = $tutor->sessions()->get();
-        //User details of the students who have requested the tutor
-        $userdetails = [];
-        foreach ($requests as $request) {
-            $user = User::where('id', $request->user_id)->first();
-            //profile details also
-            $profiles = Profile::where('user_id', $request->user_id)->first();
-
-            $userdetails[] = [
-                'user' => $user,
-                'profile' => $profiles,
-                      ];
-        }
+        // Sort session details by session_date and then by start_time
+        usort($bookingdetails, function ($a, $b) {
+            // Compare session_date first
+            $dateComparison = strtotime($a['session_date']) - strtotime($b['session_date']);
+            if ($dateComparison === 0) {
+                // If session_date is the same, compare start_time
+                return strtotime($a['start_time']) - strtotime($b['start_time']);
+            }
+            return $dateComparison;
+        });
 
         return Inertia::render('Tutor/Dashboard',
         [
@@ -53,9 +90,8 @@ class TutorController extends Controller
             'rejectedModules' => $rejectedModules,
             'rejectedReason' => $rejectedReason,
             'tutorsSelectedModules' => $tutorsSelectedModules,
-            'availableTimes' => $availableTimes,
-            'requests' => $requests,
-            'userdetails' => $userdetails,
+            'sessionSlots' => $tutorsessions,
+            'bookings' => $bookingdetails,
         ]);
     }
 
@@ -75,52 +111,54 @@ class TutorController extends Controller
         return redirect()->route('tutor.dashboard');
     }
 
-    public function storeAvailableTimes(Request $request)
+    public function createSession (Request $request)
     {
-
         // Retrieve the tutor associated with the authenticated user
         $tutor = Tutor::where('user_id', auth()->id())->first();
 
-        $tutoravailabletimes = $tutor->availableTimes()->get();
-        $tutoravailabletimes->each->delete();
+        $tutorsessionslots = $tutor->sessions()->get();
+        // $tutorsessionslots->each->delete();
+
+        if (!$tutor) {
+            return redirect()->route('tutor.dashboard')
+                ->with('error', 'No associated tutor account found. Please contact support.');
+        }
 
         // Validate the request
         $request->validate([
             'sessions' => 'required|array',
-            'sessions.*.day' => 'required|string',
+            'sessions.*.session_date' => 'required|string',
             'sessions.*.start_time' => 'required|date_format:H:i',
             'sessions.*.end_time' => 'required|date_format:H:i',
         ]);
 
-        // Loop through sessions and store each time slot
-        foreach ($request->sessions as $session) {
-            AvailableTime::create([
-                'tutor_id' => $tutor->id,
-                'day' => $session['day'],
-                'start_time' => $session['start_time'],
-                'end_time' => $session['end_time']
-            ]);
-        }
+        // Extract the single session from the array
+        $session = $request->sessions[0];
+
+        // Store the session
+        TutorSession::create([
+            'tutor_id' => $tutor->id,
+            'session_date' => $session['session_date'],
+            'start_time' => $session['start_time'],
+            'end_time' => $session['end_time'],
+        ]);
 
         return redirect()->route('tutor.dashboard');
     }
 
-    public function destroyAvailableTimes(Request $request)
+    public function deleteSession ($id)
     {
-        dd($request->all());
+        $session = TutorSession::findOrFail($id);
+
+        // Ensure the session belongs to the authenticated tutor
         $tutor = Tutor::where('user_id', auth()->id())->first();
+        if ($session->tutor_id !== $tutor->id) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
 
-        // Validate that 'days' is provided
-        $request->validate([
-            'days' => 'required|array',
-        ]);
+        $session->delete();
 
-        // Delete available times for the provided days
-        AvailableTime::where('tutor_id', $tutor->id)
-            ->whereIn('day', $request->days)
-            ->delete();
-
-        return response()->json(['message' => 'Available times deleted successfully']);
+        return redirect()->route('tutor.dashboard');
     }
 
 }

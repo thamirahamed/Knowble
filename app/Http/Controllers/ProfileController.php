@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
-use App\Models\AvailableTime;
 use App\Models\Course;
 use App\Models\CourseLevel;
 use App\Models\DegreeProgram;
@@ -13,6 +12,7 @@ use App\Models\Semester;
 use App\Models\Tutor;
 use App\Models\User;
 use App\Models\Profile;
+use App\Models\TutorSession;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -180,17 +180,18 @@ class ProfileController extends Controller
     // New Method to display the profile
     public function show()
     {
+        $userId = auth()->id();
         $profile = Profile::where('user_id', auth()->id())->firstOrFail();
-        $tutor = Tutor::where('user_id', auth()->id())->first();
+        $tutor = Tutor::where('user_id', $userId)->first();
 
         $userdetails = auth()->user();
         $userschool = SchoolOfStudy::find($profile->school_id);
         $userlevel  = Level::find($profile->level_id);
         $usersemester = Semester::find($profile->semester_id);
         $usercourse = DegreeProgram::find($profile->degree_id);
-
+        
         if($tutor){
-            $tutoravailabletime = AvailableTime::where('tutor_id', $tutor->id)->get();
+            $tutorsessions = TutorSession::where('tutor_id', $tutor->id)->get();
             $tutorselectedmodules = $tutor->selectedModules()->get();
 
             return Inertia::render('Profile/View',[
@@ -200,7 +201,7 @@ class ProfileController extends Controller
                 'level' => $userlevel,
                 'semester' => $usersemester,
                 'course' => $usercourse,
-                'tutoravailabletime' => $tutoravailabletime,
+                'tutorsessions' => $tutorsessions,
                 'tutorselectedmodules' => $tutorselectedmodules,
             ]);
         }

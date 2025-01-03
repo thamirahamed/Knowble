@@ -781,17 +781,17 @@ class DatabaseSeeder extends Seeder
             ]);
                     
             // Insert default availability (customize as needed)
-            $days = ['Monday', 'Wednesday', 'Friday'];
-            foreach ($days as $day) {
-                DB::table('available_times')->insert([
-                    'tutor_id' => $tutorId,
-                    'day' => $day,
-                    'start_time' => '10:00:00',
-                    'end_time' => '12:00:00',
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-            }
+            // $days = ['Monday', 'Wednesday', 'Friday'];
+            // foreach ($days as $day) {
+            //     DB::table('available_times')->insert([
+            //         'tutor_id' => $tutorId,
+            //         'day' => $day,
+            //         'start_time' => '10:00:00',
+            //         'end_time' => '12:00:00',
+            //         'created_at' => now(),
+            //         'updated_at' => now(),
+            //     ]);
+            // }
 
             // Insert approved modules into tutor_selected_modules table
             foreach ($tutor['approved_modules'] as $moduleId) {

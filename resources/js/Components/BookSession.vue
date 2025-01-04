@@ -44,14 +44,14 @@ const submitSessionRequest = () => {
     console.log (payload);
 
     // Submit the form using router.post
-    router.post('/tutor/sessions/request', payload, {
+    router.post('/tutor/sessions/book', payload, {
         onSuccess: () => {
-            alert('Session request submitted successfully!');
+            alert('Session booked successfully!');
             props.closeModal(); // Close the modal on success
             form.reset(); // Reset the form fields
         },
         onError: (errors) => {
-            console.error('Failed to submit session request:', errors);
+            console.error('Failed to book session:', errors);
         },
     });
 };

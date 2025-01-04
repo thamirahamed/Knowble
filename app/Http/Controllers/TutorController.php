@@ -52,6 +52,7 @@ class TutorController extends Controller
         $bookings = TutorSession::where('tutor_id', $tutor->id)
                                 ->where('status', 'booked')
                                 ->get();
+        $tutorName = User::where('id', $tutor->user_id)->first();
         $bookingdetails = [];
         foreach ($bookings as $booking) {
             $user = User::where('id', $booking->user_id)->first();
@@ -62,6 +63,7 @@ class TutorController extends Controller
             $bookingdetails[] = [
                 'id' => $booking->id,
                 'user' => $user->name,
+                'tutor' => $tutorName->name,
                 'profile_pic' => $profiles->profile_pic,
                 'degree' => $degree->degree_name,
                 'meeting_url' => $booking->meeting_url,

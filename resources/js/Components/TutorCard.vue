@@ -1,6 +1,7 @@
 <script setup>
 import { CheckBadgeIcon } from '@heroicons/vue/24/solid';
 import PrimaryButton from './PrimaryButton.vue';
+import { router } from '@inertiajs/vue3';
 
 const props = defineProps({
     tutorname: String,
@@ -9,6 +10,10 @@ const props = defineProps({
     tutor_id: Number,
     school: String,
 });
+
+const viewProfile = (tutorid) => {
+    router.visit(route('tutor.profile', { id: tutorid }));
+}  
 </script>
 
 <template>
@@ -22,14 +27,20 @@ const props = defineProps({
         </div>
         <div class="flex flex-1 flex-col text-lg">
             <div class="flex flex-row items-center">
-                <h1 class="text-slate-900 font-semibold">{{ props.tutorname }}</h1>
+                <h1 class="text-slate-900 font-semibold">{{ tutorname }}</h1>
                 <CheckBadgeIcon class="ml-1 w-5" />
             </div>
-            <h2 class="text-slate-500 font-light">{{ props.cbnumber }}</h2>
-            <h2 class="text-slate-500 font-light">{{props.school}}</h2>
+            <h2 class="text-slate-500 font-light">{{ cbnumber }}</h2>
+            <h2 class="text-slate-500 font-light">{{ school }}</h2>
         </div>
         <div>
-            <PrimaryButton id="viewProfileBtn" class="!text-sm"><a :href="route('tutor.profile', props.tutor_id)">View Profile</a></PrimaryButton>
+            <PrimaryButton 
+                :id="'viewProfileBtn-' + tutor_id" 
+                class="!text-sm" 
+                @click="viewProfile(tutor_id)"
+            >   
+                View Profile
+            </PrimaryButton>
         </div>
     </div>
 </template>

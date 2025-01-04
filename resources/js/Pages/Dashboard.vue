@@ -14,7 +14,7 @@ const props = defineProps({
     tutors: Array,
     sessions: Array,
 });
-console.log(props.sessions);
+console.log(JSON.stringify(props.sessions, null, 2));
 
 function getDegreeName(schoolId) {
     const school = props.allDegree.find((deg) => deg.id === schoolId);
@@ -26,8 +26,19 @@ const selectedModule = ref("");
 
 // Error message for validation
 const moduleError = ref("");
-const joinMeeting = (meetingUrl) => {
-    router.visit(route("meetings.index", { meetingUrl }));
+
+// Redirect to Join Meeting with the meeting_url from a specific booking
+const joinMeeting = (booking) => {
+    // Get the base meeting URL from the booking
+    let meetingUrl = booking.meeting_url;
+    
+    // Create the tutor's name (convert to lowercase and replace spaces with hyphens)
+    const studentName = booking.student_name.replace(" ", "-").toLowerCase();  // Example: Emily Davis -> emily-davis
+    
+    // append the 'name' parameter
+    meetingUrl += `&name=${studentName}`;
+
+    router.visit(route("meetings.index", { meetingUrl, id: booking.id }));
 };
 
 // Function to format date to words with suffix
@@ -103,7 +114,7 @@ const getDaySuffix = (day) => {
                                 :tutorname="tutor.user.name"
                                 :cbnumber="tutor.profile.cb_number"
                                 :profile_pic="tutor.profile.profile_pic"
-                                :tutor_id="tutor.tutor"
+                                :tutor_id="tutor.tutor.id"
                                 :school="getDegreeName(tutor.profile.degree_id)"
                             />
                         </div>
@@ -127,6 +138,11 @@ const getDaySuffix = (day) => {
                                 <!-- Tutor Name -->
                                 <div>
                                     <div class="flex items-center">
+                                        <img
+                                            :src="session.profile_pic"
+                                            alt="Profile Picture"
+                                            class="w-8 h-8 mr-3 rounded-full object-cover"
+                                        />
                                         <p class="text-lg font-semibold text-gray-800">{{ session.tutor_name }}</p>
                                         <CheckBadgeIcon class="ml-1 w-5" />
                                     </div>
@@ -139,7 +155,7 @@ const getDaySuffix = (day) => {
                                         <p class="text-lg text-gray-600">{{ formatDateToWords(session.session_date) }}</p>
                                         <p class="text-lg text-gray-600">{{ session.start_time }} - {{ session.end_time }}</p>
                                     </div>
-                                    <PrimaryButton class="!text-sm">Join Now</PrimaryButton>
+                                    <PrimaryButton :id="'joinMeeting-' + session.id" class="!text-sm" @click="joinMeeting(session)">Join Now</PrimaryButton>
                                 </div>
                             </div>
                         </div>

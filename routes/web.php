@@ -12,16 +12,6 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
- Route::get('/', function () {
-     return Inertia::render('Welcome', [
-         'canLogin' => Route::has('login'),
-         'canRegister' => Route::has('register'),
-         'laravelVersion' => Application::VERSION,
-         'phpVersion' => PHP_VERSION,
-     ]
-);
- });
-
 // Landing page
 Route::get('/', function () {
     return redirect()->route('login', [
@@ -55,7 +45,6 @@ Route::middleware(['auth','studentportal'])->group(function () {
 Route::middleware(['auth','adminportal'])->group(function () {
     Route::prefix('admin')->group(function () {
         Route::get('/dashboard', [AdminVerificationController::class, 'adminDashboard'])->name('admin.dashboard');
-
     });
 });
 
@@ -70,7 +59,7 @@ Route::middleware(['auth'])->group(function (){
     Route::get('/admin/tutordata/{id}', [AdminVerificationController::class, 'tutordata'])->name('get.tutor.data');
 });
 
-//chat
+//Chat and Tutor Portal
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/chat', [ChatController::class, 'index'])->name('chatpage');
     Route::get('/api/chat/users', [ChatController::class, 'getUsers']);
@@ -89,7 +78,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 });
 
-// Admin Verification
+// Student Portak
 Route::middleware(['auth' ,'studentportal'])->group(function () {
     // Show all tutors in dashboard
     Route::get('/dashboard',[StudentController::class, 'dashboard'])->name('dashboard');
@@ -100,13 +89,10 @@ Route::middleware(['auth' ,'studentportal'])->group(function () {
     // Show Tutor Profile Data
     Route::get('/tutor/profile/{id}',[StudentController::class, 'tutorProfile'])->name('tutor.profile');
 
-    Route::get('/tutor/session/request/{id}',[StudentController::class, 'requestSession'])->name('tutor.session.request');
     Route::get('/meetings', [MeetingController::class, 'index'])->name('meetings.index');
-    Route::post('/meetings/create', [MeetingController::class, 'create'])->name('meetings.create');
 
-    Route::post('/tutor/sessions/request', [StudentController::class, 'requestSession'])->name('tutor.session.request');
+    Route::post('/tutor/sessions/book', [StudentController::class, 'bookSession'])->name('tutor.session.book');
     Route::post('/tutor/sessions/cancel/{id}', [StudentController::class, 'cancelSession'])->name('request.session.cancel');
-    Route::post('/tutor/sessions/accept/{id}', [StudentController::class, 'acceptSession'])->name('request.session.accept');
 });
 
 

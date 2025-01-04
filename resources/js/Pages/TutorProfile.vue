@@ -3,7 +3,7 @@ import { defineProps, ref, onMounted, computed } from "vue";
 import ProfilePicture from "@/Components/ProfilePicture.vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { CheckBadgeIcon, AcademicCapIcon, CalendarDateRangeIcon } from "@heroicons/vue/24/solid";
-import RequestSession from "@/Components/RequestSession.vue";
+import BookSession from "@/Components/BookSession.vue";
 
 const props = defineProps({
     tutor: Array,
@@ -16,8 +16,6 @@ const props = defineProps({
     sessions: [Array, null],
     commonModules: [Array, null],
 });
-
-console.log(props.commonModules)
 
 const openModal = ref(null);
 const modalData = ref({});
@@ -78,7 +76,7 @@ const getDaySuffix = (day) => {
                         class="w-full h-auto shadow-[rgba(50,_50,_105,_0.15)_0px_2px_5px_0px,_rgba(0,_0,_0,_0.05)_0px_1px_1px_0px]"
                     />
                 </div>
-                <RequestSession
+                <BookSession
                     :openModal="openModal"
                     :tutorid="tutor.id"
                     :closeModal="closeModal"

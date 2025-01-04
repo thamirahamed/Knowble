@@ -2,7 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Meeting;
+use App\Models\Profile;
+use App\Models\Tutor;
+use App\Models\TutorSession;
+use App\Models\User;
+use App\Models\Module;
+use App\Models\DegreeProgram;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -11,39 +16,38 @@ class MeetingController extends Controller
     // Show meeting dashboard
     public function index(Request $request)
     {
+        $userId = auth()->id();
+        $isTutor = Tutor::where('user_id', $userId)->first();
+        $booking = TutorSession::where('id', $request->get('id'))->first();
 
-        return Inertia::render('Meetings/Index',
-        [
-            'meetingUrl' => $request->get('meetingUrl')
-        ]);
-    }
-
-    // Create a new meeting
-    public function create(Request $request)
-    {
-        try {
-            // Validate the input
-            $request->validate([
-                'host_name' => 'required|string|max:255',
-            ]);
-
-            // Generate a unique meeting ID
-            $meetingId = uniqid('meet_');
-
-            // Create the meeting in the database
-            $meeting = Meeting::create([
-                'meeting_id' => $meetingId,
-                'host_name' => $request->host_name,
-            ]);
-
-            // Return the meeting URL
-            return response()->json([
-                'meeting_url' => "https://meet.jit.si/$meetingId",
-            ]);
-        } catch (\Exception $e) {
-            // Log the error for debugging
-            \Log::error('Error creating meeting: ' . $e->getMessage());
-            return response()->json(['error' => 'Internal Server Error'], 500);
+        if(!$booking){
+            return back();
         }
+
+        //Retrieve Tutor Information
+        $tutorId = $booking->tutor_id;
+        $tutor = Tutor::where('id', $tutorId)->first();
+        $tutorName = User::where('id', $tutor->user_id)->first();
+
+        // Retrieve the module name
+        $module = Module::where('id', $booking->module_id)->first();
+        $moduleName = $module->module_name;
+
+        // Create the array with only required information
+        $bookingDetails = [
+            'isUserTutor' => $isTutor ? "Yes" : "No",
+            'tutor_id' => $tutorName->id,
+            'tutor_name' => $tutorName->name,
+            'module_name' => $moduleName,
+            'session_date' => $booking->session_date,
+            'start_time' => $booking->start_time,
+            'end_time' => $booking->end_time,
+            'notes' => $booking->notes,
+        ];
+        return Inertia::render('Meetings/VideoCall',
+        [
+            'meetingUrl' => $request->get('meetingUrl'),
+            'bookingDetails' => $bookingDetails,
+        ]);
     }
 }

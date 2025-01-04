@@ -8,8 +8,10 @@ use App\Models\Module;
 use App\Models\Profile;
 use App\Models\SchoolOfStudy;
 use App\Models\Tutor;
+use App\Models\User;
 use App\Models\TutorSession;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class StudentController extends Controller
@@ -94,9 +96,14 @@ class StudentController extends Controller
         $sessionDetails = [];
         foreach ($sessions as $session) {
             $tutor = Tutor::where('id', $session->tutor_id)->with('user')->first();
+            $profiles = Profile::where('user_id', $session->user_id)->first();
             $module = Module::where('id', $session->module_id)->first();
+            $studentName = User::where('id', $userid)->first();
             $sessionDetails[] = [
+                'id' => $session->id,
+                'student_name' => $studentName->name,
                 'tutor_name' => $tutor ? $tutor->user->name : 'Unknown Tutor',
+                'profile_pic' => $profiles->profile_pic,
                 'meeting_url' => $session->meeting_url,
                 'module_name' => $module ? $module->module_name : 'Unknown Module',
                 'session_date' => $session->session_date,
@@ -166,13 +173,35 @@ class StudentController extends Controller
         ]);
     }
 
-    public function requestSession(Request $request)
+    public function bookSession(Request $request)
     {
         $userid = auth()->user()->id;
         $session = TutorSession::find($request->sessionSlot);
+        $tutor = Tutor::where('id', $session->tutor_id)->first();
+        $tutorName = User::where('id', $tutor->user_id)->first();
+
+        // Base URL
+        $baseUrl = "https://sfu.mirotalk.com/join";
+
+        // Generate room name: "Tutor Session with <Tutor Name>"
+        $roomName = Str::slug("Tutor Session with {$tutorName->name}", '-');
+
+        // Function to generate random 6-character password
+        function generateRandomPassword($length = 6) {
+            return substr(str_shuffle("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"), 0, $length);
+        }
+
+        // Generate room password
+        $roomPassword = generateRandomPassword();
+
+        // Construct the full URL
+        $roomUrl = "{$baseUrl}?room={$roomName}&roomPassword={$roomPassword}&audio=0&video=0&screen=0&notify=0&duration=unlimited";
+
+        // Save all session data
         $session->status = 'booked';
         $session->user_id = $userid;
         $session->module_id = $request->module;
+        $session->meeting_url = $roomUrl;
         $session->notes = $request->notes;
         $session->save();
 
@@ -188,21 +217,4 @@ class StudentController extends Controller
 
         return redirect()->back();
     }
-
-    public function acceptSession($id)
-    {
-        $session = TutorSession::where('id', $id)->first();
-        $session->status = 'accepted';
-
-        // Generate a meeting link
-        $meetingId = uniqid('meet_');
-        $meetingUrl = "https://meet.jit.si/$meetingId";
-
-        // Save meeting URL to the session
-        $session->meeting_url = $meetingUrl;
-        $session->save();
-
-        return redirect()->back();
-    }
-
 }

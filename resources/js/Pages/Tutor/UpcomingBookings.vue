@@ -11,33 +11,18 @@ const props = defineProps({
 
 console.log(JSON.stringify(props.bookings, null, 2))
 
-// Approve Request and Create Meeting
-const approveRequest = async (id, tutorName) => {
-    try {
-        const response = await axios.post(route("meetings.create"), {
-            host_name: tutorName,
-        });
+// Redirect to Join Meeting with the meeting_url from a specific booking
+const joinMeeting = (booking) => {
+    // Get the base meeting URL from the booking
+    let meetingUrl = booking.meeting_url;
+    
+    // Create the tutor's name (convert to lowercase and replace spaces with hyphens)
+    const tutorName = booking.tutor.replace(" ", "-").toLowerCase();  // Example: Emily Davis -> emily-davis
+    
+    // append the 'name' parameter
+    meetingUrl += `&name=${tutorName}`;
 
-        const meetingUrl = response.data.meeting_url;
-
-        // Update session to approved and store meeting URL
-        router.post(route("request.session.accept", { id }), {}, {
-            onSuccess: () => {
-                enhancedRequests.value = enhancedRequests.value.map((request) =>
-                    request.id === id
-                        ? { ...request, status: "approved", meeting_url: meetingUrl }
-                        : request
-                );
-            },
-        });
-    } catch (error) {
-        console.error("Error creating meeting:", error);
-    }
-};
-
-// Redirect to Join Meeting
-const joinMeeting = (meetingUrl) => {
-    router.visit(route("meetings.index", { meetingUrl }));
+    router.visit(route("meetings.index", { meetingUrl, id: booking.id }));
 };
 
 // Reject Request
@@ -103,11 +88,15 @@ const getDaySuffix = (day) => {
                         <p class="text-lg text-gray-600">
                             {{ formatDateToWords(booking.session_date) }} | {{ booking.start_time }} - {{ booking.end_time }}
                         </p>
+                        <p v-if="booking.notes " class="text-lg text-gray-600">Notes: {{ booking.notes }}</p>
                     </div>
                 </div>
 
                 <div class="flex items-center gap-2">
-                    <PrimaryButton>
+                    <PrimaryButton
+                        :id="'joinSession-' + booking.id" 
+                        @click="joinMeeting(booking)"
+                    >
                         Join Now
                     </PrimaryButton>
                     <DangerButton>

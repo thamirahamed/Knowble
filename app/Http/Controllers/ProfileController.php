@@ -191,7 +191,26 @@ class ProfileController extends Controller
         $usercourse = DegreeProgram::find($profile->degree_id);
         
         if($tutor){
-            $tutorsessions = TutorSession::where('tutor_id', $tutor->id)->get();
+            $tutorSessions = TutorSession::where('tutor_id', $tutor->id)
+                             ->where('status', 'pending')
+                             ->get();
+            // Convert the collection to an array for sorting
+            $tutorsessionsArray = $tutorSessions->toArray();
+
+            // Sort the array by session_date and then start_time
+            usort($tutorsessionsArray, function ($a, $b) {
+                // Compare session_date first
+                $dateComparison = strtotime($a['session_date']) - strtotime($b['session_date']);
+                if ($dateComparison === 0) {
+                    // If session_date is the same, compare start_time
+                    return strtotime($a['start_time']) - strtotime($b['start_time']);
+                }
+                return $dateComparison;
+            });
+
+            // You can convert the sorted array back to a collection if needed
+            $tutorSessions = collect($tutorsessionsArray);
+            
             $tutorselectedmodules = $tutor->selectedModules()->get();
 
             return Inertia::render('Profile/View',[
@@ -201,7 +220,7 @@ class ProfileController extends Controller
                 'level' => $userlevel,
                 'semester' => $usersemester,
                 'course' => $usercourse,
-                'tutorsessions' => $tutorsessions,
+                'tutorsessions' => $tutorSessions,
                 'tutorselectedmodules' => $tutorselectedmodules,
             ]);
         }

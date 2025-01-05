@@ -21,7 +21,18 @@ const form = useForm({
     notes: '',
 });
 
-const submitSessionBooking = () => {
+// Create a reactive reference to store the filtered tutorsessions
+const filteredSessions = ref([]);
+
+onMounted(() =>{
+    // Filter the tutorsessions to include only those with a 'pending' status
+    filteredSessions.value = props.sessionSlots.filter(session => session.status === 'pending');
+    
+    filteredSessions.value.sort((a, b) => new Date(a.session_date) - new Date(b.session_date));
+});
+
+
+const submitSessionRequest = () => {
 
     // Prepare the data to be sent
     const payload = {
@@ -99,7 +110,6 @@ const getDaySuffix = (day) => {
                                 v-for="cModule in commonModules"
                                 :key="cModule.id"
                                 :value="cModule.id"
-                                :id="'session-'+ cModule.id"
                             >
                                 {{ cModule.module_name }}
                             </option>
@@ -116,10 +126,9 @@ const getDaySuffix = (day) => {
                         >
                             <option value="">Select Level</option>
                             <option
-                                v-for="slots in sessionSlots"
+                                v-for="slots in filteredSessions"
                                 :key="slots.id"
                                 :value="slots.id"
-                                :id="'session-'+slots.id"
                             >
                                 {{ formatDateToWords(slots.session_date) }} - {{ slots.start_time }} to {{ slots.end_time }}
                             </option>
@@ -139,9 +148,8 @@ const getDaySuffix = (day) => {
                     </div>
                     <div class="mt-2 text-right">
                         <PrimaryButton
-                            id="submitSessionBtn"
                             type="submit"
-                            @click =submitSessionBooking
+                            @click =submitSessionRequest
                         >
                             Submit Request
                         </PrimaryButton>

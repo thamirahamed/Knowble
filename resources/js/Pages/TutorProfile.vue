@@ -4,6 +4,8 @@ import ProfilePicture from "@/Components/ProfilePicture.vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { CheckBadgeIcon, AcademicCapIcon, CalendarDateRangeIcon } from "@heroicons/vue/24/solid";
 import BookSession from "@/Components/BookSession.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
+import { Head } from "@inertiajs/vue3";
 
 const props = defineProps({
     tutor: Array,
@@ -12,13 +14,13 @@ const props = defineProps({
     tutormodules: Array,
     degree: Array,
     level: Array,
+    semester: Array,
     user: Array,
     sessions: [Array, null],
     commonModules: [Array, null],
 });
 
 const openModal = ref(null);
-const modalData = ref({});
 
 const closeModal = () => {
     openModal.value = null;
@@ -27,12 +29,6 @@ const closeModal = () => {
 const openModalWithData = () => {
     openModal.value = true;
 };
-
-
-// Sort sessionSlots by session_date in ascending order
-onMounted(() =>{    
-    props.sessions.sort((a, b) => new Date(a.session_date) - new Date(b.session_date));
-});
 
 // Function to format date to words with suffix
 const formatDateToWords = (date) => {
@@ -63,92 +59,102 @@ const getDaySuffix = (day) => {
 
 </script>
 <template>
+    <Head :title='user.name' />
+
     <AuthenticatedLayout>
-    <!-- Main Container -->
-    <div class="flex justify-center bg-gray-100  p-6">
-        <div class="flex lg:max-w-7xl w-full gap-8">
-            <!-- Profile Info Section -->
-            <div class="flex flex-col max-w-xs w-full bg-white rounded-md mt-8 shadow">
-                <!-- Profile Pic Section -->
-                <div class="flex py-8 px-8 justify-center">
-                    <ProfilePicture
-                        :profile="profile"
-                        class="w-full h-auto shadow-[rgba(50,_50,_105,_0.15)_0px_2px_5px_0px,_rgba(0,_0,_0,_0.05)_0px_1px_1px_0px]"
+        <!-- Main Container -->
+        <div class="flex justify-center">
+            <div class="flex lg:max-w-7xl w-full gap-8">
+                <!-- Profile Info Section -->
+                <div class="flex flex-col max-w-xs w-full bg-white rounded-md mt-8 shadow h-fit">
+                    <!-- Profile Pic Section -->
+                    <div class="flex py-8 px-8 justify-center">
+                        <ProfilePicture
+                            :profile="profile"
+                            class="w-full h-auto shadow-[rgba(50,_50,_105,_0.15)_0px_2px_5px_0px,_rgba(0,_0,_0,_0.05)_0px_1px_1px_0px]"
+                        />
+                    </div>
+                    <BookSession
+                        :openModal="openModal"
+                        :tutorid="tutor.id"
+                        :closeModal="closeModal"
+                        :commonModules="commonModules"
+                        :sessionSlots="sessions"
                     />
-                </div>
-                <BookSession
-                    :openModal="openModal"
-                    :tutorid="tutor.id"
-                    :closeModal="closeModal"
-                    :commonModules="commonModules"
-                    :sessionSlots="sessions"
-                />
-                <!-- User Information Section -->
-                <div class="flex flex-col flex-1 pb-6 px-6">
-                    <div class="border-t border-gray-300 py-3">
-                        <h1 class="text-2xl font-bold text-slate-900 flex items-center">
-                            <template v-if="tutor === 'approved'">
+                    <!-- User Information Section -->
+                    <div class="flex flex-col flex-1 pb-5 px-6">
+                        <div class="border-y border-gray-300 py-3 px-1">
+                            <h1 class="flex text-2xl font-extrabold tracking-wide text-slate-900">
                                 {{ user.name }}
-                                <CheckBadgeIcon class="ml-2 w-6 text-green-500" />
-                            </template>
-                            <template v-else>
-                                {{ user.name }}
-                            </template>
-                        </h1>
-                        <p class="text-lg font-medium text-gray-600">{{ profile.cb_number }}</p>
-                    </div>
-                    <div class="pt-2">
-                        <p class="text-gray-700">{{ degree.degree_name }}</p>
-                        <p class="text-gray-700">{{ level.level_name }}</p>
-                    </div>
+                                <CheckBadgeIcon class="ml-1 w-6 text-accent" />
+                            </h1>
+                            <p class="text-xl font-medium text-gray-700">{{ profile.cb_number }}</p>
+                        </div>
+                        <div class="p-1">
+                            <p class="text-lg text-gray-700">{{ degree.degree_name }}</p>
+                            <p class="text-lg text-gray-700">{{ level.level_name }} | {{ semester.semester_name }}</p>
+                        </div>
 
-                    <button id="bookSessionBtn" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md" @click="openModalWithData(tutor.id)">
-                            Book a Session
-                    </button>
-
+                        <PrimaryButton 
+                            v-if="sessions.length > 0 && tutormodules.length > 0"
+                            id="bookSessionBtn" 
+                            class="mt-4 w-full" 
+                            @click="openModalWithData(tutor.id)"
+                        >
+                            Book Session
+                        </PrimaryButton>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Tutor Details -->
-            <div v-if="tutor.status === 'approved'" class="flex flex-col flex-1 bg-white rounded-md shadow-md mt-8 p-6">
-                <h2 class="text-2xl font-bold mb-4">Tutor Details</h2>
-                <p class="text-gray-600 mb-6">
-                    View the tutor's modules and availability to easily find when and what they teach.
-                </p>
+                <!-- Tutor Details -->
+                <div class="flex flex-col flex-1 bg-white rounded-md mt-8 shadow h-fit py-4 px-6">
+                    <h2 class="text-2xl font-bold">Tutor Details</h2>
+                    <p class="text-gray-700">
+                        View the tutor's modules and availability to easily find when and what they teach.
+                    </p>
 
-                <div class="flex gap-12">
-                    <!-- Selected Modules -->
-                    <div v-if="tutormodules && tutormodules.length > 0" class="flex-1">
-                        <h3 class="text-lg font-semibold mb-2">Modules</h3>
-                        <ul>
-                            <li v-for="module in tutormodules" :key="module.id" class="flex items-center px-4 py-2 even:bg-gray-100 text-gray-800">
-                                <AcademicCapIcon class="mr-2 w-5 text-gray-500" />
-                                {{ module.module_name }}
-                            </li>
-                        </ul>
-                    </div>
+                    <div class="flex w-full gap-12">
+                        <!-- Selected Modules -->
+                        <div v-if="tutormodules && tutormodules.length > 0" class="mt-4 flex flex-col flex-1">
+                            <h3 class="text-lg font-semibold mb-2">Modules</h3>
+                            <ul>
+                                <li v-for="module in tutormodules" :key="module.id" class="flex items-center even:bg-accent/5 px-4 py-2 text-gray-800">
+                                    <AcademicCapIcon class="mr-2 w-4 h-4 text-gray-700" />
+                                    {{ module.module_name }}
+                                </li>
+                            </ul>
+                        </div>
+                        <div v-else class="mt-4 flex flex-col flex-1">
+                            <h3 class="text-lg font-medium mb-2">Modules</h3>
+                            <p class="mt-2 text-gray-600 h-full">No modules available.</p>
+                        </div>
 
-                    <!-- Available Time -->
-                    <div v-if="sessions.length > 0" class="mt-4 flex flex-col flex-1">
-                        <h3 class="text-lg font-medium mb-2">Tutor Availability</h3>
-                        <ul>
-                            <li 
-                                v-for="session in sessions" 
-                                :key="session.id" 
-                                class="flex justify-between even:bg-accent/5 px-4 py-2 text-gray-800"
-                            >
-                                <div class="flex items-center">
-                                    <CalendarDateRangeIcon class="mr-2 w-4 text-gray-700" /> {{ formatDateToWords(session.session_date) }} 
-                                </div>
-                                <div class="flex items-center">
+                        <!-- Available Time -->
+                        <div v-if="sessions.length > 0" class="mt-4 flex flex-col flex-1">
+                            <h3 class="text-lg font-medium mb-2">Tutor Availability</h3>
+                            <ul>
+                                <li 
+                                    v-for="session in sessions" 
+                                    :key="session.id" 
+                                    class="flex justify-between even:bg-accent/5 px-4 py-2 text-gray-800 "
+                                >
+                                    <div class="flex items-center">
+                                        <CalendarDateRangeIcon class="mr-2 w-4 h-4 text-gray-700" /> {{ formatDateToWords(session.session_date) }} 
+                                    </div>
+                                    <div class="flex items-center">
                                         {{ session.start_time }} - {{ session.end_time }}
-                                </div>
-                            </li>
-                        </ul>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div v-else class="mt-4 flex flex-col flex-1">
+                            <h3 class="text-lg font-medium mb-2">Tutor Availability</h3>
+                            <p class="mt-2 text-gray-600 h-full">No sessions available.</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
     </AuthenticatedLayout>
 </template>
+

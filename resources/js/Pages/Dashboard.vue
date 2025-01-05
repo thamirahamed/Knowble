@@ -79,9 +79,9 @@ const getDaySuffix = (day) => {
             <div class="container flex flex-col lg:flex-row gap-10 h-[85vh]">
 
                 <!-- Tutor Listings -->
-                <div class="flex flex-col flex-1 bg-white rounded-md shadow-sm py-6 px-8 gap-5 " >
+                <div class="flex flex-col flex-1 bg-white rounded-md shadow-sm py-4 px-6 gap-5 " >
                     <div class="flex flex-col gap-2">
-                        <h1 class="text-xl font-bold">Tutors</h1>
+                        <h1 class="text-2xl font-bold text-slate-900">Tutors</h1>
                         <DynamicDropdown
                             label="Module"
                             id="module-dropdown"
@@ -123,17 +123,17 @@ const getDaySuffix = (day) => {
                 </div>
 
                 <!-- Upcoming sessions -->
-                <div class="flex flex-1 bg-white rounded-md shadow-sm py-6 px-8 max-w-[30rem]">
+                <div class="flex flex-1 bg-white rounded-md shadow-sm py-4 px-6 max-w-[30rem] min-h-60 h-fit overflow-y-auto max-h-full">
                     <div class="flex flex-col w-full">
                         <!-- Section Header -->
-                        <h1 class="text-xl font-bold mb-4 text-gray-700">Upcoming Sessions</h1>
+                        <h1 class="text-xl font-bold mb-4 text-slate-900">Upcoming Sessions</h1>
 
                         <!-- Session List -->
-                        <div class="flex flex-col gap-3 overflow-y-auto h-full">
+                        <div v-if="sessions.length > 0" class="flex flex-col gap-3 overflow-y-auto h-full">
                             <div
                                 v-for="(session, index) in sessions"
                                 :key="index"
-                                class="flex flex-col bg-accentdark/5 p-3 rounded-md shadow-md"
+                                class="flex flex-col bg-secondary/5 p-3 rounded-md shadow-md"
                             >
                                 <!-- Tutor Name -->
                                 <div>
@@ -144,7 +144,7 @@ const getDaySuffix = (day) => {
                                             class="w-8 h-8 mr-3 rounded-full object-cover"
                                         />
                                         <p class="text-lg font-semibold text-gray-800">{{ session.tutor_name }}</p>
-                                        <CheckBadgeIcon class="ml-1 w-5" />
+                                        <CheckBadgeIcon class="ml-1 w-5 h-5 text-accent" />
                                     </div>
                                     <p class="text-lg text-gray-600">{{ session.module_name }}</p>
                                 </div>
@@ -158,6 +158,9 @@ const getDaySuffix = (day) => {
                                     <PrimaryButton :id="'joinMeeting-' + session.id" class="!text-sm" @click="joinMeeting(session)">Join Now</PrimaryButton>
                                 </div>
                             </div>
+                        </div>
+                        <div v-else class="flex flex-col w-full">
+                            <p class="text-lg text-gray-600">No upcoming sessions.</p>
                         </div>
                     </div>
                 </div>

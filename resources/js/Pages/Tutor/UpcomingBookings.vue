@@ -92,14 +92,16 @@ const getDaySuffix = (day) => {
                     </div>
                 </div>
 
-                <div class="flex items-center gap-2">
+                <div class="flex flex-col gap-2">
                     <PrimaryButton
                         :id="'joinSession-' + booking.id" 
                         @click="joinMeeting(booking)"
                     >
                         Join Now
                     </PrimaryButton>
-                    <DangerButton>
+                    <DangerButton
+                        :id="'cancelSession-' + booking.id"
+                    >
                         Cancel
                     </DangerButton>
                     <!-- <span

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\DegreeProgram;
 use App\Models\Level;
+use App\Models\Semester;
 use App\Models\Module;
 use App\Models\Profile;
 use App\Models\SchoolOfStudy;
@@ -138,11 +139,28 @@ class StudentController extends Controller
         $tutorSchool = SchoolOfStudy::find($profile->school_id);
         $tutorDegree = DegreeProgram::find($profile->degree_id);
         $tutorLevel = Level::find($profile->level_id);
+        $tutorSemester = Semester::find($profile->semester_id);
         $tutorSelectedModules = $tutor->selectedModules()->get();
         $user = $tutor->user;
         $tutorSessions = TutorSession::where('tutor_id', $id)
                              ->where('status', 'pending')
                              ->get();
+        // Convert the collection to an array for sorting
+        $tutorsessionsArray = $tutorSessions->toArray();
+
+        // Sort the array by session_date and then start_time
+        usort($tutorsessionsArray, function ($a, $b) {
+            // Compare session_date first
+            $dateComparison = strtotime($a['session_date']) - strtotime($b['session_date']);
+            if ($dateComparison === 0) {
+                // If session_date is the same, compare start_time
+                return strtotime($a['start_time']) - strtotime($b['start_time']);
+            }
+            return $dateComparison;
+        });
+        
+        // You can convert the sorted array back to a collection if needed
+        $tutorSessions = collect($tutorsessionsArray);
 
         // get students current modules
         $userid = auth()->user()->id;
@@ -166,6 +184,7 @@ class StudentController extends Controller
             'school' => $tutorSchool,
             'degree' => $tutorDegree,
             'level' => $tutorLevel,
+            'semester' => $tutorSemester,
             'tutormodules' => $tutorSelectedModules,
             'user' => $user,
             'sessions' => $tutorSessions,

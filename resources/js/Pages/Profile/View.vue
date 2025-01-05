@@ -3,7 +3,6 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head } from "@inertiajs/vue3";
 import ProfilePicture from "@/Components/ProfilePicture.vue";
 import { PencilIcon, CheckBadgeIcon, AcademicCapIcon, CalendarDateRangeIcon } from "@heroicons/vue/24/solid";
-import { onMounted, ref } from "vue";
 
 // Props
 const props = defineProps({
@@ -15,17 +14,6 @@ const props = defineProps({
     tutor: [String, null],
     tutorsessions: [Array, null],
     tutorselectedmodules: [Array, null],
-});
-
-// Create a reactive reference to store the filtered tutorsessions
-const filteredSessions = ref([]);
-
-// Sort sessionSlots by session_date in ascending order
-onMounted(() =>{
-    // Filter the tutorsessions to include only those with a 'pending' status
-    filteredSessions.value = props.tutorsessions.filter(session => session.status === 'pending');
-    
-    filteredSessions.value.sort((a, b) => new Date(a.session_date) - new Date(b.session_date));
 });
 
 // Function to format date to words with suffix
@@ -64,7 +52,7 @@ const getDaySuffix = (day) => {
         <div class="flex justify-center">
             <div class="flex lg:max-w-7xl w-full gap-8">
                 <!-- Profile Info Section -->
-                <div class="flex flex-col max-w-xs w-full bg-white rounded-md mt-8 shadow" >
+                <div class="flex flex-col max-w-xs w-full bg-white rounded-md mt-8 shadow h-fit" >
                     <!-- Profile Pic Section -->
                     <div class="flex py-8 px-8 justify-center w-full md:w-fit">
                         <ProfilePicture
@@ -73,17 +61,17 @@ const getDaySuffix = (day) => {
                         />
                     </div>
                     <!-- User Information Section -->
-                    <div class="flex flex-col flex-1 pb-5 px-6 justify-between ">
+                    <div class="flex flex-col flex-1 pb-5 px-6">
                         <div class="border-y border-gray-300 py-3 p-1">
-                            <p class="flex text-2xl font-extrabold tracking-wide">
+                            <h1 class="flex text-2xl font-extrabold tracking-wide text-slate-900">
                                 <!-- {{ user.name }} -->
                                 <template v-if="tutor === 'approved'">
-                                    {{ user.name }} <CheckBadgeIcon class="ml-1 w-6" />
+                                    {{ user.name }} <CheckBadgeIcon class="ml-1 w-6 text-accent" />
                                 </template>
                                 <template v-else>
                                     {{ user.name }}
                                 </template>
-                            </p>
+                            </h1>
                             <div class="flex justify-between items-center w-full gap-3">
                                 <p class="text-xl font-medium text-gray-700">{{ profile.cb_number.toUpperCase() }}</p>
                                 <a
@@ -96,15 +84,14 @@ const getDaySuffix = (day) => {
                         </div>
                         <div class="p-1">
                             <p class="text-lg text-gray-700">{{ course.degree_name}}</p>
-                            <p class="text-lg text-gray-700">{{ level.level_name}}</p>
-                            <p class="text-lg text-gray-700">{{ semester.semester_name}}</p>
+                            <p class="text-lg text-gray-700">{{ level.level_name}} | {{ semester.semester_name}}</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Tutoring Details -->
                 <div v-if="tutor === 'approved'" class="flex flex-col flex-1 bg-white rounded-md mt-8 shadow h-fit"> 
-                    <div class="p-6">
+                    <div class="py-4 px-6">
                         <h2 class="text-2xl font-bold">Tutor Details</h2>
                         <p class="text-gray-700">
                             View the tutor's modules and availability to easily find when and what they teach.
@@ -116,17 +103,21 @@ const getDaySuffix = (day) => {
                                 <h3 class="text-lg font-medium mb-2">Modules</h3>
                                 <ul>
                                     <li v-for="module in tutorselectedmodules" :key="module.id" class="flex items-center even:bg-accent/5 px-4 py-2 text-gray-800 " >
-                                        <AcademicCapIcon class="mr-2 w-4 text-gray-700" /> {{ module.module_name }}
+                                        <AcademicCapIcon class="mr-2 w-4 h-4 text-gray-700" /> {{ module.module_name }}
                                     </li>
                                 </ul>
                             </div>
+                            <div v-else class="mt-4 flex flex-col flex-1">
+                                <h3 class="text-lg font-medium mb-2">Modules</h3>
+                                <p class="mt-2 text-gray-600 h-full">No modules available.</p>
+                            </div>
 
                             <!-- Available Time -->
-                            <div v-if="filteredSessions.length > 0" class="mt-4 flex flex-col flex-1">
+                            <div v-if="tutorsessions.length > 0" class="mt-4 flex flex-col flex-1">
                                 <h3 class="text-lg font-medium mb-2">Tutor Availability</h3>
                                 <ul>
                                     <li 
-                                        v-for="session in filteredSessions" 
+                                        v-for="session in tutorsessions" 
                                         :key="session.id" 
                                         class="flex justify-between even:bg-accent/5 px-4 py-2 text-gray-800"
                                     >
@@ -138,6 +129,10 @@ const getDaySuffix = (day) => {
                                         </div>
                                     </li>
                                 </ul>
+                            </div>
+                            <div v-else class="mt-4 flex flex-col flex-1">
+                                <h3 class="text-lg font-medium mb-2">Tutor Availability</h3>
+                                <p class="mt-2 text-gray-600 h-full">No sessions available.</p>
                             </div>
                         </div>
                     </div>

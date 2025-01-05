@@ -28,7 +28,7 @@ const viewProfile = (tutorid) => {
         <div class="flex flex-1 flex-col text-lg">
             <div class="flex flex-row items-center">
                 <h1 class="text-slate-900 font-semibold">{{ tutorname }}</h1>
-                <CheckBadgeIcon class="ml-1 w-5" />
+                <CheckBadgeIcon class="ml-1 w-5 h-5 text-accent" />
             </div>
             <h2 class="text-slate-500 font-light">{{ cbnumber }}</h2>
             <h2 class="text-slate-500 font-light">{{ school }}</h2>

@@ -75,6 +75,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('remove/{id}',[TutorController::class, 'removeModule'])->name('tutor.remove.module');
         Route::post('/sessions/create', [TutorController::class, 'createSession'])->name('tutor.session.create');   
         Route::post('/sessions/cancel', [TutorController::class, 'cancelSession'])->name('tutor.session.cancel');   
+        Route::post('/sessions/delete/{id}', [TutorController::class, 'deleteSession'])->name('tutor.session.delete');   
     });
 });
 

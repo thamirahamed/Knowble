@@ -199,4 +199,18 @@ class TutorController extends Controller
         return redirect()->route('tutor.dashboard');
     }
 
+    public function deleteSession ($id)
+    {
+        $session = TutorSession::findOrFail($id);
+
+        // Ensure the session belongs to the authenticated tutor
+        $tutor = Tutor::where('user_id', auth()->id())->first();
+        if ($session->tutor_id !== $tutor->id) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $session->delete();
+
+        return redirect()->route('tutor.dashboard');
+    }
 }

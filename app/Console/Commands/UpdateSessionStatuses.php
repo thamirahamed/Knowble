@@ -3,6 +3,8 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Carbon\Carbon;
+use App\Models\TutorSession;
 
 class UpdateSessionStatuses extends Command
 {
@@ -27,35 +29,29 @@ class UpdateSessionStatuses extends Command
     {
         // Get current timestamp
         $now = Carbon::now();
-
-        // Update "pending" sessions if session_date and start_time have passed
+        
+        // Update "pending" sessions if session_date and start_time combined have passed
         $pendingSessions = TutorSession::where('status', 'pending')
-            ->where(function ($query) use ($now) {
-                $query->whereDate('session_date', '<=', $now->toDateString())
-                      ->whereTime('start_time', '<=', $now->toTimeString());
-            })
-            ->get();
+        ->whereRaw('datetime(session_date || " " || start_time) <= ?', [$now->toDateTimeString()])
+        ->get();
 
         foreach ($pendingSessions as $session) {
-            $session->status = 'completed';
-            $session->meeting_url = null;
-            $session->save();
+        $session->status = 'completed';
+        $session->meeting_url = null;
+        $session->save();
         }
 
-        // Update "booked" sessions if session_date and end_time have passed
+        // Update "booked" sessions if session_date and end_time combined have passed
         $bookedSessions = TutorSession::where('status', 'booked')
-            ->where(function ($query) use ($now) {
-                $query->whereDate('session_date', '<=', $now->toDateString())
-                      ->whereTime('end_time', '<=', $now->toTimeString());
-            })
-            ->get();
+        ->whereRaw('datetime(session_date || " " || end_time) <= ?', [$now->toDateTimeString()])
+        ->get();
 
         foreach ($bookedSessions as $session) {
-            $session->status = 'completed';
-            $session->meeting_url = null;
-            $session->save();
+        $session->status = 'completed';
+        $session->meeting_url = null;
+        $session->save();
         }
 
-        $this->info('Session statuses updated successfully.');
+        $this->info('Session statuses updated successfully. Current time: ' . $now);
     }
 }

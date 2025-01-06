@@ -21,10 +21,6 @@ const props = defineProps({
     studentModules: Array,
 });
 
-console.log(JSON.stringify(props.tutormodules, null, 2));
-console.log(JSON.stringify(props.studentModules, null, 2));
-console.log(JSON.stringify(props.commonModules, null, 2));
-
 const openModal = ref(null);
 
 const closeModal = () => {

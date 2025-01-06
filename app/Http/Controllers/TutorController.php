@@ -66,7 +66,6 @@ class TutorController extends Controller
                 'tutor' => $tutorName->name,
                 'profile_pic' => $profiles->profile_pic,
                 'degree' => $degree->degree_name,
-                'meeting_url' => $booking->meeting_url,
                 'notes' => $booking->notes,
                 'module_name' => $module ? $module->module_name : 'Unknown Module',
                 'session_date' => $booking->session_date,

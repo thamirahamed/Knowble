@@ -14,7 +14,10 @@ const props = defineProps({
     tutor: [String, null],
     tutorsessions: [Array, null],
     tutorselectedmodules: [Array, null],
+    cBookings: [Array, null],
 });
+
+console.log(JSON.stringify(props.cBookings, null, 2));
 
 // Function to format date to words with suffix
 const formatDateToWords = (date) => {
@@ -89,54 +92,102 @@ const getDaySuffix = (day) => {
                     </div>
                 </div>
 
-                <!-- Tutoring Details -->
-                <div v-if="tutor === 'approved'" class="flex flex-col flex-1 bg-white rounded-md mt-8 shadow h-fit"> 
-                    <div class="py-4 px-6">
-                        <h2 class="text-2xl font-bold">Tutor Details</h2>
+                <!-- Right side profile cards -->
+                <div class="flex flex-col flex-1">
+                    <!-- Tutoring Details -->
+                    <div v-if="tutor === 'approved'" class="flex flex-col flex-1 bg-white rounded-md mt-8 shadow h-fit"> 
+                        <div class="py-4 px-6">
+                            <h2 class="text-2xl font-bold">Tutor Details</h2>
+                            <p class="text-gray-700">
+                                View the tutor's modules and availability to easily find when and what they teach.
+                            </p>
+
+                            <div class="flex w-full gap-12">   
+                                <!-- Selected Modules -->
+                                <div v-if="tutorselectedmodules && tutorselectedmodules.length > 0" class="mt-4 flex flex-col flex-1">
+                                    <h3 class="text-lg font-medium mb-2">Modules</h3>
+                                    <ul>
+                                        <li v-for="module in tutorselectedmodules" :key="module.id" class="flex items-center even:bg-accent/5 px-4 py-2 text-gray-800 " >
+                                            <AcademicCapIcon class="mr-2 w-4 h-4 text-gray-700" /> {{ module.module_name }}
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div v-else class="mt-4 flex flex-col flex-1">
+                                    <h3 class="text-lg font-medium mb-2">Modules</h3>
+                                    <p class="mt-2 text-gray-600 h-full">No modules available.</p>
+                                </div>
+
+                                <!-- Available Time -->
+                                <div v-if="tutorsessions.length > 0" class="mt-4 flex flex-col flex-1">
+                                    <h3 class="text-lg font-medium mb-2">Tutor Availability</h3>
+                                    <ul>
+                                        <li 
+                                            v-for="session in tutorsessions" 
+                                            :key="session.id" 
+                                            class="flex justify-between even:bg-accent/5 px-4 py-2 text-gray-800"
+                                        >
+                                            <div class="flex items-center">
+                                                <CalendarDateRangeIcon class="mr-2 w-4 text-gray-700" /> {{ formatDateToWords(session.session_date) }} 
+                                            </div>
+                                            <div class="flex items-center">
+                                                {{ session.start_time }} - {{ session.end_time }}
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div v-else class="mt-4 flex flex-col flex-1">
+                                    <h3 class="text-lg font-medium mb-2">Tutor Availability</h3>
+                                    <p class="mt-2 text-gray-600 h-full">No sessions available.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Completed Session Details -->
+                    <div class="flex flex-col flex-1 bg-white rounded-md mt-8 shadow py-4 px-6">
+                        <h2 class="text-2xl font-bold">Past Sessions</h2>
                         <p class="text-gray-700">
-                            View the tutor's modules and availability to easily find when and what they teach.
+                            View your log of past sessions, including those that were completed and cancelled.
                         </p>
-
-                        <div class="flex w-full gap-12">   
-                            <!-- Selected Modules -->
-                            <div v-if="tutorselectedmodules && tutorselectedmodules.length > 0" class="mt-4 flex flex-col flex-1">
-                                <h3 class="text-lg font-medium mb-2">Modules</h3>
-                                <ul>
-                                    <li v-for="module in tutorselectedmodules" :key="module.id" class="flex items-center even:bg-accent/5 px-4 py-2 text-gray-800 " >
-                                        <AcademicCapIcon class="mr-2 w-4 h-4 text-gray-700" /> {{ module.module_name }}
-                                    </li>
-                                </ul>
-                            </div>
-                            <div v-else class="mt-4 flex flex-col flex-1">
-                                <h3 class="text-lg font-medium mb-2">Modules</h3>
-                                <p class="mt-2 text-gray-600 h-full">No modules available.</p>
-                            </div>
-
-                            <!-- Available Time -->
-                            <div v-if="tutorsessions.length > 0" class="mt-4 flex flex-col flex-1">
-                                <h3 class="text-lg font-medium mb-2">Tutor Availability</h3>
-                                <ul>
-                                    <li 
-                                        v-for="session in tutorsessions" 
-                                        :key="session.id" 
-                                        class="flex justify-between even:bg-accent/5 px-4 py-2 text-gray-800"
-                                    >
-                                        <div class="flex items-center">
-                                            <CalendarDateRangeIcon class="mr-2 w-4 text-gray-700" /> {{ formatDateToWords(session.session_date) }} 
+                        <div class=" flex flex-wrap gap-4 justify-between mt-4 max-h-96 overflow-y-auto h-fit">
+                            <div   
+                                v-if="cBookings.length > 0"
+                                v-for="booking in cBookings"
+                                :key="booking.id"
+                                class="flex justify-between items-center bg-secondary/5 p-4 rounded-md shadow-md xl:w-[49%] flex-wrap" 
+                            >
+                                <div class="flex flex-col">
+                                    <div class="inline-flex">
+                                        <img
+                                            :src="booking.profile_pic"
+                                            alt="Profile Picture"
+                                            class="w-8 h-8 mr-3 rounded-full object-cover"
+                                        />
+                                        <div class="flex items-center text-lg font-semibold text-gray-800">
+                                            <p>{{ booking.tutor }}</p>
+                                            <CheckBadgeIcon class="ml-1 w-5 h-5 text-accent" />
                                         </div>
-                                        <div class="flex items-center">
-                                             {{ session.start_time }} - {{ session.end_time }}
-                                        </div>
-                                    </li>
-                                </ul>
+                                    </div>
+                                    <div>
+                                        <p class="text-lg text-gray-600">{{ booking.module_name }}</p>
+                                        <p class="text-lg text-gray-600">
+                                            {{ formatDateToWords(booking.session_date) }} | {{ booking.start_time }} - {{ booking.end_time }}
+                                        </p>
+                                        <p v-if="booking.notes " class="text-lg text-gray-600">Notes: {{ booking.notes }}</p>
+                                        <p v-if="booking.status==='cancelled'" class="text-lg text-red-500">Cancelled</p>
+                                        <p v-if="booking.status==='completed'" class="text-lg text-accent">Completed</p>
+                                    </div>
+                                </div>
                             </div>
-                            <div v-else class="mt-4 flex flex-col flex-1">
-                                <h3 class="text-lg font-medium mb-2">Tutor Availability</h3>
-                                <p class="mt-2 text-gray-600 h-full">No sessions available.</p>
+                            <div v-else>
+                                <p class="text-gray-600">
+                                    No past sessions with tutor found.
+                                </p>
                             </div>
                         </div>
                     </div>
                 </div>
+                
             </div>
         </div>
     </AuthenticatedLayout>

@@ -47,5 +47,9 @@ class Module extends Model
         return $this->belongsToMany(Tutor::class, 'tutor_selected_modules', 'module_id', 'tutor_id');
     }
 
-
+    // A Module can have many PeerGroups
+    public function peerGroups()
+    {
+        return $this->hasMany(PeerGroup::class);
+    }
 }

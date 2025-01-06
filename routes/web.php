@@ -6,6 +6,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TutorController;
+use App\Http\Controllers\PeerGroupController;
 use App\Http\Controllers\VideoRoomController;
 use App\Models\Tutor;
 use Illuminate\Foundation\Application;
@@ -95,6 +96,15 @@ Route::middleware(['auth' ,'studentportal'])->group(function () {
 
     // Book a session
     Route::post('/tutor/sessions/book', [StudentController::class, 'bookSession'])->name('tutor.session.book');
+
+    Route::prefix('peer-group')->group(function () {
+        Route::get('/{id}',[PeerGroupController::class, 'index'])->name('peergroup');
+        // Create, Join, Leave, Delete Group
+        Route::post('/create', [PeerGroupController::class, 'createGroup'])->name('peergroup.create');
+        Route::post('/join', [PeerGroupController::class, 'joinGroup'])->name('peergroup.join');
+        Route::post('/leave', [PeerGroupController::class, 'leaveGroup'])->name('peergroup.leave');
+        Route::post('/delete', [PeerGroupController::class, 'deleteGroup'])->name('peergroup.delete');
+    });
 });
 
 

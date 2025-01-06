@@ -92,7 +92,7 @@ const getDaySuffix = (day) => {
                             required
                             v-model="form.module"
                         >
-                            <option value="">Select Level</option>
+                            <option value="">Select Module</option>
                             <option
                                 v-for="cModule in commonModules"
                                 :key="cModule.id"
@@ -112,7 +112,7 @@ const getDaySuffix = (day) => {
                             required
                             v-model="form.sessionSlot"
                         >
-                            <option value="">Select Level</option>
+                            <option value="">Select Session</option>
                             <option
                                 v-for="slots in sessionSlots"
                                 :key="slots.id"
@@ -139,7 +139,6 @@ const getDaySuffix = (day) => {
                         <PrimaryButton
                             id="submitSessionBtn"
                             type="submit"
-                            @click =submitSessionBooking
                         >
                             Submit Request
                         </PrimaryButton>

@@ -11,6 +11,8 @@ use App\Models\SchoolOfStudy;
 use App\Models\Tutor;
 use App\Models\User;
 use App\Models\TutorSession;
+use App\Models\PeerGroup;
+use App\Models\PeerGroupMember;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -124,11 +126,50 @@ class StudentController extends Controller
             return $dateComparison;
         });
 
+        // get students current modules
+        $userid = auth()->user()->id;
+        $studentprofile = Profile::where('user_id', $userid)->first();
+        $studentModules = Module::where('semester_id', $studentprofile->semester_id)
+                                ->where('degree_program_id', $studentprofile->degree_id)
+                                ->where('level_id', $studentprofile->level_id)
+                                ->get();
+
+        // Fetch module ids based on the student's profile
+        $studentModulesId = Module::where('semester_id', $studentprofile->semester_id)
+                                ->where('degree_program_id', $studentprofile->degree_id)
+                                ->where('level_id', $studentprofile->level_id)
+                                ->pluck('id'); // Only get the module IDs
+
+        
+        
+        // Fetch all peer groups for the student's modules in a single query with eager loading
+        $peerGroups = PeerGroup::with(['leader', 'module'])
+                                ->whereIn('module_id', $studentModulesId)
+                                ->get();
+        // Format the peer groups data with the required fields
+        $formattedPeerGroups = $peerGroups->map(function ($group) {
+            $leader = User::where('id', $group->leader)->first();
+            $leaderProfile = Profile::where('user_id', $leader->id)->first();
+            $leaderDegree = DegreeProgram::where('id', $leaderProfile->degree_id)->first();
+            $memberCount = PeerGroupMember::where('peer_group_id', $group->id)->count() + 1;
+            return [
+                'id' => $group->id,
+                'name' => $group->name,
+                'degree' => $leaderDegree->degree_name,
+                'module' => $group->module->module_name,  // Assuming the module name is stored as 'module_name'
+                'leader' => $leader->name,
+                'currentMembers' => $memberCount,          
+                'totalMembers' => $group->total_members,
+            ];
+        });
+
         return Inertia::render('Dashboard',[
             'semstertutors' => $tutordetails,
             'allDegree' => $allDegree,
             'tutors' => $degreetutordetails,
             'sessions' => $sessionDetails,
+            'sModules' => $studentModules,
+            'peerGroups'=>$formattedPeerGroups
         ]);
     }
 

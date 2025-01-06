@@ -72,4 +72,16 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(TutorSession::class);
     }
 
+    // A User can be a leader of many PeerGroups
+    public function peerGroupsAsLeader()
+    {
+        return $this->hasMany(PeerGroup::class, 'leader');
+    }
+
+    // A User can be a member of many PeerGroups through PeerGroupMember
+    public function peerGroups()
+    {
+        return $this->belongsToMany(PeerGroup::class, 'peer_group_members', 'user_id', 'peer_group_id');
+    }
+
 }

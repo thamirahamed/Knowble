@@ -6,15 +6,34 @@ import TutorCard from "@/Components/TutorCard.vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head, router } from "@inertiajs/vue3";
 import { ref } from "vue";
-import { CheckBadgeIcon } from "@heroicons/vue/24/solid";
+import { CheckBadgeIcon, UserGroupIcon, UserIcon, PlusIcon } from "@heroicons/vue/24/solid";
+import { Link } from "@inertiajs/vue3";
+import PeerGroupCard from "@/Components/PeerGroupCard.vue";
+import CreatePeerGroup from "@/Components/CreatePeerGroup.vue";
 
 const props = defineProps({
     semstertutors: Array,
     allDegree: Array,
     tutors: Array,
     sessions: Array,
+    sModules: Array,
+    peerGroups: Array,
 });
-console.log(JSON.stringify(props.sessions, null, 2));
+
+console.log(JSON.stringify(props.peerGroups, null, 2));
+
+// Track the currently active content
+const activeContent = ref("solo");
+
+const openModal = ref(null);
+
+const closeModal = () => {
+    openModal.value = null;
+};
+
+const openModalWithData = () => {
+    openModal.value = true;
+};
 
 function getDegreeName(schoolId) {
     const school = props.allDegree.find((deg) => deg.id === schoolId);
@@ -75,9 +94,36 @@ const getDaySuffix = (day) => {
 
     <AuthenticatedLayout>
 
-        <div class="pt-8 flex justify-center">
-            <div class="container flex flex-col lg:flex-row gap-10 h-[85vh]">
-
+        <div class="pt-8 flex items-center flex-col">
+            <div class="flex flex-col container w-full">
+                <div class="flex justify-start">
+                    <Link
+                        href="#"
+                        class="inline-flex items-center py-2 px-4"
+                        :class="activeContent === 'solo' ? 'text-white bg-accent/80 relative z-0 overflow-hidden transition-all duration-200 after:absolute after:inset-0 after:-z-10 after:scale-[2.5] after:rounded-[100%] after:bg-gradient-to-l from-accentdark hover:bg-accent' : 'hover:bg-primary/15 text-gray-600 hover:text-gray-900'"
+                        @click="() => (activeContent = 'solo')"
+                        preserve-state
+                    >   
+                        <UserIcon class="w-5 h-5 mr-2" />
+                        One-on-One
+                    </Link>
+                    <Link
+                        href="#"
+                        class="inline-flex items-center py-2 px-4"
+                        :class="activeContent === 'peergroup' ? 'text-white bg-accent/80 relative z-0 overflow-hidden transition-all duration-200 after:absolute after:inset-0 after:-z-10 after:scale-[2.5] after:rounded-[100%] after:bg-gradient-to-l from-accentdark hover:bg-accent' : 'hover:bg-primary/15 text-gray-600 hover:text-gray-900'"
+                        @click="() => (activeContent = 'peergroup')"
+                        preserve-state
+                    >
+                        <UserGroupIcon class="w-5 h-5 mr-2" />
+                        Peer Group
+                    </Link>
+                </div>
+                <div class="container flex mb-4">
+                    <span class="w-full h-0.5 bg-accent"></span>
+                </div>
+            </div>
+            <!-- One on One Tutoring -->
+            <div v-if="activeContent === 'solo'" class="container flex flex-col lg:flex-row gap-10 h-[85vh]">
                 <!-- Tutor Listings -->
                 <div class="flex flex-col flex-1 bg-white rounded-md shadow-sm py-4 px-6 gap-5 " >
                     <div class="flex flex-col gap-2">
@@ -85,7 +131,7 @@ const getDaySuffix = (day) => {
                         <DynamicDropdown
                             label="Module"
                             id="module-dropdown"
-                            :options="modules"
+                            :options="sModules"
                             v-model="selectedModule"
                             :error="moduleError"
                         />
@@ -164,7 +210,54 @@ const getDaySuffix = (day) => {
                         </div>
                     </div>
                 </div>
+            </div>
 
+            <!-- Peer Group -->
+            <div v-if="activeContent === 'peergroup'" class="container flex flex-col lg:flex-row gap-10 h-[85vh]">
+                <div class="flex flex-col flex-1 bg-white rounded-md shadow-sm py-4 px-6 gap-5 " >
+                    <div class="flex flex-col gap-2">
+                        <div class="inline-flex justify-between items-center">
+                            <h1 class="text-2xl font-bold text-slate-900">Peer Groups</h1>
+                            <PrimaryButton 
+                                :icon="true" 
+                                iconPlacement="left"
+                                id="createPeerGrpBtn"
+                                @click="openModalWithData()"
+                            >
+                                <template #icon>
+                                    <PlusIcon class="text-white" />
+                                </template>
+                                    Create Peer Group
+                            </PrimaryButton>
+                        </div>
+                        <DynamicDropdown
+                            label="Module"
+                            id="module-dropdown"
+                            :options="sModules"
+                            v-model="selectedModule"
+                            :error="moduleError"
+                        />
+                        <TextInput
+                            id="searchTutor"
+                            type="text"
+                            class="mt-1 block w-full"
+                            placeholder="Search Tutor"
+                        />
+                        <CreatePeerGroup
+                            :openModal="openModal"
+                            :closeModal="closeModal"
+                            :sModules="sModules"
+                        />
+                    </div>
+
+                    <div class="flex flex-col overflow-y-auto gap-2">
+                        <div v-for="group in peerGroups" :key="group.id">
+                            <PeerGroupCard 
+                                :peerGroup="group"
+                            />
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </AuthenticatedLayout>

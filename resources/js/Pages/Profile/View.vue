@@ -173,7 +173,8 @@ const getDaySuffix = (day) => {
                                         <p class="text-lg text-gray-600">
                                             {{ formatDateToWords(booking.session_date) }} | {{ booking.start_time }} - {{ booking.end_time }}
                                         </p>
-                                        <p v-if="booking.notes " class="text-lg text-gray-600">Notes: {{ booking.notes }}</p>
+                                        <p v-if="booking.notes && booking.status==='completed'" class="text-lg text-gray-600">Notes: {{ booking.notes }}</p>
+                                        <p v-if="booking.notes && booking.status==='cancelled'" class="text-lg text-gray-600">Reason: {{ booking.notes }}</p>
                                         <p v-if="booking.status==='cancelled'" class="text-lg text-red-500">Cancelled</p>
                                         <p v-if="booking.status==='completed'" class="text-lg text-accent">Completed</p>
                                     </div>

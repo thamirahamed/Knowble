@@ -64,6 +64,7 @@ const leaveMeeting = (booking) => {
                         <DangerButton 
                             :icon="true" 
                             iconPlacement="left"
+                            id="leaveMeatingBtn"
                             @click="leaveMeeting(bookingDetails)"
                         >
                             <template #icon>

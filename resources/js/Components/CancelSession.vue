@@ -98,6 +98,7 @@ const getDaySuffix = (day) => {
                     <div class="mt-2 text-right">
                         <DangerButton
                             type="submit"
+                            id="confirmCancellation"
                             @click =submitSessionRequest
                         >
                             Submit Cancellation

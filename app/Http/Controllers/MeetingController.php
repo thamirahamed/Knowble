@@ -29,6 +29,10 @@ class MeetingController extends Controller
         $tutor = Tutor::where('id', $tutorId)->first();
         $tutorName = User::where('id', $tutor->user_id)->first();
 
+        //Retrieve student information
+        $userId = $booking->user_id;
+        $student = User::where('id', $userId)->first();
+
         // Retrieve the module name
         $module = Module::where('id', $booking->module_id)->first();
         $moduleName = $module->module_name;
@@ -38,6 +42,7 @@ class MeetingController extends Controller
             'isUserTutor' => $isTutor ? "Yes" : "No",
             'tutor_id' => $tutorName->id,
             'tutor_name' => $tutorName->name,
+            'student_name' => $student->name,
             'module_name' => $moduleName,
             'session_date' => $booking->session_date,
             'start_time' => $booking->start_time,

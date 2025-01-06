@@ -74,7 +74,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('select/{id}',[TutorController::class, 'selectModule'])->name('tutor.select.module');
         Route::post('remove/{id}',[TutorController::class, 'removeModule'])->name('tutor.remove.module');
         Route::post('/sessions/create', [TutorController::class, 'createSession'])->name('tutor.session.create');   
-        Route::post('/sessions/delete/{id}', [TutorController::class, 'deleteSession'])->name('tutor.session.delete');   
+        Route::post('/sessions/cancel', [TutorController::class, 'cancelSession'])->name('tutor.session.cancel');   
     });
 });
 
@@ -89,10 +89,11 @@ Route::middleware(['auth' ,'studentportal'])->group(function () {
     // Show Tutor Profile Data
     Route::get('/tutor/profile/{id}',[StudentController::class, 'tutorProfile'])->name('tutor.profile');
 
+    // Join meeting
     Route::get('/meetings', [MeetingController::class, 'index'])->name('meetings.index');
 
+    // Book a session
     Route::post('/tutor/sessions/book', [StudentController::class, 'bookSession'])->name('tutor.session.book');
-    Route::post('/tutor/sessions/cancel/{id}', [StudentController::class, 'cancelSession'])->name('request.session.cancel');
 });
 
 

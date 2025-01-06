@@ -5,53 +5,36 @@ import InputLabel from './InputLabel.vue';
 import PrimaryButton from './PrimaryButton.vue';
 import { XMarkIcon } from '@heroicons/vue/24/solid';
 import { onMounted } from 'vue';
+import DangerButton from './DangerButton.vue';
 
 const props = defineProps({
     openModal: Boolean,
-    tutorid: Number,
     closeModal: Function,
-    commonModules: Array,
-    sessionSlots: Array,
+    booking: Array,
 });
 
 // Initialize the form
 const form = useForm({
-    module: '',
-    sessionSlot: '',
     notes: '',
 });
 
-// Create a reactive reference to store the filtered tutorsessions
-const filteredSessions = ref([]);
-
-onMounted(() =>{
-    // Filter the tutorsessions to include only those with a 'pending' status
-    filteredSessions.value = props.sessionSlots.filter(session => session.status === 'pending');
-    
-    filteredSessions.value.sort((a, b) => new Date(a.session_date) - new Date(b.session_date));
-});
-
-
-const submitSessionRequest = () => {
+const submitSessionCancel = () => {
 
     // Prepare the data to be sent
     const payload = {
-        module: form.module,
-        sessionSlot: form.sessionSlot,
+        sessionId: props.booking.id,
         notes: form.notes,
     };
 
-    console.log (payload);
-
     // Submit the form using router.post
-    router.post('/tutor/sessions/book', payload, {
+    router.post('/tutor/sessions/cancel', payload, {
         onSuccess: () => {
-            alert('Session booked successfully!');
+            alert('Session cancelled successfully!');
             props.closeModal(); // Close the modal on success
             form.reset(); // Reset the form fields
         },
         onError: (errors) => {
-            console.error('Failed to book session:', errors);
+            alert('Failed to cancel session:', errors);
         },
     });
 };
@@ -90,69 +73,35 @@ const getDaySuffix = (day) => {
         <div class="bg-white rounded-lg shadow-md max-w-lg w-full overflow-hidden">
             <!-- Modal Header -->
             <div class="flex justify-between items-center py-2 px-6 bg-primary">
-                <h2 class="text-lg  font-light text-white">Tutor Details</h2>
+                <h2 class="text-lg  font-light text-white">Cancel Session</h2>
                 <button id="closeModal" @click="closeModal" class="p-1 rounded-full bg-red-500 text-white"><XMarkIcon class="w-4" /></button>
             </div>
 
             <!-- Modal Body -->
             <div class="mt-4 px-6 pb-4">
-                <form @submit.prevent="submitSessionRequest">
+                <p class="text-lg font-semibold">{{ booking.user }}</p>
+                <p class="text-lg text-gray-700">{{ booking.module_name }}</p>
+                <p class="text-lg text-gray-700">{{ formatDateToWords(booking.session_date) }} | {{ booking.start_time }} - {{ booking.end_time }}</p>
+                <p class="text-lg text-gray-700" v-if="booking.notes">Notes: {{ booking.notes }}</p>
+                <form @submit.prevent="submitSessionCancel" class="mt-2 pt-2 border-t border-gray-300">
                     <div class="mb-4">
-                        <InputLabel for="session_module" value="Module" />
-                        <select
-                            id="session_module"
-                            class="cursor-pointer mt-1 block w-full text-lg shadow-sm border-gray-300 rounded-md hover:border-slate-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-slate-500"
-                            required
-                            v-model="form.module"
-                        >
-                            <option value="">Select Level</option>
-                            <option
-                                v-for="cModule in commonModules"
-                                :key="cModule.id"
-                                :value="cModule.id"
-                            >
-                                {{ cModule.module_name }}
-                            </option>
-                        </select>
-                        <InputError class="mt-2" :message="form.errors.module" />
-                    </div>
-                    <div class="mb-4">
-                        <InputLabel for="session-slot" value="Session Slot" />
-                        <select
-                            id="session_slots"
-                            class="cursor-pointer mt-1 block w-full text-lg shadow-sm border-gray-300 rounded-md hover:border-slate-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-slate-500"
-                            required
-                            v-model="form.sessionSlot"
-                        >
-                            <option value="">Select Level</option>
-                            <option
-                                v-for="slots in filteredSessions"
-                                :key="slots.id"
-                                :value="slots.id"
-                            >
-                                {{ formatDateToWords(slots.session_date) }} - {{ slots.start_time }} to {{ slots.end_time }}
-                            </option>
-                            <InputError class="mt-2" :message="form.errors.sessionSlot" />
-                        </select>
-                    </div>
-    
-                    <div class="mb-4">
-                        <inputLabel for="notes" value="Additional Notes" />
+                        <inputLabel for="notes" value="Reason for Cancellation" />
                         <textarea
                             id="notes"
                             rows="3"
                             class="mt-1 block w-full text-lg shadow-sm border-gray-300 rounded-md hover:border-slate-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-slate-500"
-                            placeholder="Any additional details for the tutor"
+                            placeholder="Enter cancellation reason"
                             v-model="form.notes"
+                            required
                         ></textarea>
                     </div>
                     <div class="mt-2 text-right">
-                        <PrimaryButton
+                        <DangerButton
                             type="submit"
                             @click =submitSessionRequest
                         >
-                            Submit Request
-                        </PrimaryButton>
+                            Submit Cancellation
+                        </DangerButton>
                     </div>
                 </form>
             </div>

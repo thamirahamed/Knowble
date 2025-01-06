@@ -30,8 +30,6 @@ const submitSessionBooking = () => {
         notes: form.notes,
     };
 
-    console.log (payload);
-
     // Submit the form using router.post
     router.post('/tutor/sessions/book', payload, {
         onSuccess: () => {
@@ -40,7 +38,7 @@ const submitSessionBooking = () => {
             form.reset(); // Reset the form fields
         },
         onError: (errors) => {
-            console.error('Failed to book session:', errors);
+            alert('Failed to book session:', errors);
         },
     });
 };
@@ -85,7 +83,7 @@ const getDaySuffix = (day) => {
 
             <!-- Modal Body -->
             <div class="mt-4 px-6 pb-4">
-                <form @submit.prevent="submitSessionRequest">
+                <form @submit.prevent="submitSessionBooking">
                     <div class="mb-4">
                         <InputLabel for="session_module" value="Module" />
                         <select

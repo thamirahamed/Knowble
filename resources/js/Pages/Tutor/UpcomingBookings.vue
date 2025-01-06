@@ -1,15 +1,27 @@
 <script setup>
 import { router } from "@inertiajs/vue3";
-import axios from "axios";
+import { ref } from "vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import DangerButton from "@/Components/DangerButton.vue";
+import CancelSession from "@/Components/CancelSession.vue";
 
 // Props
 const props = defineProps({
     bookings: Array,      // Array of booked sessions
 });
 
-console.log(JSON.stringify(props.bookings, null, 2))
+const openModal = ref(null);
+const selectedBooking = ref(null);
+
+const closeModal = () => {
+    openModal.value = null;
+    selectedBooking.value = null;
+};
+
+const openModalWithData = (booking) => {
+    selectedBooking.value = booking;
+    openModal.value = true;
+};
 
 // Redirect to Join Meeting with the meeting_url from a specific booking
 const joinMeeting = (booking) => {
@@ -23,17 +35,6 @@ const joinMeeting = (booking) => {
     meetingUrl += `&name=${tutorName}`;
 
     router.visit(route("meetings.index", { meetingUrl, id: booking.id }));
-};
-
-// Reject Request
-const rejectRequest = (id) => {
-    router.post(route("request.session.cancel", { id }), {}, {
-        onSuccess: () => {
-            enhancedRequests.value = enhancedRequests.value.map((request) =>
-                request.id === id ? { ...request, status: "rejected" } : request
-            );
-        },
-    });
 };
 
 // Function to format date to words with suffix
@@ -67,13 +68,14 @@ const getDaySuffix = (day) => {
 
 <template>
     <div class="flex flex-col w-full">
-        <h1 class="text-xl font-bold text-gray-800 mb-4">Upcoming Bookings</h1>
+        <h1 class="text-xl font-bold text-gray-800">Upcoming Bookings</h1>
+        <p class="text-gray-500 mb-4">View your upcoming sessions, where you can join the meeting or cancel it.</p>
 
         <div v-if="bookings.length > 0" class="space-y-4 mb-4">
             <div
                 v-for="booking in bookings"
                 :key="booking.id"
-                class="flex justify-between items-center bg-accentdark/5 p-4 rounded-md shadow-md" 
+                class="flex justify-between items-center bg-secondary/5 p-4 rounded-md shadow-md" 
             >
                 <div class="flex items-center gap-4">
                     <img
@@ -101,37 +103,10 @@ const getDaySuffix = (day) => {
                     </PrimaryButton>
                     <DangerButton
                         :id="'cancelSession-' + booking.id"
+                        @click="openModalWithData(booking)"
                     >
                         Cancel
                     </DangerButton>
-                    <!-- <span
-                        v-if="request.status === 'accepted' && request.meeting_url"
-                        class="font-semibold text-green-500"
-                    >
-                        Approved
-                    </span>
-                    <button
-                        v-if="request.status === 'accepted' && request.meeting_url"
-                        @click="joinMeeting(request.meeting_url)"
-                        class="px-4 py-2 bg-blue-600 text-white rounded-md"
-                    >
-                        Join Meeting
-                    </button>
-
-                    <button
-                        v-if="request.status === 'pending'"
-                        @click="approveRequest(request.id, request.tutor_name)"
-                        id="requestApproveBtn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded transition"
-                    >
-                        Approve
-                    </button>
-                    <button
-                        v-if="request.status === 'pending'"
-                        @click="rejectRequest(request.id)"
-                        id="requestRejectBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition"
-                    >
-                        Reject
-                    </button> -->
                 </div>
             </div>
         </div>
@@ -139,5 +114,11 @@ const getDaySuffix = (day) => {
         <div v-else class="text-center text-gray-500 py-6 mb-4">
             No bookings at the moment.
         </div>
+
+        <CancelSession
+            :openModal="openModal"
+            :closeModal="closeModal"
+            :booking="selectedBooking"
+        />
     </div>
 </template>

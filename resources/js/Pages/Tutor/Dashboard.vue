@@ -5,6 +5,7 @@ import SidebarLink from "@/Components/SidebarLink.vue";
 import { ref } from "vue";
 import Overview from "@/Pages/Tutor/Overview.vue";
 import UpcomingBookings from "@/Pages/Tutor/UpcomingBookings.vue";
+import CompletedBookings from "./CompletedBookings.vue";
 
 // Track the currently active content
 const activeContent = ref("Overview");
@@ -34,7 +35,13 @@ const props = defineProps({
         type: Object,
         required: true,
     },
+    completedBookings: {
+        type: Object,
+        required: true,
+    },
 });
+
+console.log(JSON.stringify(props.completedBookings, null, 2))
 
 const TutorRequest = (id) => {
     router.post(`/admin/request/${id}`, {}, {
@@ -104,7 +111,9 @@ const TutorRequest = (id) => {
                         />
                     </template>
                     <template v-else-if="activeContent === 'CompletedBookings'">
-                        <p>Completed / Cancelled Bookings here</p>
+                        <CompletedBookings
+                            :cBookings="props.completedBookings"
+                        />
                     </template>
                 </div>
             </div>

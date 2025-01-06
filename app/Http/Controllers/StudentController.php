@@ -165,10 +165,15 @@ class StudentController extends Controller
         // get students current modules
         $userid = auth()->user()->id;
         $studentprofile = Profile::where('user_id', $userid)->first();
-        $studentModules = Module::where('semester_id', $studentprofile->semester_id)->where('degree_program_id', $studentprofile->degree_id)->where('level_id', $studentprofile->level_id)->get();
+        $studentModules = Module::where('semester_id', $studentprofile->semester_id)
+                                ->where('degree_program_id', $studentprofile->degree_id)
+                                ->where('level_id', $studentprofile->level_id)
+                                ->get();
 
-        // Find the common modules between student and tutor
-        $commonModules = $studentModules->intersect($tutorSelectedModules);
+        // Find the common modules between student and tutor based on 'module_name'
+        $commonModules = $studentModules->filter(function ($studentModule) use ($tutorSelectedModules) {
+            return $tutorSelectedModules->contains('module_name', $studentModule->module_name);
+        });
 
         // Map to include only 'id' and 'module_name' if needed
         $commonModules = $commonModules->map(function ($module) {
@@ -189,6 +194,7 @@ class StudentController extends Controller
             'user' => $user,
             'sessions' => $tutorSessions,
             'commonModules' => $commonModules,
+            'studentModules' => $studentModules,
         ]);
     }
 
@@ -225,15 +231,5 @@ class StudentController extends Controller
         $session->save();
 
         return redirect()->route('tutor.profile', ['id' => $session->tutor_id]);
-    }
-
-    public function cancelSession($id)
-    {
-
-        $session = TutorSession::where('id', $id)->first();
-        $session->status = 'Rejected';
-        $session->save();
-
-        return redirect()->back();
     }
 }

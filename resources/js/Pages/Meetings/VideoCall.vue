@@ -54,7 +54,8 @@ const leaveMeeting = (booking) => {
             <div class="flex flex-col max-w-7xl w-full bg-white px-8 py-6 min-h-[90vh] rounded-md shadow-sm">
                 <div class="flex justify-between items-center">
                     <div>
-                        <h1 class="text-xl text-gray-800 font-semibold">Meeting with {{ bookingDetails.tutor_name }}</h1>
+                        <h1 v-if="bookingDetails.isUserTutor === 'Yes'" class="text-xl text-gray-800 font-semibold">Meeting with {{ bookingDetails.student_name  }}</h1>
+                        <h1 v-if="bookingDetails.isUserTutor === 'No'" class="text-xl text-gray-800 font-semibold">Meeting with {{ bookingDetails.tutor_name }}</h1>
                         <h2 class="text-lg text-gray-600">{{ bookingDetails.module_name }}</h2>
                         <h2 class="text-lg text-gray-600">{{ formatDateToWords(bookingDetails.session_date) }} | {{ bookingDetails.start_time }} - {{ bookingDetails.end_time }}</h2>
                         <h2 v-if="bookingDetails.notes" class="text-lg text-gray-600">Notes: {{ bookingDetails.notes }}</h2>

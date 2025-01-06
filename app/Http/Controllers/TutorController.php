@@ -75,8 +75,46 @@ class TutorController extends Controller
             ];
         }
 
+        $completedBookings = TutorSession::where('tutor_id', $tutor->id)
+                        ->whereIn('status', ['completed', 'cancelled'])
+                        ->get();
+        $completedBookingDetails = [];
+        foreach ($completedBookings as $cBooking) {
+            $user = User::where('id', $cBooking->user_id)->first();
+            $module = Module::where('id', $cBooking->module_id)->first();
+            $profiles = Profile::where('user_id', $cBooking->user_id)->first();
+            $degree = DegreeProgram::where('id', $profiles->degree_id)->first();
+
+            $completedBookingDetails[] = [
+                'id' => $cBooking->id,
+                'user' => $user->name,
+                'tutor' => $tutorName->name,
+                'profile_pic' => $profiles->profile_pic,
+                'degree' => $degree->degree_name,
+                'meeting_url' => $cBooking->meeting_url,
+                'notes' => $cBooking->notes,
+                'module_name' => $module ? $module->module_name : 'Unknown Module',
+                'session_date' => $cBooking->session_date,
+                'start_time' => $cBooking->start_time,
+                'end_time' => $cBooking->end_time,
+                'status' => $cBooking->status,
+            ];
+        }
+
+
         // Sort session details by session_date and then by start_time
         usort($bookingdetails, function ($a, $b) {
+            // Compare session_date first
+            $dateComparison = strtotime($a['session_date']) - strtotime($b['session_date']);
+            if ($dateComparison === 0) {
+                // If session_date is the same, compare start_time
+                return strtotime($a['start_time']) - strtotime($b['start_time']);
+            }
+            return $dateComparison;
+        });
+
+        // Sort completed session details by session_date and then by start_time
+        usort($completedBookingDetails, function ($a, $b) {
             // Compare session_date first
             $dateComparison = strtotime($a['session_date']) - strtotime($b['session_date']);
             if ($dateComparison === 0) {
@@ -94,6 +132,7 @@ class TutorController extends Controller
             'tutorsSelectedModules' => $tutorsSelectedModules,
             'sessionSlots' => $tutorsessions,
             'bookings' => $bookingdetails,
+            'completedBookings' => $completedBookingDetails,
         ]);
     }
 
@@ -148,17 +187,15 @@ class TutorController extends Controller
         return redirect()->route('tutor.dashboard');
     }
 
-    public function deleteSession ($id)
+    public function cancelSession (Request $request)
     {
-        $session = TutorSession::findOrFail($id);
+        $userid = auth()->user()->id;
+        $session = TutorSession::find($request->sessionId);
 
-        // Ensure the session belongs to the authenticated tutor
-        $tutor = Tutor::where('user_id', auth()->id())->first();
-        if ($session->tutor_id !== $tutor->id) {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
-
-        $session->delete();
+        $session->status = 'cancelled';
+        $session->meeting_url = null;
+        $session->notes = $request->notes;
+        $session->save();
 
         return redirect()->route('tutor.dashboard');
     }

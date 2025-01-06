@@ -111,78 +111,6 @@ class DatabaseSeeder extends Seeder
 
 
         $modules = [
-              'Business Foundation' => [
-                  'Semester 1' => [
-                      'Level 3' => [
-                          'English for Academic Purposes - 1',
-                          'Self & Society - 1',
-                          'Business Mathematics',
-                          'Introduction to Business Environments',
-                      ],
-                  ],
-                  'Semester 2' => [
-                      'Level 3' => [
-                          'English for Academic Purposes -1',
-                          'Self & Society -1',
-                          'Digital Literacy & Communication',
-                          'Organisations & Behaviour',
-                      ],
-                  ],
-              ],
-            'Computing Foundation' => [
-                'Semester 1' => [
-                    'Level 3' => [
-                        'English for Academic Purposes - 1',
-                        'Self & Society - 1',
-                        'Computing Mathematics',
-                        'Introduction to Business Environment',
-                    ],
-                ],
-                'Semester 2' => [
-                    'Level 3' => [
-                        'English for Academic Purposes - 2',
-                        'Self & Society - 2',
-                        'Digital Literacy & Communication',
-                        'Programming $ Web Development',
-                    ],
-                ],
-            ],
-            'Law Foundation' => [
-                'Semester 1' => [
-                    'Level 3' => [
-                        'English for Academic Purposes - 1',
-                        'Self & Society - 1',
-                        'Legal Systems & History',
-                        'Legal Methods',
-                    ],
-                ],
-                'Semester 2' => [
-                    'Level 3' => [
-                        'English for Academic Purposes - 2',
-                        'Self & Society - 2',
-                        'Digital Literacy & Communication',
-                        'Legal Skills & Critical Thinking',
-                    ],
-                ],
-            ],
-            'NCUK International Foundation Year' => [
-                'Semester 1' => [
-                    'Level 3' => [
-                        'Business Economics',
-                        'Business Skills',
-                        'Organizational Behaviour',
-                        'Financial Accounting',
-                    ],
-                ],
-                'Semester 2' => [
-                    'Level 3' => [
-                        'Management Themes and Case Studies',
-                        'Marketing or International Business',
-                        'Management Accounting',
-                        'Quantitative Methods for Business',
-                    ],
-                ],
-            ],
             'BEng (Hons) Software Engineering' => [
                 'Semester 1' => [
                     'Level 4' => [
@@ -192,7 +120,7 @@ class DatabaseSeeder extends Seeder
                         'Web Development and Operating Systems - 1',
                     ],
                     'Level 5' => [
-                        'Commercial Computing for Software Engineers - 1',
+                        'Commercial Computing - 1',
                         'Databases and Data Structures - 1',
                         'Server-Side Programming - 1',
                         'Mobile App Development - 1 ',
@@ -212,7 +140,7 @@ class DatabaseSeeder extends Seeder
                         'Web Development and Operating Systems - 2',
                     ],
                     'Level 5' => [
-                        'Commercial Computing for Software Engineers - 2',
+                        'Commercial Computing - 2',
                         'Databases and Data Structures - 2',
                         'Server-Side Programming - 2',
                         'Mobile App Development - 2 ',
@@ -234,7 +162,7 @@ class DatabaseSeeder extends Seeder
                         'Web Development and Operating Systems - 1',
                     ],
                     'Level 5' => [
-                        'Commercial Computing for Software Engineers - 1',
+                        'Commercial Computing - 1',
                         'Databases and Data Structures - 1',
                         'Server-Side Programming - 1',
                         'Mobile App Development - 1 ',
@@ -263,7 +191,7 @@ class DatabaseSeeder extends Seeder
                         'Web Development and Operating Systems - 2',
                     ],
                     'Level 5' => [
-                        'Commercial Computing for Software Engineers - 2',
+                        'Commercial Computing - 2',
                         'Databases and Data Structures - 2',
                         'Server-Side Programming - 2',
                         'Mobile App Development - 2 ',
@@ -294,7 +222,7 @@ class DatabaseSeeder extends Seeder
                         'Web Development and Operating Systems - 1',
                     ],
                     'Level 5' => [
-                        'Commercial Computing for Software Engineers - 1',
+                        'Commercial Computing - 1',
                         'Cyber Operations and Network Security - 1',
                         'Ethical Hacking - 1',
                         'Cyber Security - 1',
@@ -314,7 +242,7 @@ class DatabaseSeeder extends Seeder
                         'Web Development and Operating Systems - 2',
                     ],
                     'Level 5' => [
-                        'Commercial Computing for Software Engineers - 2',
+                        'Commercial Computing - 2',
                         'Cyber Operations and Network Security - 2',
                         'Ethical Hacking - 2',
                         'Cyber Security - 2',

@@ -13,6 +13,7 @@ use App\Models\Tutor;
 use App\Models\User;
 use App\Models\Profile;
 use App\Models\TutorSession;
+use App\Models\Module;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -189,6 +190,40 @@ class ProfileController extends Controller
         $userlevel  = Level::find($profile->level_id);
         $usersemester = Semester::find($profile->semester_id);
         $usercourse = DegreeProgram::find($profile->degree_id);
+
+        $completedBookings = TutorSession::where('user_id', $userId)
+                        ->whereIn('status', ['completed', 'cancelled'])
+                        ->get();
+        $completedBookingDetails = [];
+        foreach ($completedBookings as $cBooking) {
+            $tutorId = Tutor::where('id', $cBooking->tutor_id)->first();
+            $tutorName = User::where('id', $tutorId->user_id)->first();
+            $module = Module::where('id', $cBooking->module_id)->first();
+            $profiles = Profile::where('user_id', $tutorName->id)->first();
+
+            $completedBookingDetails[] = [
+                'id' => $cBooking->id,
+                'tutor' => $tutorName->name,
+                'profile_pic' => $profiles->profile_pic,
+                'notes' => $cBooking->notes,
+                'module_name' => $module ? $module->module_name : 'Unknown Module',
+                'session_date' => $cBooking->session_date,
+                'start_time' => $cBooking->start_time,
+                'end_time' => $cBooking->end_time,
+                'status' => $cBooking->status,
+            ];
+        }
+
+        // Sort completed session details by session_date and then by start_time
+        usort($completedBookingDetails, function ($a, $b) {
+            // Compare session_date first
+            $dateComparison = strtotime($a['session_date']) - strtotime($b['session_date']);
+            if ($dateComparison === 0) {
+                // If session_date is the same, compare start_time
+                return strtotime($a['start_time']) - strtotime($b['start_time']);
+            }
+            return $dateComparison;
+        });
         
         if($tutor){
             $tutorSessions = TutorSession::where('tutor_id', $tutor->id)
@@ -222,6 +257,7 @@ class ProfileController extends Controller
                 'course' => $usercourse,
                 'tutorsessions' => $tutorSessions,
                 'tutorselectedmodules' => $tutorselectedmodules,
+                'cBookings' => $completedBookingDetails,
             ]);
         }
 
@@ -233,6 +269,7 @@ class ProfileController extends Controller
             'level' => $userlevel,
             'semester' => $usersemester,
             'course' => $usercourse,
+            'cBookings' => $completedBookingDetails,
         ]);
     }
 

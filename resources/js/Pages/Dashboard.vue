@@ -160,7 +160,7 @@ const getDaySuffix = (day) => {
                             </div>
                         </div>
                         <div v-else class="flex flex-col w-full">
-                            <p class="text-lg text-gray-600">No upcoming sessions.</p>
+                            <p class="text-lg text-gray-600">No upcoming sessions with tutor.</p>
                         </div>
                     </div>
                 </div>

@@ -20,7 +20,7 @@ class MeetingController extends Controller
         $isTutor = Tutor::where('user_id', $userId)->first();
         $booking = TutorSession::where('id', $request->get('id'))->first();
 
-        if(!$booking){
+        if(!$booking || is_null($booking->meeting_url)){
             return back();
         }
 

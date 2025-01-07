@@ -89,6 +89,7 @@ const deleteGroup = () => {
                         :icon="true" 
                         iconPlacement="left"
                         @click="joinGroup"
+                        id="joinGroupBtn"
                         v-if="peerGroup.isUserLeader === 'No' && peerGroup.isUserMember === 'No' && peerGroup.currentMembers < peerGroup.totalMembers"
                     >
                         <template #icon>
@@ -101,6 +102,7 @@ const deleteGroup = () => {
                         iconPlacement="left"
                         @click="deleteGroup"
                         v-if="peerGroup.isUserLeader === 'Yes'"
+                        id="deleteGroupBtn"
                     >
                         <template #icon>
                             <TrashIcon class="text-white" />
@@ -112,6 +114,7 @@ const deleteGroup = () => {
                         iconPlacement="left"
                         @click="leaveGroup"
                         v-if="peerGroup.isUserMember === 'Yes'"
+                        id="leaveGroupBtn"
                     >
                         <template #icon>
                             <ArrowLeftEndOnRectangleIcon class="text-white" />

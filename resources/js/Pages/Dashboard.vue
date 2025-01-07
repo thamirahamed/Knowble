@@ -20,7 +20,7 @@ const props = defineProps({
     peerGroups: Array,
 });
 
-console.log(JSON.stringify(props.semstertutors, null, 2));
+console.log(JSON.stringify(props.peerGroups, null, 2));
 
 // Track the currently active content
 const activeContent = ref("solo");
@@ -252,9 +252,25 @@ const getDaySuffix = (day) => {
 
                     <div class="flex flex-col overflow-y-auto gap-2">
                         <div v-for="group in peerGroups" :key="group.id">
-                            <PeerGroupCard 
-                                :peerGroup="group"
-                            />
+                            <div v-if="group.isUserLeader === false && group.isUserMember === false && group.currentMembers < group.totalMembers">
+                                <PeerGroupCard 
+                                    :peerGroup="group"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex flex-col flex-1 max-w-xl bg-white rounded-md shadow-sm py-4 px-6 gap-5 min" >
+                    <div>
+                        <h1 class="text-xl font-bold text-slate-900">Joined Groups</h1>
+                    </div>
+                    <div class="flex flex-col overflow-y-auto gap-2">
+                        <div v-for="group in peerGroups" :key="group.id">
+                            <div v-if="group.isUserLeader === true || group.isUserMember === true">
+                                <PeerGroupCard 
+                                    :peerGroup="group"
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>

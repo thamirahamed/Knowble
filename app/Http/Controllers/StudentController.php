@@ -139,24 +139,30 @@ class StudentController extends Controller
                                 ->where('level_id', $studentprofile->level_id)
                                 ->get();
 
-        // Fetch module ids based on the student's profile
-        $studentModulesId = Module::where('semester_id', $studentprofile->semester_id)
-                                ->where('degree_program_id', $studentprofile->degree_id)
-                                ->where('level_id', $studentprofile->level_id)
-                                ->pluck('id'); // Only get the module IDs
+        // Extract module names based on the student's profile
+        $studentModuleNames = $studentModules->pluck('module_name'); // Get module names instead of IDs
 
-        
-        
-        // Fetch all peer groups for the student's modules in a single query with eager loading
+        // Fetch all peer groups for the student's modules by matching module names
         $peerGroups = PeerGroup::with(['leader', 'module'])
-                                ->whereIn('module_id', $studentModulesId)
+                                ->whereHas('module', function ($query) use ($studentModuleNames) {
+                                    $query->whereIn('module_name', $studentModuleNames); // Match by module names
+                                })
                                 ->get();
         // Format the peer groups data with the required fields
         $formattedPeerGroups = $peerGroups->map(function ($group) {
+            $userid = auth()->user()->id;
             $leader = User::where('id', $group->leader)->first();
+            $studentProfile = Profile::where('user_id', $userid)->first();
             $leaderProfile = Profile::where('user_id', $leader->id)->first();
             $leaderDegree = DegreeProgram::where('id', $leaderProfile->degree_id)->first();
             $memberCount = PeerGroupMember::where('peer_group_id', $group->id)->count() + 1;
+            // Check if the current user is the leader
+            $isLeader = $group->leader == $userid;
+
+            // Check if the current user is a member
+            $isMember = PeerGroupMember::where('user_id', $userid)
+                                        ->where('peer_group_id', $group->id)
+                                        ->exists();
             return [
                 'id' => $group->id,
                 'name' => $group->name,
@@ -165,8 +171,14 @@ class StudentController extends Controller
                 'leader' => $leader->name,
                 'currentMembers' => $memberCount,          
                 'totalMembers' => $group->total_members,
+                'isUserLeader' => $isLeader,
+                'isUserMember' => $isMember,
+                'isUserDegree' => $leaderProfile->degree_id == $studentProfile->degree_id,
             ];
         });
+
+        // Sort the peer groups to prioritize the user's degree program
+        $sortedPeerGroups = $formattedPeerGroups->sortByDesc('isUserDegree')->values();
 
         return Inertia::render('Dashboard',[
             'semstertutors' => $tutordetails,
@@ -174,7 +186,7 @@ class StudentController extends Controller
             'tutors' => $degreetutordetails,
             'sessions' => $sessionDetails,
             'sModules' => $studentModules,
-            'peerGroups'=>$formattedPeerGroups
+            'peerGroups'=>$sortedPeerGroups
         ]);
     }
 

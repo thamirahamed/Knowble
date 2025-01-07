@@ -47,6 +47,7 @@ watch(currentValue, (newValue) => {
         :min="min"
         :max="max"
         v-model="currentValue"
+        id="slider"
         class="w-full h-2 bg-secondary/40 rounded-lg appearance-none cursor-pointer focus:outline-none focus:ring-0 slider-thumb"
       />
   

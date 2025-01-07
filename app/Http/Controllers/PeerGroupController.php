@@ -187,7 +187,7 @@ class PeerGroupController extends Controller
         // Remove the user from the peer group
         $member->delete();
 
-        return redirect()->route('peergroup', ['id' => $peerGroupId])->with('success', 'Successfully left the peer group.');
+        return redirect()->route('dashboard');
     }
 
     // Delete peer group

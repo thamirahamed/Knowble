@@ -103,6 +103,7 @@ const getDaySuffix = (day) => {
                         :class="activeContent === 'solo' ? 'text-white bg-accent/80 relative z-0 overflow-hidden transition-all duration-200 after:absolute after:inset-0 after:-z-10 after:scale-[2.5] after:rounded-[100%] after:bg-gradient-to-l from-accentdark hover:bg-accent' : 'hover:bg-primary/15 text-gray-600 hover:text-gray-900'"
                         @click="() => (activeContent = 'solo')"
                         preserve-state
+                        id="one-on-one"
                     >   
                         <UserIcon class="w-5 h-5 mr-2" />
                         One-on-One
@@ -113,6 +114,7 @@ const getDaySuffix = (day) => {
                         :class="activeContent === 'peergroup' ? 'text-white bg-accent/80 relative z-0 overflow-hidden transition-all duration-200 after:absolute after:inset-0 after:-z-10 after:scale-[2.5] after:rounded-[100%] after:bg-gradient-to-l from-accentdark hover:bg-accent' : 'hover:bg-primary/15 text-gray-600 hover:text-gray-900'"
                         @click="() => (activeContent = 'peergroup')"
                         preserve-state
+                        id="peergrp"
                     >
                         <UserGroupIcon class="w-5 h-5 mr-2" />
                         Peer Group

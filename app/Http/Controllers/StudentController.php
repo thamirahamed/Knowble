@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\SessionStatusUpdated;
 use App\Models\DegreeProgram;
 use App\Models\Level;
 use App\Models\Semester;
@@ -13,6 +14,7 @@ use App\Models\User;
 use App\Models\TutorSession;
 use App\Models\PeerGroup;
 use App\Models\PeerGroupMember;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -97,12 +99,31 @@ class StudentController extends Controller
             ];
         }
 
+        $allsessions = TutorSession::all();
+
+        foreach ($allsessions as $session){
+            $sesssionendtime = $session->end_time;
+            $currenttime = Carbon::now();
+
+
+            if($currenttime > $sesssionendtime){
+                $session->status = 'completed';
+                $session->save();
+
+                broadcast(new SessionStatusUpdated($session));
+
+            }
+        }
+
         //upcomming sessions and status of the user
         $sessions = TutorSession::where('user_id', $userid)
                                 ->where('status', 'booked') // Filter for "booked" status
                                 ->get();
         $sessionDetails = [];
         foreach ($sessions as $session) {
+
+
+
             $tutor = Tutor::where('id', $session->tutor_id)->with('user')->first();
             $profiles = Profile::where('user_id', $session->user_id)->first();
             $module = Module::where('id', $session->module_id)->first();
@@ -169,7 +190,7 @@ class StudentController extends Controller
                 'degree' => $leaderDegree->degree_name,
                 'module' => $group->module->module_name,  // Assuming the module name is stored as 'module_name'
                 'leader' => $leader->name,
-                'currentMembers' => $memberCount,          
+                'currentMembers' => $memberCount,
                 'totalMembers' => $group->total_members,
                 'isUserLeader' => $isLeader,
                 'isUserMember' => $isMember,
@@ -216,7 +237,7 @@ class StudentController extends Controller
             }
             return $dateComparison;
         });
-        
+
         // You can convert the sorted array back to a collection if needed
         $tutorSessions = collect($tutorsessionsArray);
 

@@ -14,6 +14,7 @@ class TutorSession extends Model
         'status',
         'date',
         'user_id',
+        'peer_group_id',
         'module_id',
         'meeting_url',
         'notes',
@@ -32,5 +33,10 @@ class TutorSession extends Model
     public function modules()
     {
         return $this->belongsTo(Module::class);
+    }
+
+    public function peerGroup()
+    {
+        return $this->belongsTo(PeerGroup::class, 'peer_group_id');
     }
 }

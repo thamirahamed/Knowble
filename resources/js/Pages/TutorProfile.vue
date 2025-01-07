@@ -2,10 +2,11 @@
 import { defineProps, ref, onMounted, computed } from "vue";
 import ProfilePicture from "@/Components/ProfilePicture.vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { CheckBadgeIcon, AcademicCapIcon, CalendarDateRangeIcon } from "@heroicons/vue/24/solid";
+import { CheckBadgeIcon, AcademicCapIcon, CalendarDateRangeIcon, UserGroupIcon, UserIcon } from "@heroicons/vue/24/solid";
 import BookSession from "@/Components/BookSession.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import { Head } from "@inertiajs/vue3";
+import BookGroupSession from "@/Components/BookGroupSession.vue";
 
 const props = defineProps({
     tutor: Array,
@@ -19,7 +20,11 @@ const props = defineProps({
     sessions: [Array, null],
     commonModules: [Array, null],
     studentModules: Array,
+    isLeader: Array,
+    peerGroups: Array,
 });
+
+console.log(JSON.stringify(props.peerGroups, null, 2));
 
 const openModal = ref(null);
 
@@ -29,6 +34,16 @@ const closeModal = () => {
 
 const openModalWithData = () => {
     openModal.value = true;
+};
+
+const openModal1 = ref(null);
+
+const closeModal1 = () => {
+    openModal1.value = null;
+};
+
+const openModalWithData1 = () => {
+    openModal1.value = true;
 };
 
 // Function to format date to words with suffix
@@ -82,6 +97,13 @@ const getDaySuffix = (day) => {
                         :commonModules="commonModules"
                         :sessionSlots="sessions"
                     />
+                    <BookGroupSession
+                        :openModal="openModal1"
+                        :tutorid="tutor.id"
+                        :closeModal="closeModal1"
+                        :peerGroups="peerGroups"
+                        :sessionSlots="sessions"
+                    />
                     <!-- User Information Section -->
                     <div class="flex flex-col flex-1 pb-5 px-6">
                         <div class="border-y border-gray-300 py-3 px-1">
@@ -102,7 +124,25 @@ const getDaySuffix = (day) => {
                             class="mt-4 w-full" 
                             @click="openModalWithData(tutor.id)"
                         >
-                            Book Session
+                            <div class="flex items-center">
+                                <UserIcon class="text-white w-5 h-5 mr-2" />
+                                <span>
+                                    Book Session 
+                                </span>
+                            </div>
+                        </PrimaryButton>
+                        <PrimaryButton 
+                            v-if="sessions.length > 0 && tutormodules.length > 0 && isLeader"
+                            id="bookSessionBtn" 
+                            class="mt-4 w-full" 
+                            @click="openModalWithData1(tutor.id)"
+                        >   
+                            <div class="flex items-center">
+                                <UserGroupIcon class="text-white w-5 h-5 mr-2" />
+                                <span>
+                                    Book Session for Peer Group
+                                </span>
+                            </div>
                         </PrimaryButton>
                     </div>
                 </div>

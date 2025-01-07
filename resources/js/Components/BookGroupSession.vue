@@ -10,13 +10,13 @@ const props = defineProps({
     openModal: Boolean,
     tutorid: Number,
     closeModal: Function,
-    commonModules: Array,
+    peerGroups: Array,
     sessionSlots: Array,
 });
 
 // Initialize the form
 const form = useForm({
-    module: '',
+    peerGroups: '',
     sessionSlot: '',
     notes: '',
 });
@@ -25,20 +25,23 @@ const submitSessionBooking = () => {
 
     // Prepare the data to be sent
     const payload = {
-        module: form.module,
+        peerGroups: form.peerGroups,
         sessionSlot: form.sessionSlot,
         notes: form.notes,
     };
 
+    console.log(payload);
+
     // Submit the form using router.post
-    router.post('/tutor/sessions/book', payload, {
+    router.post('/peer-group/book', payload, {
         onSuccess: () => {
             alert('Session booked successfully!');
             props.closeModal(); // Close the modal on success
             form.reset(); // Reset the form fields
         },
         onError: (errors) => {
-            alert('Failed to book session:', errors);
+            console.log(errors);
+            alert('Failed to book session:' + Object.values(errors).join(', '));
         },
     });
 };
@@ -77,7 +80,7 @@ const getDaySuffix = (day) => {
         <div class="bg-white rounded-lg shadow-md max-w-lg w-full overflow-hidden">
             <!-- Modal Header -->
             <div class="flex justify-between items-center py-2 px-6 bg-primary">
-                <h2 class="text-lg  font-light text-white">Book one-on-one session</h2>
+                <h2 class="text-lg  font-light text-white">Book Group Session</h2>
                 <button id="closeModal" @click="closeModal" class="p-1 rounded-full bg-red-500 text-white"><XMarkIcon class="w-4" /></button>
             </div>
 
@@ -85,25 +88,26 @@ const getDaySuffix = (day) => {
             <div class="mt-4 px-6 pb-4">
                 <form @submit.prevent="submitSessionBooking">
                     <div class="mb-4">
-                        <InputLabel for="session_module" value="Module" />
+                        <InputLabel for="peer-group" value="Peer Group" />
                         <select
-                            id="session_module"
+                            id="peer-group"
                             class="cursor-pointer mt-1 block w-full text-lg shadow-sm border-gray-300 rounded-md hover:border-slate-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-slate-500"
                             required
-                            v-model="form.module"
+                            v-model="form.peerGroups"
                         >
-                            <option value="">Select Module</option>
+                            <option value="">Select Group</option>
                             <option
-                                v-for="cModule in commonModules"
-                                :key="cModule.id"
-                                :value="cModule.id"
-                                :id="'session-'+ cModule.id"
+                                v-for="group in peerGroups"
+                                :key="group.id"
+                                :value="group.id"
+                                :id="'group-'+group.id"
                             >
-                                {{ cModule.module_name }}
+                                {{ group.name }} | {{ group.moduleName }}
                             </option>
+                            <InputError class="mt-2" :message="form.errors.peerGroups" />
                         </select>
-                        <InputError class="mt-2" :message="form.errors.module" />
                     </div>
+
                     <div class="mb-4">
                         <InputLabel for="session-slot" value="Session Slot" />
                         <select

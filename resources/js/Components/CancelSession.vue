@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { router, useForm } from '@inertiajs/vue3';
 import InputLabel from './InputLabel.vue';
 import PrimaryButton from './PrimaryButton.vue';
-import { XMarkIcon } from '@heroicons/vue/24/solid';
+import { UserGroupIcon, XMarkIcon } from '@heroicons/vue/24/solid';
 import { onMounted } from 'vue';
 import DangerButton from './DangerButton.vue';
 
@@ -79,7 +79,8 @@ const getDaySuffix = (day) => {
 
             <!-- Modal Body -->
             <div class="mt-4 px-6 pb-4">
-                <p class="text-lg font-semibold">{{ booking.user }}</p>
+                <p v-if="booking.type === 'individual'" class="text-lg font-semibold">{{ booking.user }}</p>
+                <p v-if="booking.type === 'group'" class="text-lg font-semibold flex items-center"><UserGroupIcon class="w-4 h-4 mr-2" /> {{ booking.peer_group_name }}<span class="text-gray-600 text-sm ml-2">({{ booking.current_members }} / {{ booking.total_members }})</span></p>
                 <p class="text-lg text-gray-700">{{ booking.module_name }}</p>
                 <p class="text-lg text-gray-700">{{ formatDateToWords(booking.session_date) }} | {{ booking.start_time }} - {{ booking.end_time }}</p>
                 <p class="text-lg text-gray-700" v-if="booking.notes">Notes: {{ booking.notes }}</p>

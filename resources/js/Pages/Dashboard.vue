@@ -16,11 +16,12 @@ const props = defineProps({
     allDegree: Array,
     tutors: Array,
     sessions: Array,
+    groupSessions: Array,
     sModules: Array,
     peerGroups: Array,
 });
 
-console.log(JSON.stringify(props.peerGroups, null, 2));
+console.log(JSON.stringify(props.groupSessions, null, 2));
 
 // Track the currently active content
 const activeContent = ref("solo");
@@ -208,7 +209,7 @@ const getDaySuffix = (day) => {
                             </div>
                         </div>
                         <div v-else class="flex flex-col w-full">
-                            <p class="text-lg text-gray-600">No upcoming sessions with tutor.</p>
+                            <p class="text-gray-600">No upcoming sessions with tutor.</p>
                         </div>
                     </div>
                 </div>
@@ -252,27 +253,41 @@ const getDaySuffix = (day) => {
                         />
                     </div>
 
-                    <div class="flex flex-col overflow-y-auto gap-2">
-                        <div v-for="group in peerGroups" :key="group.id">
+                    <div class="flex flex-col overflow-y-auto gap-2" v-if="peerGroups.length > 0">
+                        <div v-for="group in peerGroups" :key="group.id" class="flex flex-col w-full">
                             <div v-if="group.isUserLeader === false && group.isUserMember === false && group.currentMembers < group.totalMembers">
                                 <PeerGroupCard 
                                     :peerGroup="group"
                                 />
                             </div>
+                            <div v-else class="text-gray-600 mx-auto mt-6">    
+                                <p class="">No peer groups found for your modules.</p>
+                            </div>
                         </div>
                     </div>
+                    
+                    <div v-else class="text-gray-600 mx-auto mt-6">    
+                        <p class="">No peer groups found for your modules.</p>
+                    </div>
                 </div>
-                <div class="flex flex-col flex-1 max-w-xl bg-white rounded-md shadow-sm py-4 px-6 gap-5 min" >
+                <div class="flex flex-col flex-1 max-w-xl bg-white rounded-md shadow-sm py-4 px-6 gap-5 min-h-60 h-fit overflow-y-auto max-h-full" >
                     <div>
                         <h1 class="text-xl font-bold text-slate-900">Joined Groups</h1>
                     </div>
-                    <div class="flex flex-col overflow-y-auto gap-2">
-                        <div v-for="group in peerGroups" :key="group.id">
+                    <div class="flex flex-col flex-1 overflow-y-auto gap-2">
+                        <div 
+                            v-for="group in peerGroups" 
+                            :key="group.id"
+                            v-if="peerGroups.isUserLeader === true || peerGroups.isUserMember === true"
+                        >
                             <div v-if="group.isUserLeader === true || group.isUserMember === true">
                                 <PeerGroupCard 
                                     :peerGroup="group"
                                 />
                             </div>
+                        </div>
+                        <div v-else class="text-gray-600 flex flex-col m-auto">
+                            <p>Currently, you are not a member of any peer group.</p>
                         </div>
                     </div>
                 </div>

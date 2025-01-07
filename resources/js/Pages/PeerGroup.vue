@@ -2,16 +2,18 @@
 import DangerButton from '@/Components/DangerButton.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { TrashIcon, UserPlusIcon, ArrowLeftEndOnRectangleIcon, UserGroupIcon } from '@heroicons/vue/24/solid';
+import { TrashIcon, UserPlusIcon, ArrowLeftEndOnRectangleIcon, UserGroupIcon, CheckBadgeIcon } from '@heroicons/vue/24/solid';
 import { router } from '@inertiajs/vue3';
 
 const props = defineProps({
     peerGroup: Array,
     peerGroupMembers: Array,
+    groupSessions: Array,
+    pastGroupSessions: Array,
 });
 
 console.log(JSON.stringify(props.peerGroup, null, 2));
-console.log(JSON.stringify(props.peerGroupMembers, null, 2));
+console.log(JSON.stringify(props.pastGroupSessions, null, 2));
 
 const joinGroup = () => {
     // Prepare the data to be sent
@@ -62,7 +64,6 @@ const deleteGroup = () => {
         router.post('/peer-group/delete', payload, {
             onSuccess: () => {
                 alert('Peer group deleted successfully!');
-                router.push('/home'); // Redirect to the home page after successful deletion
             },
             onError: (errors) => {
                 console.error(errors); // Log errors to the console for debugging
@@ -71,6 +72,48 @@ const deleteGroup = () => {
         });
     }
 };
+
+// Redirect to Join Meeting with the meeting_url from a specific booking
+const joinMeeting = (booking) => {
+    // Get the base meeting URL from the booking
+    let meetingUrl = booking.meeting_url;
+    
+    // Create the tutor's name (convert to lowercase and replace spaces with hyphens)
+    const studentName = booking.student_name.replace(" ", "-").toLowerCase();  // Example: Emily Davis -> emily-davis
+    
+    // append the 'name' parameter
+    meetingUrl += `&name=${studentName}`;
+
+    router.visit(route("meetings.index", { meetingUrl, id: booking.id }));
+};
+
+// Function to format date to words with suffix
+const formatDateToWords = (date) => {
+  const options = { year: 'numeric', month: 'long', day: 'numeric' };
+  const d = new Date(date);
+  const day = d.getDate();
+  const suffix = getDaySuffix(day);
+  
+  const formatter = new Intl.DateTimeFormat('en-US', options);
+  return `${formatter.format(d).replace(day, day + suffix)}`;
+};
+
+// Function to get the day suffix (st, nd, rd, th)
+const getDaySuffix = (day) => {
+  const j = day % 10;
+  const k = day % 100;
+  if (j === 1 && k !== 11) {
+    return 'st';
+  }
+  if (j === 2 && k !== 12) {
+    return 'nd';
+  }
+  if (j === 3 && k !== 13) {
+    return 'rd';
+  }
+  return 'th';
+};
+
 </script>
 
 <template>
@@ -124,8 +167,81 @@ const deleteGroup = () => {
                 </div>
             </div>
             <span class="w-full h-0.5 bg-accent mb-4"></span>
-            <div>
-                <div class="flex flex-col bg-white rounded-md shadow px-6 py-4 w-full mb-4">
+            <div class="flex gap-8">
+                <!-- Upcoming Sessions -->
+                <div class="flex flex-col flex-1">
+                    <div v-if="peerGroup.isUserLeader === 'Yes' || peerGroup.isUserMember === 'Yes'" class="flex flex-col flex-1 bg-white rounded-md shadow px-6 py-4 mb-4 min-h-72 max-h-[30rem] overflow-y-auto">
+                        <h1 class="text-xl text-slate-900 font-bold mb-4">Upcoming Sessions</h1>
+                        <div v-if="groupSessions.length > 0" class="flex flex-col gap-3 overflow-y-auto">
+                            <div
+                                v-for="(session, index) in groupSessions"
+                                :key="index"
+                                class="flex flex-col bg-secondary/5 px-5 py-4 rounded-md shadow-md"
+                            >
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <div class="flex items-center">
+                                            <img
+                                                :src="session.profile_pic"
+                                                alt="Profile Picture"
+                                                class="w-8 h-8 mr-3 rounded-full object-cover"
+                                            />
+                                            <p class="text-lg font-semibold text-gray-800">{{ session.tutor_name }}</p>
+                                            <CheckBadgeIcon class="ml-1 w-5 h-5 text-accent" />
+                                        </div>
+                                        <p class="text-lg text-gray-600">{{ session.module_name }}</p>
+                                        <p class="text-lg text-gray-600">{{ formatDateToWords(session.session_date) }} | {{ session.start_time }} - {{ session.end_time }}</p>            
+                                        <p v-if="session.notes " class="text-lg text-gray-600">Notes: {{ session.notes }}</p>
+                                    </div>
+                                    <PrimaryButton :id="'joinMeeting-' + session.id" class="!text-sm" @click="joinMeeting(session)">Join Now</PrimaryButton>
+                                </div>
+                            </div>
+                        </div>
+                        <div v-else class="m-auto flex flex-col items-center">
+                            <p class="text-base text-gray-600">No upcoming group sessions with tutor.</p>
+                            <p class="text-base text-gray-600">Group leader has to place booking.</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-col flex-1 bg-white rounded-md shadow px-6 py-4 mb-4 min-h-64 h-fit max-h-[30rem] overflow-y-auto">
+                        <h1 class="text-xl text-slate-900 font-bold mb-4">Past Sessions</h1>
+                        <div v-if="pastGroupSessions.length > 0" class="flex flex-col gap-3 overflow-y-auto flex-wrap">
+                            <div   
+                                v-for="session in pastGroupSessions"
+                                :key="session.id"
+                                class="flex justify-between items-center bg-secondary/5 p-4 rounded-md shadow-md xl:w-[49%]" 
+                            >
+                                <div class="flex flex-col">
+                                    <div class="inline-flex">
+                                        <img
+                                            :src="session.profile_pic"
+                                            alt="Profile Picture"
+                                            class="w-8 h-8 mr-3 rounded-full object-cover"
+                                        />
+                                        <div class="flex items-center text-lg font-semibold text-gray-800">
+                                            <p>{{ session.tutor_name }}</p>
+                                            <CheckBadgeIcon class="ml-1 w-5 h-5 text-accent" />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <p class="text-lg text-gray-600">{{ session.module_name }}</p>
+                                        <p class="text-lg text-gray-600">
+                                            {{ formatDateToWords(session.session_date) }} | {{ session.start_time }} - {{ session.end_time }}
+                                        </p>
+                                        <p v-if="session.notes && session.status==='completed'" class="text-lg text-gray-600">Notes: {{ session.notes }}</p>
+                                        <p v-if="session.notes && session.status==='cancelled'" class="text-lg text-gray-600">Reason: {{ session.notes }}</p>
+                                        <p v-if="session.status==='cancelled'" class="text-lg text-red-500">Cancelled</p>
+                                        <p v-if="session.status==='completed'" class="text-lg text-accent">Completed</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div v-else class="flex flex-col w-full">
+                            <p class="text-gray-600 m-auto">No past group sessions found.</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Members -->
+                <div class="flex flex-col bg-white max-w-xl rounded-md shadow px-6 py-4 flex-1 mb-4 h-fit">
                     <h1 class="text-xl text-slate-900 font-bold mb-4">Members</h1>
                     <div class="bg-secondary/5 py-4 px-5 shadow rounded-md mb-2 w-full flex items-center gap-4" >
                         <div class="flex">

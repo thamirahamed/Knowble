@@ -1,7 +1,7 @@
 <script setup>
 import DangerButton from "@/Components/DangerButton.vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { ArrowLeftEndOnRectangleIcon } from "@heroicons/vue/24/solid";
+import { ArrowLeftEndOnRectangleIcon, CheckBadgeIcon } from "@heroicons/vue/24/solid";
 import { router } from "@inertiajs/vue3";
 
 const props = defineProps({
@@ -53,9 +53,16 @@ const leaveMeeting = (booking) => {
         <div class="flex justify-center mt-8">
             <div class="flex flex-col max-w-7xl w-full bg-white px-8 py-6 min-h-[90vh] rounded-md shadow-sm">
                 <div class="flex justify-between items-center">
-                    <div>
+                    <div v-if="bookingDetails.type === 'individual'">
                         <h1 v-if="bookingDetails.isUserTutor === 'Yes'" class="text-xl text-gray-800 font-semibold">Meeting with {{ bookingDetails.student_name  }}</h1>
-                        <h1 v-if="bookingDetails.isUserTutor === 'No'" class="text-xl text-gray-800 font-semibold">Meeting with {{ bookingDetails.tutor_name }}</h1>
+                        <h1 v-if="bookingDetails.isUserTutor === 'No'" class="text-xl text-gray-800 font-semibold flex items-center">Meeting with {{ bookingDetails.tutor_name }}<CheckBadgeIcon class="w-5 h-5 ml-1 text-accent" /></h1>
+                        <h2 class="text-lg text-gray-600">{{ bookingDetails.module_name }}</h2>
+                        <h2 class="text-lg text-gray-600">{{ formatDateToWords(bookingDetails.session_date) }} | {{ bookingDetails.start_time }} - {{ bookingDetails.end_time }}</h2>
+                        <h2 v-if="bookingDetails.notes" class="text-lg text-gray-600">Notes: {{ bookingDetails.notes }}</h2>
+                    </div>
+                    <div v-if="bookingDetails.type === 'group'">
+                        <h1 v-if="bookingDetails.isUserTutor === 'Yes'" class="text-xl text-gray-800 font-semibold flex items-center">Peer group session with {{ bookingDetails.group_name }} <span class="text-gray-600 text-sm ml-2">({{ bookingDetails.currentMembers }} / {{ bookingDetails.total_members }})</span></h1>
+                        <h1 v-if="bookingDetails.isUserTutor === 'No'" class="text-xl text-gray-800 font-semibold flex items-center">Peer group session with {{ bookingDetails.tutor_name }}<CheckBadgeIcon class="w-5 h-5 ml-1 text-accent" /></h1>
                         <h2 class="text-lg text-gray-600">{{ bookingDetails.module_name }}</h2>
                         <h2 class="text-lg text-gray-600">{{ formatDateToWords(bookingDetails.session_date) }} | {{ bookingDetails.start_time }} - {{ bookingDetails.end_time }}</h2>
                         <h2 v-if="bookingDetails.notes" class="text-lg text-gray-600">Notes: {{ bookingDetails.notes }}</h2>

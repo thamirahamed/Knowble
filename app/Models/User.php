@@ -84,4 +84,8 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsToMany(PeerGroup::class, 'peer_group_members', 'user_id', 'peer_group_id');
     }
 
+    public function ledPeerGroupSessions()
+    {
+        return $this->hasManyThrough(Session::class, PeerGroup::class, 'leader_id', 'peer_group_id', 'id', 'id');
+    }
 }

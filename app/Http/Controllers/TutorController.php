@@ -6,6 +6,8 @@ use App\Models\Profile;
 use App\Models\Tutor;
 use App\Models\TutorSession;
 use App\Models\User;
+use App\Models\PeerGroup;
+use App\Models\PeerGroupMember;
 use App\Models\Module;
 use App\Models\DegreeProgram;
 use Illuminate\Http\Request;
@@ -57,26 +59,72 @@ class TutorController extends Controller
                                 ->where('status', 'booked')
                                 ->get();
         $tutorName = User::where('id', $tutor->user_id)->first();
-        $bookingdetails = [];
-        foreach ($bookings as $booking) {
-            $user = User::where('id', $booking->user_id)->first();
-            $module = Module::where('id', $booking->module_id)->first();
-            $profiles = Profile::where('user_id', $booking->user_id)->first();
-            $degree = DegreeProgram::where('id', $profiles->degree_id)->first();
+        // $bookingdetails = [];
+        // foreach ($bookings as $booking) {
+        //     $user = User::where('id', $booking->user_id)->first();
+        //     $module = Module::where('id', $booking->module_id)->first();
+        //     $profiles = Profile::where('user_id', $booking->user_id)->first();
+        //     $degree = DegreeProgram::where('id', $profiles->degree_id)->first();
 
-            $bookingdetails[] = [
+        //     $bookingdetails[] = [
+        //         'id' => $booking->id,
+        //         'user' => $user->name,
+        //         'tutor' => $tutorName->name,
+        //         'profile_pic' => $profiles->profile_pic,
+        //         'degree' => $degree->degree_name,
+        //         'notes' => $booking->notes,
+        //         'module_name' => $module ? $module->module_name : 'Unknown Module',
+        //         'meeting_url' => $booking->meeting_url,
+        //         'session_date' => $booking->session_date,
+        //         'start_time' => $booking->start_time,
+        //         'end_time' => $booking->end_time,
+        //     ];
+        // }
+
+        $combinedBookings = [];
+
+        foreach ($bookings as $booking) {
+            $module = Module::where('id', $booking->module_id)->first();
+            $commonDetails = [
                 'id' => $booking->id,
-                'user' => $user->name,
                 'tutor' => $tutorName->name,
-                'profile_pic' => $profiles->profile_pic,
-                'degree' => $degree->degree_name,
-                'notes' => $booking->notes,
                 'module_name' => $module ? $module->module_name : 'Unknown Module',
                 'meeting_url' => $booking->meeting_url,
                 'session_date' => $booking->session_date,
                 'start_time' => $booking->start_time,
                 'end_time' => $booking->end_time,
+                'notes' => $booking->notes,
             ];
+
+            if (!is_null($booking->user_id)) {
+                // Individual Booking
+                $user = User::where('id', $booking->user_id)->first();
+                $profile = Profile::where('user_id', $booking->user_id)->first();
+                $degree = DegreeProgram::where('id', $profile->degree_id)->first();
+
+                $combinedBookings[] = array_merge($commonDetails, [
+                    'type' => 'individual',
+                    'user' => $user->name,
+                    'profile_pic' => $profile->profile_pic,
+                    'degree' => $degree->degree_name,
+                ]);
+            } elseif (!is_null($booking->peer_group_id)) {
+                // Group Booking
+                $peerGroup = PeerGroup::where('id', $booking->peer_group_id)->first();
+                $leader = User::where('id', $peerGroup->leader)->first();
+                $leaderProfile = Profile::where('user_id', $peerGroup->leader)->first();
+                $leaderDegree = DegreeProgram::where('id', $leaderProfile->degree_id)->first();
+                $memberCount = PeerGroupMember::where('peer_group_id', $peerGroup->id)->count() + 1;
+
+                $combinedBookings[] = array_merge($commonDetails, [
+                    'type' => 'group',
+                    'peer_group_name' => $peerGroup->name,
+                    'leader_name' => $leader->name,
+                    'leader_degree' => $leaderDegree->degree_name,
+                    'current_members' => $memberCount,
+                    'total_members' => $peerGroup->total_members,
+                ]);
+            }
         }
 
         $completedBookings = TutorSession::where('tutor_id', $tutor->id)
@@ -84,29 +132,57 @@ class TutorController extends Controller
                         ->get();
         $completedBookingDetails = [];
         foreach ($completedBookings as $cBooking) {
-            $user = User::where('id', $cBooking->user_id)->first();
             $module = Module::where('id', $cBooking->module_id)->first();
-            $profiles = Profile::where('user_id', $cBooking->user_id)->first();
-            $degree = DegreeProgram::where('id', $profiles->degree_id)->first();
-
-            $completedBookingDetails[] = [
-                'id' => $cBooking->id,
-                'user' => $user->name,
-                'tutor' => $tutorName->name,
-                'profile_pic' => $profiles->profile_pic,
-                'degree' => $degree->degree_name,
-                'notes' => $cBooking->notes,
-                'module_name' => $module ? $module->module_name : 'Unknown Module',
-                'session_date' => $cBooking->session_date,
-                'start_time' => $cBooking->start_time,
-                'end_time' => $cBooking->end_time,
-                'status' => $cBooking->status,
-            ];
+            $type = $cBooking->peer_group_id ? 'group' : 'individual';
+        
+            if ($type === 'individual') {
+                // Handle individual bookings
+                $user = User::where('id', $cBooking->user_id)->first();
+                $profiles = Profile::where('user_id', $cBooking->user_id)->first();
+                $degree = DegreeProgram::where('id', $profiles->degree_id)->first();
+        
+                $completedBookingDetails[] = [
+                    'id' => $cBooking->id,
+                    'type' => 'individual',
+                    'user' => $user->name,
+                    'profile_pic' => $profiles->profile_pic,
+                    'degree' => $degree->degree_name,
+                    'notes' => $cBooking->notes,
+                    'module_name' => $module ? $module->module_name : 'Unknown Module',
+                    'session_date' => $cBooking->session_date,
+                    'start_time' => $cBooking->start_time,
+                    'end_time' => $cBooking->end_time,
+                    'status' => $cBooking->status,
+                ];
+            } else {
+                // Handle group bookings
+                $peerGroup = PeerGroup::where('id', $cBooking->peer_group_id)->first();
+                $leader = User::where('id', $peerGroup->leader)->first();
+                $profiles = Profile::where('user_id', $leader->id)->first();
+                $degree = DegreeProgram::where('id', $profiles->degree_id)->first();
+                $memberCount = PeerGroupMember::where('peer_group_id', $peerGroup->id)->count() + 1;
+        
+                $completedBookingDetails[] = [
+                    'id' => $cBooking->id,
+                    'type' => 'group',
+                    'group_name' => $peerGroup->name,
+                    'leader' => $leader->name,
+                    'profile_pic' => $profiles->profile_pic,
+                    'degree' => $degree->degree_name,
+                    'notes' => $cBooking->notes,
+                    'module_name' => $module ? $module->module_name : 'Unknown Module',
+                    'session_date' => $cBooking->session_date,
+                    'start_time' => $cBooking->start_time,
+                    'end_time' => $cBooking->end_time,
+                    'status' => $cBooking->status,
+                    'currentMembers' => $memberCount,
+                    'total_members' => $peerGroup->total_members,
+                ];
+            }
         }
 
-
         // Sort session details by session_date and then by start_time
-        usort($bookingdetails, function ($a, $b) {
+        usort($combinedBookings, function ($a, $b) {
             // Compare session_date first
             $dateComparison = strtotime($a['session_date']) - strtotime($b['session_date']);
             if ($dateComparison === 0) {
@@ -134,7 +210,7 @@ class TutorController extends Controller
             'rejectedReason' => $rejectedReason,
             'tutorsSelectedModules' => $tutorsSelectedModules,
             'sessionSlots' => $tutorsessions,
-            'bookings' => $bookingdetails,
+            'bookings' => $combinedBookings,
             'completedBookings' => $completedBookingDetails,
         ]);
     }

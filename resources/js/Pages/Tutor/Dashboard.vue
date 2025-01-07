@@ -41,7 +41,7 @@ const props = defineProps({
     },
 });
 
-console.log(JSON.stringify(props.completedBookings, null, 2))
+console.log(JSON.stringify(props.bookings, null, 2))
 
 const TutorRequest = (id) => {
     router.post(`/admin/request/${id}`, {}, {

@@ -104,6 +104,7 @@ Route::middleware(['auth' ,'studentportal'])->group(function () {
         Route::post('/join', [PeerGroupController::class, 'joinGroup'])->name('peergroup.join');
         Route::post('/leave', [PeerGroupController::class, 'leaveGroup'])->name('peergroup.leave');
         Route::post('/delete', [PeerGroupController::class, 'deleteGroup'])->name('peergroup.delete');
+        Route::post('/book', [PeerGroupController::class, 'bookSession'])->name('peergroup.book.session');
     });
 });
 

@@ -39,4 +39,9 @@ class PeerGroup extends Model
     {
         return $this->belongsTo(Module::class, 'module_id');
     }
+
+    public function sessions()
+    {
+        return $this->hasMany(Session::class, 'peer_group_id');
+    }
 }

@@ -7,6 +7,9 @@ use App\Models\PeerGroupMember;
 use App\Models\User;
 use App\Models\Profile;
 use App\Models\DegreeProgram;
+use App\Models\Module;
+use App\Models\Tutor;
+use App\Models\TutorSession;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;;
 use Illuminate\Support\Str;
@@ -71,10 +74,73 @@ class PeerGroupController extends Controller
             ];
         });
 
+        // Get all booked sessions for the specified peer group
+        $groupSessions = TutorSession::where('peer_group_id', $id)
+                                    ->where('status', 'booked')  // Filter for "booked" status
+                                    ->get();
+
+        // Initialize session details array
+        $groupSessionDetails = [];
+
+        if ($groupSessions->isNotEmpty()) {
+            foreach ($groupSessions as $session) {
+                $tutor = Tutor::where('id', $session->tutor_id)->with('user')->first();
+                $profiles = Profile::where('user_id', $tutor->user_id)->first();
+                $module = Module::where('id', $session->module_id)->first();
+                $studentName = User::where('id', $userid)->first();  
+
+                // Add session details to the array
+                $groupSessionDetails[] = [
+                    'id' => $session->id,
+                    'student_name' => $studentName->name,
+                    'tutor_name' => $tutor ? $tutor->user->name : 'Unknown Tutor',
+                    'profile_pic' => $profiles->profile_pic,
+                    'meeting_url' => $session->meeting_url,
+                    'module_name' => $module ? $module->module_name : 'Unknown Module',
+                    'session_date' => $session->session_date,
+                    'start_time' => $session->start_time,
+                    'end_time' => $session->end_time,
+                    'notes' => $session->notes,
+                ];
+            }
+        }
+
+        // Get all completed and cancelled sessions for the specified peer group
+        $pastGroupSessions = TutorSession::where('peer_group_id', $id)
+                        ->whereIn('status', ['completed', 'cancelled'])  // Filter for "completed" and "cancelled" status
+                        ->get();
+
+        // Initialize session details array
+        $pastGroupSessionDetails = [];
+
+        if ($pastGroupSessions->isNotEmpty()) {
+            foreach ($pastGroupSessions as $session) {
+                $tutor = Tutor::where('id', $session->tutor_id)->with('user')->first();
+                $profiles = Profile::where('user_id', $tutor->user_id)->first();
+                $module = Module::where('id', $session->module_id)->first();
+
+                // Add session details to the array
+                $pastGroupSessionDetails[] = [
+                    'id' => $session->id,
+                    'tutor_name' => $tutor ? $tutor->user->name : 'Unknown Tutor',
+                    'profile_pic' => $profiles->profile_pic,
+                    'module_name' => $module ? $module->module_name : 'Unknown Module',
+                    'session_date' => $session->session_date,
+                    'start_time' => $session->start_time,
+                    'end_time' => $session->end_time,
+                    'status' => $session->status,  
+                    'notes' => $session->notes,
+                ];
+            }
+        }
+
+
 
         return Inertia::render('PeerGroup',[
             'peerGroup'=>$formattedPeerGroup,
             'peerGroupMembers'=>$formattedMembers,
+            'groupSessions' => $groupSessionDetails,
+            'pastGroupSessions' => $pastGroupSessionDetails,
         ]);
     }
 
@@ -220,6 +286,51 @@ class PeerGroupController extends Controller
         $peerGroup->delete();
 
         return redirect()->route('dashboard');
+    }
+
+    public function bookSession (Request $request) {
+        // Validate the incoming request
+        $validated = $request->validate([
+            'peerGroups' => 'required',
+            'sessionSlot' => 'required',
+            'notes' => 'nullable|string|max:255',
+        ]);
+
+        $userId = auth()->user()->id;
+
+        // Find the peer group
+        $peerGroup = PeerGroup::find($validated['peerGroups']);
+        if (!$peerGroup || $peerGroup->leader !== $userId) {
+            return back()->withErrors('error', 'You are not authorized to book a session for this peer group.');
+        }
+
+        // Find the session slot
+        $session = TutorSession::find($validated['sessionSlot']);
+        if (!$session || $session->status === 'booked') {
+            return back()->withErrors('error', 'The selected session slot is not available.');
+        }
+
+        // Base URL for the meeting
+        $baseUrl = "https://sfu.mirotalk.com/join";
+
+        // Generate room name: "Peer Group Session for <Peer Group Name>"
+        $roomName = Str::slug("Peer Group Session for {$peerGroup->name}", '-');
+
+        // Generate a random 6-character password
+        $roomPassword = substr(str_shuffle("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"), 0, 6);
+
+        // Construct the meeting URL
+        $roomUrl = "{$baseUrl}?room={$roomName}&roomPassword={$roomPassword}&audio=0&video=0&screen=0&notify=0&duration=unlimited";
+
+        // Save the session data
+        $session->status = 'booked';
+        $session->peer_group_id = $peerGroup->id; // Assign the peer group ID
+        $session->module_id = $peerGroup->module_id; // Assign the module from the peer group
+        $session->meeting_url = $roomUrl;
+        $session->notes = $validated['notes'];
+        $session->save();
+
+        return redirect()->route('tutor.profile', ['id' => $session->tutor_id]);
     }
 
 }

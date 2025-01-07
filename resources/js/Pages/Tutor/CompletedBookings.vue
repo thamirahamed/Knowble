@@ -1,4 +1,5 @@
 <script setup>
+import { UserGroupIcon } from '@heroicons/vue/24/solid';
 
 // Props
 const props = defineProps({
@@ -46,13 +47,19 @@ const getDaySuffix = (day) => {
                 class="flex justify-between items-center bg-secondary/5 p-4 rounded-md shadow-md xl:w-[49%] flex-wrap" 
             >
                 <div class="flex flex-col">
-                    <div class="inline-flex">
+                    <div v-if="booking.type === 'individual'" class="inline-flex">
                         <img
                             :src="booking.profile_pic"
                             alt="Profile Picture"
                             class="w-8 h-8 mr-3 rounded-full object-cover"
                         />
                         <p class="text-lg font-semibold text-gray-800">{{ booking.user }}</p>
+                    </div>
+                    <div v-if="booking.type === 'group'" class="inline-flex">
+                        <UserGroupIcon
+                            class="w-8 h-8 text-gray-900 mr-3"
+                        />
+                        <p class="text-lg font-semibold text-gray-800 flex items-center">{{ booking.group_name }}<span class="text-gray-600 text-sm ml-2">({{ booking.currentMembers }} / {{ booking.total_members }})</span></p>
                     </div>
                     <div>
                         <p class="text-lg text-gray-600">{{ booking.degree }}</p>

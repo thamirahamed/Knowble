@@ -4,6 +4,7 @@ import { ref } from "vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import DangerButton from "@/Components/DangerButton.vue";
 import CancelSession from "@/Components/CancelSession.vue";
+import { UserGroupIcon } from "@heroicons/vue/24/solid";
 
 // Props
 const props = defineProps({
@@ -20,6 +21,7 @@ const closeModal = () => {
 
 const openModalWithData = (booking) => {
     selectedBooking.value = booking;
+    console.log(JSON.stringify(booking, null, 2))
     openModal.value = true;
 };
 
@@ -69,7 +71,7 @@ const getDaySuffix = (day) => {
 <template>
     <div class="flex flex-col w-full">
         <h1 class="text-xl font-bold text-gray-800">Upcoming Bookings</h1>
-        <p class="text-gray-500 mb-4">View your upcoming sessions, where you can join the meeting or cancel it.</p>
+        <p class="text-gray-500 mb-4">View your upcoming one-on-one or group sessions, where you can join the meeting or cancel it.</p>
 
         <div v-if="bookings.length > 0" class="space-y-4 mb-4">
             <div
@@ -79,13 +81,27 @@ const getDaySuffix = (day) => {
             >
                 <div class="flex items-center gap-4">
                     <img
+                        v-if="booking.type === 'individual'"
                         :src="booking.profile_pic"
                         alt="Profile Picture"
                         class="w-16 h-16 rounded-full object-cover"
                     />
-                    <div>
+                    <UserGroupIcon
+                        v-if="booking.type === 'group'"
+                        class="w-16 h-16 text-gray-900"
+                    />
+                    <div v-if="booking.type === 'individual'">
                         <p class="text-lg font-semibold text-gray-800">{{ booking.user }}</p>
                         <p class="text-lg text-gray-600">{{ booking.degree }}</p>
+                        <p class="text-lg text-gray-600">{{ booking.module_name }}</p>
+                        <p class="text-lg text-gray-600">
+                            {{ formatDateToWords(booking.session_date) }} | {{ booking.start_time }} - {{ booking.end_time }}
+                        </p>
+                        <p v-if="booking.notes " class="text-lg text-gray-600">Notes: {{ booking.notes }}</p>
+                    </div>
+                    <div v-if="booking.type === 'group'">
+                        <p class="text-lg font-semibold text-gray-800 flex items-center">{{ booking.peer_group_name }}<span class="text-gray-600 text-sm ml-2">({{ booking.current_members }} / {{ booking.total_members }})</span></p>
+                        <p class="text-lg text-gray-600">{{ booking.leader_degree }}</p>
                         <p class="text-lg text-gray-600">{{ booking.module_name }}</p>
                         <p class="text-lg text-gray-600">
                             {{ formatDateToWords(booking.session_date) }} | {{ booking.start_time }} - {{ booking.end_time }}

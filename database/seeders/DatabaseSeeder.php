@@ -29,7 +29,6 @@ class DatabaseSeeder extends Seeder
             'School of Computing',
             'School of Business',
             'School of Law',
-            'School of Foundation',
         ];
 
         foreach ($schoolofstudy as $school) {
@@ -41,7 +40,6 @@ class DatabaseSeeder extends Seeder
         }
 
         $levels = [
-            'Level 3',
             'Level 4',
             'Level 5',
             'Level 6',
@@ -56,13 +54,6 @@ class DatabaseSeeder extends Seeder
         }
 
         $degreePrograms = [
-            'School of Foundation' => [
-                'Business Foundation',
-                'Computing Foundation',
-                'Law Foundation',
-                'NCUK International Foundation Year',
-            ],
-
             'School of Business' => [
                 'BSc (Hons) Business Management',
                 'BA (Hons) Business Innovation and Entrepreneurship',
@@ -562,12 +553,12 @@ class DatabaseSeeder extends Seeder
                 'cb_number' => 'CB012345',
                 'profile_pic' => 'https://knowblestorage.s3.ap-southeast-1.amazonaws.com/profile_pic/default.jpg', // Replace with actual file if necessary
                 'status' => 'approved',
-                'approved_modules' => [33, 34, 35, 45, 46, 39, 40],
-                'rejected_modules' => [36, 47, 48, 37, 38],
+                'approved_modules' => [1, 2, 4, 13, 16, 5,],
+                'rejected_modules' => [3, 6, 7, 14, 15, 8],
                 'reject_reason' => 'Well done',
-                'degree' => 10,
+                'degree' => 6,
                 'school_of_study' => 1,
-                'level' => 3,
+                'level' => 2,
                 'semester' => 2,
             ],
             [
@@ -577,12 +568,12 @@ class DatabaseSeeder extends Seeder
                 'cb_number' => 'CB054321',
                 'profile_pic' => 'https://knowblestorage.s3.ap-southeast-1.amazonaws.com/profile_pic/default.jpg',
                 'status' => 'approved',
-                'approved_modules' => [57, 59, 61, 63, 80, 81],
-                'rejected_modules' => [58, 60, 62, 64, 78, 79],
+                'approved_modules' => [3, 6, 7, 14, 15, 8],
+                'rejected_modules' => [1, 2, 4, 13, 16, 5],
                 'reject_reason' => 'Well done',
-                'degree' => 11,
+                'degree' => 6,
                 'school_of_study' => 1,
-                'level' => 3,
+                'level' => 2,
                 'semester' => 2,
             ],
             [
@@ -592,12 +583,12 @@ class DatabaseSeeder extends Seeder
                 'cb_number' => 'CB098765',
                 'profile_pic' => 'https://knowblestorage.s3.ap-southeast-1.amazonaws.com/profile_pic/default.jpg',
                 'status' => 'approved',
-                'approved_modules' => [57, 59, 61, 63, 80, 81],
-                'rejected_modules' => [58, 60, 62, 64, 78, 79],
+                'approved_modules' => [25, 28, 29, 30, 34, 36, 47, 49],
+                'rejected_modules' => [26, 27, 31, 32, 33, 35, 46, 48],
                 'reject_reason' => 'Well done',
-                'degree' => 11,
+                'degree' => 7,
                 'school_of_study' => 1,
-                'level' => 3,
+                'level' => 2,
                 'semester' => 2,
             ],
             [
@@ -607,12 +598,12 @@ class DatabaseSeeder extends Seeder
                 'cb_number' => 'CB076543',
                 'profile_pic' => 'https://knowblestorage.s3.ap-southeast-1.amazonaws.com/profile_pic/default.jpg',
                 'status' => 'approved',
-                'approved_modules' => [33, 34, 35, 45, 46, 39, 40],
-                'rejected_modules' => [36, 47, 48, 37, 38],
+                'approved_modules' => [26, 27, 31, 32, 33, 35, 46, 48],
+                'rejected_modules' => [25, 28, 29, 30, 34, 36, 47, 49],
                 'reject_reason' => 'Well done',
-                'degree' => 10,
+                'degree' => 7,
                 'school_of_study' => 1,
-                'level' => 3,
+                'level' => 2,
                 'semester' => 2,
             ],
             [
@@ -622,12 +613,12 @@ class DatabaseSeeder extends Seeder
                 'cb_number' => 'CB064321',
                 'profile_pic' => 'https://knowblestorage.s3.ap-southeast-1.amazonaws.com/profile_pic/default.jpg',
                 'status' => 'approved',
-                'approved_modules' => [101, 102, 112, 113, 103, 104, 105],
-                'rejected_modules' => [103, 104, 111, 114, 106],
+                'approved_modules' => [67, 70, 71, 73, 80, 81],
+                'rejected_modules' => [68, 69, 72, 74, 79, 82],
                 'reject_reason' => 'Well done',
-                'degree' => 12,
+                'degree' => 8,
                 'school_of_study' => 1,
-                'level' => 3,
+                'level' => 2,
                 'semester' => 2,
             ],
             [
@@ -637,12 +628,12 @@ class DatabaseSeeder extends Seeder
                 'cb_number' => 'CB064325',
                 'profile_pic' => 'https://knowblestorage.s3.ap-southeast-1.amazonaws.com/profile_pic/default.jpg',
                 'status' => 'approved',
-                'approved_modules' => [101, 102, 112, 113, 103, 104, 105],
-                'rejected_modules' => [103, 104, 111, 114, 106],
+                'approved_modules' => [68, 69, 72, 74, 79, 82],
+                'rejected_modules' => [67, 70, 71, 73, 80, 81],
                 'reject_reason' => 'Well done',
-                'degree' => 12,
+                'degree' => 8,
                 'school_of_study' => 1,
-                'level' => 3,
+                'level' => 2,
                 'semester' => 2,
             ]
         ];

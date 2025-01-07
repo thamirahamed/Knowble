@@ -20,7 +20,7 @@ const props = defineProps({
     peerGroups: Array,
 });
 
-console.log(JSON.stringify(props.peerGroups, null, 2));
+console.log(JSON.stringify(props.semstertutors, null, 2));
 
 // Track the currently active content
 const activeContent = ref("solo");

@@ -140,7 +140,7 @@ const getDaySuffix = (day) => {
                             id="submitSessionBtn"
                             type="submit"
                         >
-                            Submit Request
+                            Submit Booking
                         </PrimaryButton>
                     </div>
                 </form>

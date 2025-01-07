@@ -16,12 +16,11 @@ const props = defineProps({
     allDegree: Array,
     tutors: Array,
     sessions: Array,
-    groupSessions: Array,
     sModules: Array,
     peerGroups: Array,
 });
 
-console.log(JSON.stringify(props.groupSessions, null, 2));
+console.log(JSON.stringify(props.peerGroups, null, 2));
 
 // Track the currently active content
 const activeContent = ref("solo");
@@ -40,6 +39,8 @@ function getDegreeName(schoolId) {
     const school = props.allDegree.find((deg) => deg.id === schoolId);
     return school ? school.degree_name : 'Not Found';
 }
+
+const error1 = ref("");
 
 // Define the state for the selected value
 const selectedModule = ref("");
@@ -260,9 +261,6 @@ const getDaySuffix = (day) => {
                                     :peerGroup="group"
                                 />
                             </div>
-                            <div v-else class="text-gray-600 mx-auto mt-6">    
-                                <p class="">No peer groups found for your modules.</p>
-                            </div>
                         </div>
                     </div>
                     
@@ -278,16 +276,12 @@ const getDaySuffix = (day) => {
                         <div 
                             v-for="group in peerGroups" 
                             :key="group.id"
-                            v-if="peerGroups.isUserLeader === true || peerGroups.isUserMember === true"
                         >
                             <div v-if="group.isUserLeader === true || group.isUserMember === true">
                                 <PeerGroupCard 
                                     :peerGroup="group"
                                 />
                             </div>
-                        </div>
-                        <div v-else class="text-gray-600 flex flex-col m-auto">
-                            <p>Currently, you are not a member of any peer group.</p>
                         </div>
                     </div>
                 </div>

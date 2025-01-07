@@ -17,9 +17,49 @@ class DatabaseSeeder extends Seeder
     {
         DB::table('users')->insert([
             'name' => 'Admin',
-            'email' => 'admin@apiit.lk', // Email with the required domain
+            'email' => 'admin@apiit.lk', 
             'email_verified_at' => now(),
-            'password' => bcrypt('password'), // You can change this to any default password
+            'password' => bcrypt('password'), 
+            'remember_token' => Str::random(10),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('users')->insert([
+            'name' => 'Thamir Ahamed',
+            'email' => 'cb012828@students.apiit.lk', 
+            'email_verified_at' => now(),
+            'password' => bcrypt('password'), 
+            'remember_token' => Str::random(10),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('users')->insert([
+            'name' => 'Nuski Ahamed Naleem',
+            'email' => 'cb012282@students.apiit.lk', 
+            'email_verified_at' => now(),
+            'password' => bcrypt('password'), 
+            'remember_token' => Str::random(10),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('users')->insert([
+            'name' => 'Shakeel Ahamed Shajahan',
+            'email' => 'cb009882@students.apiit.lk', 
+            'email_verified_at' => now(),
+            'password' => bcrypt('password'), 
+            'remember_token' => Str::random(10),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('users')->insert([
+            'name' => 'Ammar Mohamed Zubair',
+            'email' => 'cb011246@students.apiit.lk', 
+            'email_verified_at' => now(),
+            'password' => bcrypt('password'), 
             'remember_token' => Str::random(10),
             'created_at' => now(),
             'updated_at' => now(),

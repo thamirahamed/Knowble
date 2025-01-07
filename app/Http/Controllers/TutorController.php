@@ -18,6 +18,10 @@ class TutorController extends Controller
         $userId = auth()->id();
         $tutor = Tutor::where('user_id', $userId)->first();
 
+        if (is_null($tutor)) {
+            return;
+        }
+
         if ($tutor->status === 'pending') {
             return Inertia::render('Dashboard');
         }

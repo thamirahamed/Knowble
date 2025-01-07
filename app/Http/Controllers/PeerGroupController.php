@@ -26,6 +26,9 @@ class PeerGroupController extends Controller
         $isMember = PeerGroupMember::where('user_id', $userid)
                                     ->where('peer_group_id', $id)
                                     ->exists();
+        if(is_null($peerGroup)){
+            return;
+        }
         $leader = User::where('id', $peerGroup->leader)->first();
         $leaderProfile = Profile::where('user_id', $leader->id)->first();
         $leaderDegree = DegreeProgram::where('id', $leaderProfile->degree_id)->first();

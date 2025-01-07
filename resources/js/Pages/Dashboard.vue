@@ -234,7 +234,7 @@ const getDaySuffix = (day) => {
                         </div>
                         <DynamicDropdown
                             label="Module"
-                            id="module-dropdown"
+                            id="search-module-dropdown"
                             :options="sModules"
                             v-model="selectedModule"
                             :error="moduleError"

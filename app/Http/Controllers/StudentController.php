@@ -26,8 +26,13 @@ class StudentController extends Controller
         $userid = auth()->user()->id;
         $profile = Profile::where('user_id', $userid)->first();
 
-        $semesterModules = Module::where('semester_id', $profile->semester_id)->where('degree_program_id', $profile->degree_id)->where('level_id', $profile->level_id)->get();
+        // Check if profile is null
+        if (is_null($profile)) {
+            return redirect()->route('profile.create');
+        }
 
+        $semesterModules = Module::where('semester_id', $profile->semester_id)->where('degree_program_id', $profile->degree_id)->where('level_id', $profile->level_id)->get();
+      
         //get the semesterModules id
         $semesterModulesId = [];
         foreach ($semesterModules as $module) {

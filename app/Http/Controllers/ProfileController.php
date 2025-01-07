@@ -182,7 +182,10 @@ class ProfileController extends Controller
     public function show()
     {
         $userId = auth()->id();
-        $profile = Profile::where('user_id', auth()->id())->firstOrFail();
+        $profile = Profile::where('user_id', auth()->id())->first();
+        if (is_null($profile)) {
+            return redirect()->route('profile.create');
+        }
         $tutor = Tutor::where('user_id', $userId)->first();
 
         $userdetails = auth()->user();

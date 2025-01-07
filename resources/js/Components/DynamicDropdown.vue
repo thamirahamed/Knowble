@@ -63,6 +63,7 @@ watch(selectedValue, (newValue) => {
                 :key="option.id"
                 :value="option.id"
                 class="text-black"
+                :id="label + '-' + option.id"
             >
                 {{ option.level_name || option.degree_name || option.school_name || option.semester_name || option.module_name}}
             </option>

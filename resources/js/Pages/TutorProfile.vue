@@ -139,7 +139,7 @@ const getDaySuffix = (day) => {
                         </PrimaryButton>
                         <PrimaryButton
                             v-if="sessions.length > 0 && tutormodules.length > 0 && isLeader"
-                            id="bookSessionBtn"
+                            id="bookGroupSessionBtn"
                             class="mt-4 w-full"
                             @click="openModalWithData1(tutor.id)"
                         >

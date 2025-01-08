@@ -184,7 +184,7 @@ filteredTutors.value = props.tutors;
                                         :tutorname="tutor.user.name"
                                         :cbnumber="tutor.profile.cb_number"
                                         :profile_pic="tutor.profile.profile_pic"
-                                        :tutor_id="tutor.tutor.id"
+                                        :tutor_id="tutor.tutor"
                                         :school="getDegreeName(tutor.profile.degree_id)"
                                     />
                                 </div>

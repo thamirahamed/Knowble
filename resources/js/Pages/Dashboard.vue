@@ -6,7 +6,7 @@ import TutorCard from "@/Components/TutorCard.vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head, router } from "@inertiajs/vue3";
 import { computed, ref, watch } from "vue";
-import { UserGroupIcon, UserIcon } from "@heroicons/vue/24/solid";
+import { UserGroupIcon, UserIcon, PlusIcon } from "@heroicons/vue/24/solid";
 import { Link } from "@inertiajs/vue3";
 import CreatePeerGroup from "@/Components/CreatePeerGroup.vue";
 import PeerGroupCard from "@/Components/PeerGroupCard.vue";
@@ -337,7 +337,7 @@ console.log(displayedPeerGroups);
                             id="searchTutor"
                             type="text"
                             class="mt-1 block w-full"
-                            placeholder="Search Tutor"
+                            placeholder="Search Peer Groups"
                             v-model="searchQueryPeer"
                         />
                         <CreatePeerGroup

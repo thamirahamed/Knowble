@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\FeedbackRating;
 use App\Models\Profile;
 use App\Models\ResourceShare;
 use App\Models\Tutor;
@@ -186,6 +187,27 @@ class TutorController extends Controller
         // Get all the shared resources of the tutor
         $resourceShares = ResourceShare::where('tutor_id', $tutor->id)->get();
 
+        //get all feedbacks for the tutor
+        $feedbacks = FeedbackRating::where('tutor_id', $tutor->id)->get();
+
+        $feedbackdetails = [];
+
+        foreach ($feedbacks as $feedback) {
+            $user = User::where('id', $feedback->user_id)->first();
+            $profile = Profile::where('user_id', $feedback->user_id)->first();
+            $degree = DegreeProgram::where('id', $profile->degree_id)->first();
+
+            $feedbackdetails[] = [
+                'id' => $feedback->id,
+                'user' => $user->name,
+                'profile_pic' => $profile->profile_pic,
+                'degree' => $degree->degree_name,
+                'rating' => $feedback->rating,
+                'feedback' => $feedback->feedback,
+            ];
+        }
+
+
         return Inertia::render('Tutor/Dashboard',
         [
             'approvedModules' => $approvedModules,
@@ -196,6 +218,7 @@ class TutorController extends Controller
             'bookings' => $combinedBookings,
             'completedBookings' => $completedBookingDetails,
             'resourceShares' => $resourceShares,
+            'feedbacks' => $feedbackdetails,
         ]);
     }
 

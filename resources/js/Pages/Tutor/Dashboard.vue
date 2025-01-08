@@ -7,6 +7,7 @@ import Overview from "@/Pages/Tutor/Overview.vue";
 import UpcomingBookings from "@/Pages/Tutor/UpcomingBookings.vue";
 import CompletedBookings from "./CompletedBookings.vue";
 import ResourceSharing from "@/Pages/Tutor/ResourceSharing.vue";
+import Reviews from "@/Pages/Tutor/Reviews.vue";
 
 // Track the currently active content
 const activeContent = ref("Overview");
@@ -41,6 +42,10 @@ const props = defineProps({
         required: true,
     },
     resourceShares: {
+        type: Object,
+        required: true,
+    },
+    feedbacks: {
         type: Object,
         required: true,
     },
@@ -103,6 +108,15 @@ const TutorRequest = (id) => {
                                 Resource Sharing
                             </SidebarLink>
                         </li>
+                        <li>
+                            <SidebarLink
+                                id="reviewsBtn"
+                                @click.prevent="activeContent = 'Reviews'"
+                                :active="activeContent === 'Reviews'"
+                            >
+                                Reviews
+                            </SidebarLink>
+                        </li>
                     </ul>
                 </div>
 
@@ -132,6 +146,11 @@ const TutorRequest = (id) => {
                     <template v-else-if="activeContent === 'ResourceSharing'">
                         <ResourceSharing
                             :resourceShares="props.resourceShares"
+                        />
+                    </template>
+                    <template v-else-if="activeContent === 'Reviews'">
+                        <Reviews
+                            :feedbacks="props.feedbacks"
                         />
                     </template>
                 </div>

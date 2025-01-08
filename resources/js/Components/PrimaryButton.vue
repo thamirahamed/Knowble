@@ -9,12 +9,12 @@
         >
             <slot name="icon" />
         </div>
-    
+
         <!-- Button Text -->
         <span>
             <slot />
         </span>
-    
+
         <!-- Icon on the Right (if provided) -->
         <div
             v-if="icon && iconPlacement === 'right'"

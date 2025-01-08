@@ -5,12 +5,13 @@ import TextInput from "@/Components/TextInput.vue";
 import TutorCard from "@/Components/TutorCard.vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head, router } from "@inertiajs/vue3";
-import { ref } from "vue";
-import { CheckBadgeIcon, UserGroupIcon, UserIcon, PlusIcon } from "@heroicons/vue/24/solid";
+import { computed, ref, watch } from "vue";
+import { UserGroupIcon, UserIcon } from "@heroicons/vue/24/solid";
 import { Link } from "@inertiajs/vue3";
-import PeerGroupCard from "@/Components/PeerGroupCard.vue";
 import CreatePeerGroup from "@/Components/CreatePeerGroup.vue";
+import PeerGroupCard from "@/Components/PeerGroupCard.vue";
 
+// Props
 const props = defineProps({
     semstertutors: Array,
     allDegree: Array,
@@ -19,77 +20,100 @@ const props = defineProps({
     sModules: Array,
     peerGroups: Array,
 });
-
-console.log(JSON.stringify(props.peerGroups, null, 2));
-
-// Track the currently active content
-const activeContent = ref("solo");
-
 const openModal = ref(null);
-
 const closeModal = () => {
     openModal.value = null;
 };
-
 const openModalWithData = () => {
     openModal.value = true;
 };
+// Reactive states
+const activeContent = ref("solo"); // Tracks active tab
+const searchQuery = ref(""); // Tracks search input
+const selectedModule = ref(""); // Tracks selected module
+const moduleError = ref("");    // Tracks dropdown error
 
+// Filter tutors based on module selection
+const filteredTutors = ref([]); // Tracks filtered tutors dynamically
+
+// Utility function to get degree name
 function getDegreeName(schoolId) {
     const school = props.allDegree.find((deg) => deg.id === schoolId);
-    return school ? school.degree_name : 'Not Found';
+    return school ? school.degree_name : "Not Found";
 }
-
 const error1 = ref("");
-
 // Define the state for the selected value
-const selectedModule = ref("");
-
+const selectedModules = ref("");
 // Error message for validation
-const moduleError = ref("");
-
+const moduleErrors = ref("");
 // Redirect to Join Meeting with the meeting_url from a specific booking
 const joinMeeting = (booking) => {
     // Get the base meeting URL from the booking
     let meetingUrl = booking.meeting_url;
-    
     // Create the tutor's name (convert to lowercase and replace spaces with hyphens)
     const studentName = booking.student_name.replace(" ", "-").toLowerCase();  // Example: Emily Davis -> emily-davis
-    
     // append the 'name' parameter
     meetingUrl += `&name=${studentName}`;
-
     router.visit(route("meetings.index", { meetingUrl, id: booking.id }));
 };
-
 // Function to format date to words with suffix
 const formatDateToWords = (date) => {
-  const options = { year: 'numeric', month: 'long', day: 'numeric' };
-  const d = new Date(date);
-  const day = d.getDate();
-  const suffix = getDaySuffix(day);
-  
-  const formatter = new Intl.DateTimeFormat('en-US', options);
-  return `${formatter.format(d).replace(day, day + suffix)}`;
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    const d = new Date(date);
+    const day = d.getDate();
+    const suffix = getDaySuffix(day);
+    const formatter = new Intl.DateTimeFormat('en-US', options);
+    return `${formatter.format(d).replace(day, day + suffix)}`;
 };
-
 // Function to get the day suffix (st, nd, rd, th)
 const getDaySuffix = (day) => {
-  const j = day % 10;
-  const k = day % 100;
-  if (j === 1 && k !== 11) {
-    return 'st';
-  }
-  if (j === 2 && k !== 12) {
-    return 'nd';
-  }
-  if (j === 3 && k !== 13) {
-    return 'rd';
-  }
-  return 'th';
+    const j = day % 10;
+    const k = day % 100;
+    if (j === 1 && k !== 11) {
+        return 'st';
+    }
+    if (j === 2 && k !== 12) {
+        return 'nd';
+    }
+    if (j === 3 && k !== 13) {
+        return 'rd';
+    }
+    return 'th';
 };
 
+// Watch selected module for filtering
+watch(selectedModule, (newValue) => {
+    const selectedModuleDetails = props.sModules.find((mod) => mod.id === newValue);
+
+    if (!selectedModuleDetails) {
+        filteredTutors.value = []; // Clear filters if no module selected
+        return;
+    }
+
+    // Filter tutors based on selected module
+    filteredTutors.value = props.tutors.filter((tutor) =>
+        tutor.modules.some((module) => module.module_name === selectedModuleDetails.module_name)
+    );
+});
+
+// Computed property to dynamically update displayed tutors
+const displayedTutors = computed(() => {
+    let tutorsToDisplay = filteredTutors.value.length > 0 ? filteredTutors.value : props.tutors;
+
+    // Apply search filter if searchQuery exists
+    if (searchQuery.value.trim() !== "") {
+        tutorsToDisplay = tutorsToDisplay.filter((tutor) =>
+            tutor.user.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+        );
+    }
+
+    return tutorsToDisplay;
+});
+
+// Initialize tutors with all available tutors
+filteredTutors.value = props.tutors;
 </script>
+
 
 <template>
     <Head title="Dashboard" />
@@ -106,7 +130,7 @@ const getDaySuffix = (day) => {
                         @click="() => (activeContent = 'solo')"
                         preserve-state
                         id="one-on-one"
-                    >   
+                    >
                         <UserIcon class="w-5 h-5 mr-2" />
                         One-on-One
                     </Link>
@@ -129,48 +153,74 @@ const getDaySuffix = (day) => {
             <!-- One on One Tutoring -->
             <div v-if="activeContent === 'solo'" class="container flex flex-col lg:flex-row gap-10 h-[85vh]">
                 <!-- Tutor Listings -->
-                <div class="flex flex-col flex-1 bg-white rounded-md shadow-sm py-4 px-6 gap-5 " >
-                    <div class="flex flex-col gap-2">
-                        <h1 class="text-2xl font-bold text-slate-900">Tutors</h1>
-                        <DynamicDropdown
-                            label="Module"
-                            id="module-dropdown"
-                            :options="sModules"
-                            v-model="selectedModule"
-                            :error="moduleError"
-                        />
-                        <TextInput
-                            id="searchTutor"
-                            type="text"
-                            class="mt-1 block w-full"
-                            placeholder="Search Tutor"
-                        />
-                    </div>
-
-                    <div class="flex flex-col overflow-y-auto gap-2">
-                        <div v-for="tutor in semstertutors" :key="tutor.id">
-                            <TutorCard
-                                v-if="tutor.tutor"
-                                :tutorname="tutor.user.name"
-                                :cbnumber="tutor.profile.cb_number"
-                                :profile_pic="tutor.profile.profile_pic"
-                                :tutor_id="tutor.tutor"
-                                :school="getDegreeName(tutor.profile.degree_id)"
+                <div class="flex flex-col flex-1 bg-white rounded-md shadow-sm py-4 px-6 gap-5">
+                    <!-- Filters -->
+                    <div class="flex flex-col flex-1 bg-white rounded-md shadow-sm py-4 px-6 gap-5">
+                        <!-- Filters -->
+                        <div class="flex flex-col gap-2">
+                            <!-- Title -->
+                            <h1 class="text-2xl font-bold text-slate-900">Tutors</h1>
+                            <DynamicDropdown
+                                label="Module"
+                                v-model="selectedModule"
+                                :options="sModules"
+                                :error="moduleError"
+                            />
+                            <TextInput
+                                v-model="searchQuery"
+                                placeholder="Search Tutor by Name"
                             />
                         </div>
-                        <div v-for="tutor in tutors" :key="tutor.id">
-                            <TutorCard
-                                v-if="tutor.tutor"
-                                :tutorname="tutor.user.name"
-                                :cbnumber="tutor.profile.cb_number"
-                                :profile_pic="tutor.profile.profile_pic"
-                                :tutor_id="tutor.tutor.id"
-                                :school="getDegreeName(tutor.profile.degree_id)"
-                            />
+
+                        <!-- Scrollable Tutor Listings -->
+                        <!-- Scrollable Tutor Listings -->
+                        <div class="flex flex-col gap-2 overflow-y-auto max-h-[400px]"> <!-- Scrollable Container -->
+
+                            <!-- Show Semester Tutors only when no search or filter is applied -->
+                            <div v-if="searchQuery === '' && selectedModule === ''">
+                                <div v-for="tutor in semstertutors" :key="tutor.id">
+                                    <TutorCard
+                                        v-if="tutor.tutor"
+                                        :tutorname="tutor.user.name"
+                                        :cbnumber="tutor.profile.cb_number"
+                                        :profile_pic="tutor.profile.profile_pic"
+                                        :tutor_id="tutor.tutor"
+                                        :school="getDegreeName(tutor.profile.degree_id)"
+                                    />
+                                </div>
+                                <div v-for="tutor in displayedTutors" :key="tutor.id">
+                                    <TutorCard
+                                        v-if="tutor.tutor"
+                                        :tutorname="tutor.user.name"
+                                        :cbnumber="tutor.profile.cb_number"
+                                        :profile_pic="tutor.profile.profile_pic"
+                                        :tutor_id="tutor.tutor.id"
+                                        :school="getDegreeName(tutor.profile.degree_id)"
+                                    />
+                                </div>
+
+                            </div>
+
+                            <!-- Filtered Tutors -->
+                            <div v-else-if="displayedTutors.length > 0" class="flex flex-col gap-2">
+                                <TutorCard
+                                    v-for="tutor in displayedTutors"
+                                    :key="tutor.id"
+                                    :tutorname="tutor.user.name"
+                                    :cbnumber="tutor.profile.cb_number"
+                                    :profile_pic="tutor.profile.profile_pic"
+                                    :tutor_id="tutor.id"
+                                    :school="getDegreeName(tutor.profile.degree_id)"
+                                />
+                            </div>
+
+                            <!-- Fallback Message -->
+                            <p v-else class="text-gray-600 text-center">No tutors available.</p>
                         </div>
 
                     </div>
                 </div>
+
 
                 <!-- Upcoming sessions -->
                 <div class="flex flex-1 bg-white rounded-md shadow-sm py-4 px-6 max-w-[30rem] min-h-60 h-fit overflow-y-auto max-h-full">
@@ -198,7 +248,7 @@ const getDaySuffix = (day) => {
                                     </div>
                                     <p class="text-lg text-gray-600">{{ session.module_name }}</p>
                                 </div>
-                                
+
                                 <!-- Join Meeting Button -->
                                 <div class="flex justify-between items-center">
                                     <div>
@@ -222,8 +272,8 @@ const getDaySuffix = (day) => {
                     <div class="flex flex-col gap-2">
                         <div class="inline-flex justify-between items-center">
                             <h1 class="text-2xl font-bold text-slate-900">Peer Groups</h1>
-                            <PrimaryButton 
-                                :icon="true" 
+                            <PrimaryButton
+                                :icon="true"
                                 iconPlacement="left"
                                 id="createPeerGrpBtn"
                                 @click="openModalWithData()"
@@ -231,7 +281,7 @@ const getDaySuffix = (day) => {
                                 <template #icon>
                                     <PlusIcon class="text-white" />
                                 </template>
-                                    Create Peer Group
+                                Create Peer Group
                             </PrimaryButton>
                         </div>
                         <DynamicDropdown
@@ -257,14 +307,14 @@ const getDaySuffix = (day) => {
                     <div class="flex flex-col overflow-y-auto gap-2" v-if="peerGroups.length > 0">
                         <div v-for="group in peerGroups" :key="group.id" class="flex flex-col w-full">
                             <div v-if="group.isUserLeader === false && group.isUserMember === false && group.currentMembers < group.totalMembers">
-                                <PeerGroupCard 
+                                <PeerGroupCard
                                     :peerGroup="group"
                                 />
                             </div>
                         </div>
                     </div>
-                    
-                    <div v-else class="text-gray-600 mx-auto mt-6">    
+
+                    <div v-else class="text-gray-600 mx-auto mt-6">
                         <p class="">No peer groups found for your modules.</p>
                     </div>
                 </div>
@@ -273,12 +323,12 @@ const getDaySuffix = (day) => {
                         <h1 class="text-xl font-bold text-slate-900">Joined Groups</h1>
                     </div>
                     <div class="flex flex-col flex-1 overflow-y-auto gap-2">
-                        <div 
-                            v-for="group in peerGroups" 
+                        <div
+                            v-for="group in peerGroups"
                             :key="group.id"
                         >
                             <div v-if="group.isUserLeader === true || group.isUserMember === true">
-                                <PeerGroupCard 
+                                <PeerGroupCard
                                     :peerGroup="group"
                                 />
                             </div>

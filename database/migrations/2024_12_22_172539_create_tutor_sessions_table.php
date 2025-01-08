@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id(); // Auto-incrementing ID column
             $table->foreignId('tutor_id')->constrained()->onDelete('cascade'); // Foreign key to the tutors table
             $table->date('session_date'); // The date of the session
-            $table->timestamp('start_time'); // The start time of the session
-            $table->timestamp('end_time'); // The end time of the session
+            $table->time('start_time'); // The start time of the session
+            $table->time('end_time'); // The end time of the session
             $table->enum('status', ['pending', 'booked', 'completed', 'cancelled'])->default('pending'); // Status of the session
             $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null'); // Foreign key to the user table, nullable if not booked
             $table->foreignId('peer_group_id')->nullable()->constrained()->onDelete('set null'); // Foreign key to the peer group table

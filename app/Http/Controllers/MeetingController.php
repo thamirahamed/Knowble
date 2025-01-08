@@ -38,7 +38,10 @@ class MeetingController extends Controller
         //Retrieve peer group information
         $groupId = $booking->peer_group_id;
         $peerGroup = PeerGroup::where('id', $groupId)->first();
-        $memberCount = PeerGroupMember::where('peer_group_id', $peerGroup->id)->count() + 1;
+        $memberCount = null;
+        if(!is_null($peerGroup)){
+            $memberCount = PeerGroupMember::where('peer_group_id', $peerGroup->id)->count() + 1;
+        }
 
         // Retrieve the module name
         $module = Module::where('id', $booking->module_id)->first();

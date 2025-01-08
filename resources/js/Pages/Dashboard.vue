@@ -6,11 +6,10 @@ import TutorCard from "@/Components/TutorCard.vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head, router } from "@inertiajs/vue3";
 import { computed, ref, watch } from "vue";
-import { CheckBadgeIcon, UserGroupIcon, UserIcon, PlusIcon } from "@heroicons/vue/24/solid";
+import { UserGroupIcon, UserIcon } from "@heroicons/vue/24/solid";
 import { Link } from "@inertiajs/vue3";
-import PeerGroupCard from "@/Components/PeerGroupCard.vue";
-import CreatePeerGroup from "@/Components/CreatePeerGroup.vue";
 
+// Props
 const props = defineProps({
     semstertutors: Array,
     allDegree: Array,
@@ -20,108 +19,52 @@ const props = defineProps({
     peerGroups: Array,
 });
 
-console.log(JSON.stringify(props.peerGroups, null, 2));
-
-// Track the currently active content
-const activeContent = ref("solo");
-const searchQuery = ref(""); // Search by tutor name
-const openModal = ref(null);
+// Reactive states
+const activeContent = ref("solo"); // Tracks active tab
+const searchQuery = ref(""); // Tracks search input
 const selectedModule = ref(""); // Tracks selected module
-const moduleError = ref("");    // Error message
-const filteredTutors = ref([]); // Filtered tutors to display
+const moduleError = ref("");    // Tracks dropdown error
 
+// Filter tutors based on module selection
+const filteredTutors = ref([]); // Tracks filtered tutors dynamically
 
-const closeModal = () => {
-    openModal.value = null;
-};
-
-const openModalWithData = () => {
-    openModal.value = true;
-};
-
+// Utility function to get degree name
 function getDegreeName(schoolId) {
     const school = props.allDegree.find((deg) => deg.id === schoolId);
-    return school ? school.degree_name : 'Not Found';
+    return school ? school.degree_name : "Not Found";
 }
-
-const error1 = ref("");
-
-// Define the state for the selected value
-const selectedModules = ref("");
-
-// Error message for validation
-const moduleErrors = ref("");
-
-// Redirect to Join Meeting with the meeting_url from a specific booking
-const joinMeeting = (booking) => {
-    // Get the base meeting URL from the booking
-    let meetingUrl = booking.meeting_url;
-
-    // Create the tutor's name (convert to lowercase and replace spaces with hyphens)
-    const studentName = booking.student_name.replace(" ", "-").toLowerCase();  // Example: Emily Davis -> emily-davis
-
-    // append the 'name' parameter
-    meetingUrl += `&name=${studentName}`;
-
-    router.visit(route("meetings.index", { meetingUrl, id: booking.id }));
-};
-
-// Function to format date to words with suffix
-const formatDateToWords = (date) => {
-  const options = { year: 'numeric', month: 'long', day: 'numeric' };
-  const d = new Date(date);
-  const day = d.getDate();
-  const suffix = getDaySuffix(day);
-
-  const formatter = new Intl.DateTimeFormat('en-US', options);
-  return `${formatter.format(d).replace(day, day + suffix)}`;
-};
-
-// Function to get the day suffix (st, nd, rd, th)
-const getDaySuffix = (day) => {
-  const j = day % 10;
-  const k = day % 100;
-  if (j === 1 && k !== 11) {
-    return 'st';
-  }
-  if (j === 2 && k !== 12) {
-    return 'nd';
-  }
-  if (j === 3 && k !== 13) {
-    return 'rd';
-  }
-  return 'th';
-};
-
 
 // Watch selected module for filtering
 watch(selectedModule, (newValue) => {
     const selectedModuleDetails = props.sModules.find((mod) => mod.id === newValue);
 
     if (!selectedModuleDetails) {
-        filteredTutors.value = [];
+        filteredTutors.value = []; // Clear filters if no module selected
         return;
     }
 
+    // Filter tutors based on selected module
     filteredTutors.value = props.tutors.filter((tutor) =>
         tutor.modules.some((module) => module.module_name === selectedModuleDetails.module_name)
     );
 });
 
-// Search functionality for tutor name
-const searchedTutors = computed(() => {
-    // If filtering by module is active, search within filtered tutors
-    const tutorsToSearch = filteredTutors.value.length > 0 ? filteredTutors.value : props.tutors;
+// Computed property to dynamically update displayed tutors
+const displayedTutors = computed(() => {
+    let tutorsToDisplay = filteredTutors.value.length > 0 ? filteredTutors.value : props.tutors;
 
-    // Filter by tutor name
-    return tutorsToSearch.filter((tutor) =>
-        tutor.user.name.toLowerCase().includes(searchQuery.value.toLowerCase())
-    );
+    // Apply search filter if searchQuery exists
+    if (searchQuery.value.trim() !== "") {
+        tutorsToDisplay = tutorsToDisplay.filter((tutor) =>
+            tutor.user.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+        );
+    }
+
+    return tutorsToDisplay;
 });
 
 // Initialize tutors with all available tutors
 filteredTutors.value = props.tutors;
-
 </script>
 
 <template>
@@ -190,50 +133,19 @@ filteredTutors.value = props.tutors;
                     <!-- Tutor Listings -->
                     <div class="flex flex-col overflow-y-auto gap-2">
                         <!-- Display searched or filtered tutors -->
-                        <div v-if="searchedTutors.length > 0">
-                            <div v-for="tutor in searchedTutors" :key="tutor.id">
-                                <TutorCard
-                                    :tutorname="tutor.user.name"
-                                    :cbnumber="tutor.profile.cb_number"
-                                    :profile_pic="tutor.profile.profile_pic"
-                                    :tutor_id="tutor.id"
-                                    :school="getDegreeName(tutor.profile.degree_id)"
-                                />
-                            </div>
-                        </div>
 
-                        <!-- Show all tutors if no search or filter is applied -->
-                        <div v-else>
-                            <!-- Semester Tutors -->
-                            <div v-for="tutor in semstertutors" :key="tutor.id">
-                                <TutorCard
-                                    v-if="tutor.tutor"
-                                    :tutorname="tutor.user.name"
-                                    :cbnumber="tutor.profile.cb_number"
-                                    :profile_pic="tutor.profile.profile_pic"
-                                    :tutor_id="tutor.tutor"
-                                    :school="getDegreeName(tutor.profile.degree_id)"
-                                />
-                            </div>
-
-                            <!-- All Tutors -->
-                            <div v-for="tutor in props.tutors" :key="tutor.id">
-                                <TutorCard
-                                    v-if="tutor.tutor"
-                                    :tutorname="tutor.user.name"
-                                    :cbnumber="tutor.profile.cb_number"
-                                    :profile_pic="tutor.profile.profile_pic"
-                                    :tutor_id="tutor.tutor.id"
-                                    :school="getDegreeName(tutor.profile.degree_id)"
-                                />
-                            </div>
+                        <div v-if="displayedTutors.length > 0" class="flex flex-col gap-2">
+                            <TutorCard
+                                v-for="tutor in displayedTutors"
+                                :key="tutor.id"
+                                :tutorname="tutor.user.name"
+                                :cbnumber="tutor.profile.cb_number"
+                                :profile_pic="tutor.profile.profile_pic"
+                                :tutor_id="tutor.id"
+                                :school="getDegreeName(tutor.profile.degree_id)"
+                            />
                         </div>
-
-                        <!-- Show message if no tutors match -->
-                        <div v-if="searchedTutors.length === 0 && filteredTutors.length === 0 && semstertutors.length === 0 && props.tutors.length === 0"
-                             class="text-gray-600 text-center mt-4">
-                            No tutors available.
-                        </div>
+                        <p v-else class="text-gray-600 text-center">No tutors available.</p>
                     </div>
                 </div>
 
@@ -304,7 +216,7 @@ filteredTutors.value = props.tutors;
                             label="Module"
                             id="search-module-dropdown"
                             :options="sModules"
-                            v-model="selectedModule"
+                            v-model="selectedModulePeerGroup"
                             :error="moduleError"
                         />
                         <TextInput
@@ -312,6 +224,7 @@ filteredTutors.value = props.tutors;
                             type="text"
                             class="mt-1 block w-full"
                             placeholder="Search Tutor"
+                            v-model="peerSearchQuery"
                         />
                         <CreatePeerGroup
                             :openModal="openModal"

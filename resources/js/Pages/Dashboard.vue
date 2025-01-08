@@ -33,6 +33,45 @@ function getDegreeName(schoolId) {
     const school = props.allDegree.find((deg) => deg.id === schoolId);
     return school ? school.degree_name : "Not Found";
 }
+const error1 = ref("");
+// Define the state for the selected value
+const selectedModules = ref("");
+// Error message for validation
+const moduleErrors = ref("");
+// Redirect to Join Meeting with the meeting_url from a specific booking
+const joinMeeting = (booking) => {
+    // Get the base meeting URL from the booking
+    let meetingUrl = booking.meeting_url;
+    // Create the tutor's name (convert to lowercase and replace spaces with hyphens)
+    const studentName = booking.student_name.replace(" ", "-").toLowerCase();  // Example: Emily Davis -> emily-davis
+    // append the 'name' parameter
+    meetingUrl += `&name=${studentName}`;
+    router.visit(route("meetings.index", { meetingUrl, id: booking.id }));
+};
+// Function to format date to words with suffix
+const formatDateToWords = (date) => {
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    const d = new Date(date);
+    const day = d.getDate();
+    const suffix = getDaySuffix(day);
+    const formatter = new Intl.DateTimeFormat('en-US', options);
+    return `${formatter.format(d).replace(day, day + suffix)}`;
+};
+// Function to get the day suffix (st, nd, rd, th)
+const getDaySuffix = (day) => {
+    const j = day % 10;
+    const k = day % 100;
+    if (j === 1 && k !== 11) {
+        return 'st';
+    }
+    if (j === 2 && k !== 12) {
+        return 'nd';
+    }
+    if (j === 3 && k !== 13) {
+        return 'rd';
+    }
+    return 'th';
+};
 
 // Watch selected module for filtering
 watch(selectedModule, (newValue) => {
@@ -137,19 +176,21 @@ filteredTutors.value = props.tutors;
                                         :tutorname="tutor.user.name"
                                         :cbnumber="tutor.profile.cb_number"
                                         :profile_pic="tutor.profile.profile_pic"
-                                        :tutor_id="tutor.tutor"
+                                        :tutor_id="tutor.tutor.id"
                                         :school="getDegreeName(tutor.profile.degree_id)"
                                     />
                                 </div>
-                                <TutorCard
-                                    v-for="tutor in displayedTutors"
-                                    :key="tutor.id"
-                                    :tutorname="tutor.user.name"
-                                    :cbnumber="tutor.profile.cb_number"
-                                    :profile_pic="tutor.profile.profile_pic"
-                                    :tutor_id="tutor.id"
-                                    :school="getDegreeName(tutor.profile.degree_id)"
-                                />
+                                <div v-for="tutor in displayedTutors" :key="tutor.id">
+                                    <TutorCard
+                                        v-if="tutor.tutor"
+                                        :tutorname="tutor.user.name"
+                                        :cbnumber="tutor.profile.cb_number"
+                                        :profile_pic="tutor.profile.profile_pic"
+                                        :tutor_id="tutor.tutor.id"
+                                        :school="getDegreeName(tutor.profile.degree_id)"
+                                    />
+                                </div>
+
                             </div>
 
                             <!-- Filtered Tutors -->

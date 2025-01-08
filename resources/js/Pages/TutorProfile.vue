@@ -28,7 +28,7 @@ const props = defineProps({
     }
 });
 
-console.log(JSON.stringify(props.peerGroups, null, 2));
+console.log(JSON.stringify(props.isLeader, null, 2));
 
 const openModal = ref(null);
 
@@ -124,6 +124,32 @@ const getDaySuffix = (day) => {
                             <p class="text-lg text-gray-700">{{ degree.degree_name }}</p>
                             <p class="text-lg text-gray-700">{{ level.level_name }} | {{ semester.semester_name }}</p>
                         </div>
+                        <PrimaryButton
+                            v-if="sessions.length > 0 && tutormodules.length > 0"
+                            id="bookSessionBtn"
+                            class="mt-4 w-full"
+                            @click="openModalWithData(tutor.id)"
+                        >
+                            <div class="flex items-center">
+                                <UserIcon class="text-white w-5 h-5 mr-2" />
+                                <span>
+                                    Book Session
+                                </span>
+                            </div>
+                        </PrimaryButton>
+                        <PrimaryButton
+                            v-if="sessions.length > 0 && tutormodules.length > 0 && isLeader"
+                            id="bookSessionBtn"
+                            class="mt-4 w-full"
+                            @click="openModalWithData1(tutor.id)"
+                        >
+                            <div class="flex items-center">
+                                <UserGroupIcon class="text-white w-5 h-5 mr-2" />
+                                <span>
+                                    Book Session for Peer Group
+                                </span>
+                            </div>
+                        </PrimaryButton>
                     </div>
 
 

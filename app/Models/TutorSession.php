@@ -39,4 +39,9 @@ class TutorSession extends Model
     {
         return $this->belongsTo(PeerGroup::class, 'peer_group_id');
     }
+
+    public function feedbackRating()
+    {
+        return $this->hasOne(FeedbackRating::class);
+    }
 }

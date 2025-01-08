@@ -204,6 +204,8 @@ class ProfileController extends Controller
             $module = Module::where('id', $cBooking->module_id)->first();
             $profiles = Profile::where('user_id', $tutorName->id)->first();
 
+            $isFeedback = $cBooking->feedbackRating()->exists();
+
             $completedBookingDetails[] = [
                 'id' => $cBooking->id,
                 'tutor' => $tutorName->name,
@@ -227,7 +229,7 @@ class ProfileController extends Controller
             }
             return $dateComparison;
         });
-        
+
         if($tutor){
             $tutorSessions = TutorSession::where('tutor_id', $tutor->id)
                              ->where('status', 'pending')
@@ -248,7 +250,7 @@ class ProfileController extends Controller
 
             // You can convert the sorted array back to a collection if needed
             $tutorSessions = collect($tutorsessionsArray);
-            
+
             $tutorselectedmodules = $tutor->selectedModules()->get();
 
             return Inertia::render('Profile/View',[

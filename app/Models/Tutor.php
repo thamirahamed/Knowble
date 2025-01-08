@@ -42,4 +42,10 @@ class Tutor extends Model
     {
         return $this->hasMany(ResourceShare::class);
     }
+
+    public function receivedFeedbacks()
+    {
+        return $this->hasMany(FeedbackRating::class, 'tutor_id');
+    }
+
 }

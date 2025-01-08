@@ -8,6 +8,7 @@ use App\Http\Controllers\ResourceShareController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TutorController;
 use App\Http\Controllers\PeerGroupController;
+use App\Http\Controllers\FeedbackRatingController;
 use App\Http\Controllers\VideoRoomController;
 use App\Models\Tutor;
 use Illuminate\Foundation\Application;
@@ -109,6 +110,12 @@ Route::middleware(['auth' ,'studentportal'])->group(function () {
         Route::post('/leave', [PeerGroupController::class, 'leaveGroup'])->name('peergroup.leave');
         Route::post('/delete', [PeerGroupController::class, 'deleteGroup'])->name('peergroup.delete');
         Route::post('/book', [PeerGroupController::class, 'bookSession'])->name('peergroup.book.session');
+    });
+    
+    Route::prefix('feedback')->group(function () {
+        Route::post('/create', [FeedbackRatingController::class, 'createFeedback'])->name('feedback.create');
+        Route::post('/edit', [FeedbackRatingController::class, 'editFeedback'])->name('feedback.edit');
+        Route::post('/delete', [FeedbackRatingController::class, 'deleteFeedback'])->name('feedback.delete');
     });
 });
 

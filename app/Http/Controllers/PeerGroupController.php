@@ -134,7 +134,27 @@ class PeerGroupController extends Controller
             }
         }
 
+        // Sort the array by session_date and then start_time
+        usort($groupSessionDetails, function ($a, $b) {
+            // Compare session_date first
+            $dateComparison = strtotime($a['session_date']) - strtotime($b['session_date']);
+            if ($dateComparison === 0) {
+                // If session_date is the same, compare start_time
+                return strtotime($a['start_time']) - strtotime($b['start_time']);
+            }
+            return $dateComparison;
+        });
 
+        // Sort the array by session_date and then start_time
+        usort($pastGroupSessionDetails, function ($a, $b) {
+            // Compare session_date first
+            $dateComparison = strtotime($a['session_date']) - strtotime($b['session_date']);
+            if ($dateComparison === 0) {
+                // If session_date is the same, compare start_time
+                return strtotime($a['start_time']) - strtotime($b['start_time']);
+            }
+            return $dateComparison;
+        });
 
         return Inertia::render('PeerGroup',[
             'peerGroup'=>$formattedPeerGroup,

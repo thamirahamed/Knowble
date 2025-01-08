@@ -15,6 +15,7 @@ use App\Models\User;
 use App\Models\TutorSession;
 use App\Models\PeerGroup;
 use App\Models\PeerGroupMember;
+use App\Models\FeedbackRating;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -222,8 +223,8 @@ class StudentController extends Controller
         $tutorSelectedModules = $tutor->selectedModules()->get();
         $user = $tutor->user;
         $tutorSessions = TutorSession::where('tutor_id', $id)
-                             ->where('status', 'pending')
-                             ->get();
+                                    ->where('status', 'pending')
+                                    ->get();
         // Convert the collection to an array for sorting
         $tutorsessionsArray = $tutorSessions->toArray();
 
@@ -244,6 +245,12 @@ class StudentController extends Controller
         // get students current modules
         $userid = auth()->user()->id;
         $studentprofile = Profile::where('user_id', $userid)->first();
+
+        // Check if profile is null
+        if (is_null($studentprofile)) {
+            return redirect()->route('profile.create');
+        }
+
         $studentModules = Module::where('semester_id', $studentprofile->semester_id)
                                 ->where('degree_program_id', $studentprofile->degree_id)
                                 ->where('level_id', $studentprofile->level_id)
@@ -266,6 +273,73 @@ class StudentController extends Controller
 
         // Check if the user is a leader of any peer group
         $isLeader = PeerGroup::where('leader', $userid)->exists();
+
+        $hasCompletedSessions = TutorSession::where('tutor_id', $tutor->id)
+                                            ->where('user_id', $userid)
+                                            ->where('status', 'completed')
+                                            ->first();
+
+        // Check if the user is a leader of any peer group
+        $leaderPeerGroupIds = PeerGroup::where('leader', $userid)->pluck('id');
+
+        // Check if the user is a member of any peer group
+        $memberPeerGroupIds = PeerGroupMember::where('user_id', $userid)->pluck('peer_group_id');
+
+        // Combine peer group IDs where the user is either a leader or member
+        $allPeerGroupIds = $leaderPeerGroupIds->merge($memberPeerGroupIds)->unique();
+
+        // Check if the user has completed sessions in any of the associated peer groups with the tutor
+        $hasGroupCompletedSessions = TutorSession::whereIn('peer_group_id', $allPeerGroupIds)
+                                                ->where('tutor_id', $tutor->id)
+                                                ->where('status', 'completed')
+                                                ->exists();
+
+        // Fetch feedback entries for the specified tutor
+        $feedbacks = FeedbackRating::where('tutor_id', $tutor->id)
+                                    ->where('user_id', '!=', $userid)
+                                    ->with('user') // Load user relationship to get user details
+                                    ->get();
+
+        $feedbackDetails = [];
+
+        if($feedbacks->isNotEmpty()){
+            // Map the feedback data to include required details
+            $feedbackDetails = $feedbacks->map(function ($feedback) {
+                $userid = auth()->user()->id;
+                $profiles = Profile::where('user_id', $feedback->user_id)->first();
+                return [
+                    'id' => $feedback->id,
+                    'user_name' => $feedback->user->name, // Assuming FeedbackRating belongs to User
+                    'pfp' => $profiles->profile_pic, // Assuming FeedbackRating belongs to User
+                    'rating' => $feedback->rating,
+                    'feedback' => $feedback->feedback,
+                ];
+            });
+        }
+
+        $userFeedback = FeedbackRating::where('tutor_id', $tutor->id)
+                                        ->where('user_id', $userid )
+                                        ->with('user')
+                                        ->first();
+
+        $userFeedbackData = null;
+                
+        if(!is_null($userFeedback)){
+            $userProfile = Profile::where('user_id', $userFeedback->user_id)->first();
+            $userFeedbackData = [
+                'id' => $userFeedback->id,
+                'user_name' => $userFeedback->user->name,
+                'rating' => $userFeedback->rating,
+                'feedback' => $userFeedback->feedback,
+                'pfp' => $userProfile->profile_pic, // Assuming the user has a profile picture
+            ];
+        }
+
+        
+        // Calculate the average rating of the tutor's feedback
+        $averageRating = FeedbackRating::where('tutor_id', $tutor->id)->exists()
+        ? FeedbackRating::where('tutor_id', $tutor->id)->avg('rating')
+        : null;
 
         // Get the authenticated user
         $user2 = auth()->user();
@@ -296,6 +370,11 @@ class StudentController extends Controller
             'isLeader' => $isLeader,
             'peerGroups' => $peerGroups,
             'resourcesShared' => $resourcesShared,
+            'hasCompletedSession' => $hasCompletedSessions,
+            'hasCompletedGroupSession' => $hasGroupCompletedSessions,
+            'userFeedback' => $userFeedbackData ,
+            'feedbacks' => $feedbackDetails ,
+            'avgRating' => $averageRating,
         ]);
     }
 
@@ -332,5 +411,9 @@ class StudentController extends Controller
         $session->save();
 
         return redirect()->route('tutor.profile', ['id' => $session->tutor_id]);
+    }
+
+    public function createFeedback(Request $request){
+
     }
 }

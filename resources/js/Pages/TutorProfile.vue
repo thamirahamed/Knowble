@@ -2,11 +2,16 @@
 import { defineProps, ref, onMounted, computed } from "vue";
 import ProfilePicture from "@/Components/ProfilePicture.vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { CheckBadgeIcon, AcademicCapIcon, CalendarDateRangeIcon, UserGroupIcon, UserIcon } from "@heroicons/vue/24/solid";
+import { CheckBadgeIcon, AcademicCapIcon, CalendarDateRangeIcon, UserGroupIcon, UserIcon, StarIcon, PencilIcon, TrashIcon } from "@heroicons/vue/24/solid";
 import BookSession from "@/Components/BookSession.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import { Head } from "@inertiajs/vue3";
 import BookGroupSession from "@/Components/BookGroupSession.vue";
+import Slider from "@/Components/Slider.vue";
+import { useForm } from "@inertiajs/vue3";
+import InputLabel from "@/Components/InputLabel.vue";
+import { router } from "@inertiajs/vue3";
+import DangerButton from "@/Components/DangerButton.vue";
 
 const props = defineProps({
     tutor: Array,
@@ -22,13 +27,20 @@ const props = defineProps({
     studentModules: Array,
     isLeader: Array,
     peerGroups: Array,
+    hasCompletedSession: Array,
+    hasCompletedGroupSession: Array,
+    userFeedback: Array,
+    feedbacks: Array,
+    avgRating: String,
     resourcesShared: {
         type: Object,
         required: true,
     }
 });
 
-console.log(JSON.stringify(props.isLeader, null, 2));
+console.log(JSON.stringify(props.hasCompletedSession, null, 2));
+console.log(JSON.stringify(props.hasCompletedGroupSession, null, 2));
+console.log(JSON.stringify(props.userFeedback, null, 2));
 
 const openModal = ref(null);
 
@@ -48,6 +60,94 @@ const closeModal1 = () => {
 
 const openModalWithData1 = () => {
     openModal1.value = true;
+};
+
+const form = useForm({
+    feedback: '',
+    rating: 4,
+});
+
+const isEditing = ref(false);
+
+const editForm = useForm({
+  rating: 0,
+  feedback: '',
+});
+
+function startEditing(feedback) {
+    isEditing.value = true;
+    editForm.rating = feedback.rating;
+    editForm.feedback = feedback.feedback;
+}
+
+const submitCreateFeedback = () => {
+    // Prepare the data to be sent
+    const payload = {
+        tutor: props.tutor.id,
+        feedback: form.feedback,
+        rating: form.rating,
+    };
+
+    console.log(payload);
+
+    // Submit the form using router.post
+    router.post('/feedback/create', payload, {
+        onSuccess: () => {
+            alert('Feedback submitted successfully!');
+            form.reset(); // Reset the form fields
+        },
+        onError: (errors) => {
+            console.log(errors); // Log errors to the console for debugging
+            alert('Failed to submit feedback: ' + Object.values(errors).join(', ')); // Show error messages
+        },
+    });
+};
+
+const submitEditFeedback = () => {
+
+    // Prepare the data to be sent
+    const payload = {
+        tutor: props.tutor.id,
+        feedback: editForm.feedback,
+        rating: editForm.rating,
+    };
+
+    console.log(payload);
+
+    // Submit the form using router.post
+    router.post('/feedback/edit', payload, {
+        onSuccess: () => {
+            alert('Feedback editted successfully!');
+            isEditing.value = false;
+            form.reset(); // Reset the form fields
+        },
+        onError: (errors) => {
+            console.log(errors); // Log errors to the console for debugging
+            alert('Failed to edit feedback: ' + Object.values(errors).join(', ')); // Show error messages
+        },
+    });
+};
+
+const deleteFeedback = (feedback) => {
+
+    // Prepare the data to be sent
+    const payload = {
+        tutor: props.tutor.id,
+        feedback: feedback.id,
+    };
+
+    console.log(payload);
+
+    // Submit the form using router.post
+    router.post('/feedback/delete', payload, {
+        onSuccess: () => {
+            alert('Feedback deleted successfully!');
+        },
+        onError: (errors) => {
+            console.log(errors); // Log errors to the console for debugging
+            alert('Failed to delete feedback: ' + Object.values(errors).join(', ')); // Show error messages
+        },
+    });
 };
 
 // Function to format date to words with suffix
@@ -156,55 +256,60 @@ const getDaySuffix = (day) => {
                 </div>
 
                 <!-- Tutor Details -->
-                <div class="flex flex-col flex-1 bg-white rounded-md mt-8 shadow h-fit py-4 px-6">
-                    <h2 class="text-2xl font-bold">Tutor Details</h2>
-                    <p class="text-gray-700">
-                        View the tutor's modules and availability to easily find when and what they teach.
-                    </p>
-
-                    <div class="flex w-full gap-12">
-                        <!-- Selected Modules -->
-                        <div v-if="tutormodules && tutormodules.length > 0" class="mt-4 flex flex-col flex-1">
-                            <h3 class="text-lg font-semibold mb-2">Modules</h3>
-                            <ul>
-                                <li v-for="module in tutormodules" :key="module.id" class="flex items-center even:bg-accent/5 px-4 py-2 text-gray-800">
-                                    <AcademicCapIcon class="mr-2 w-4 h-4 text-gray-700" />
-                                    {{ module.module_name }}
-                                </li>
-                            </ul>
-                        </div>
-                        <div v-else class="mt-4 flex flex-col flex-1">
-                            <h3 class="text-lg font-medium mb-2">Modules</h3>
-                            <p class="mt-2 text-gray-600 h-full">No modules available.</p>
-                        </div>
-
-                        <!-- Available Time -->
-                        <div v-if="sessions.length > 0" class="mt-4 flex flex-col flex-1">
-                            <h3 class="text-lg font-medium mb-2">Tutor Availability</h3>
-                            <ul>
-                                <li
-                                    v-for="session in sessions"
-                                    :key="session.id"
-                                    class="flex justify-between even:bg-accent/5 px-4 py-2 text-gray-800 "
-                                >
-                                    <div class="flex items-center">
-                                        <CalendarDateRangeIcon class="mr-2 w-4 h-4 text-gray-700" /> {{ formatDateToWords(session.session_date) }}
-                                    </div>
-                                    <div class="flex items-center">
-                                        {{ session.start_time }} - {{ session.end_time }}
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
-                        <div v-else class="mt-4 flex flex-col flex-1">
-                            <h3 class="text-lg font-medium mb-2">Tutor Availability</h3>
-                            <p class="mt-2 text-gray-600 h-full">No sessions available.</p>
+                <div class="flex flex-col flex-1">
+                    <div class="flex flex-col flex-1 bg-white rounded-md mt-8 shadow h-fit py-4 px-6">
+                        <h2 class="text-2xl font-bold">Tutor Details</h2>
+                        <p class="text-gray-700">
+                            View the tutor's modules and availability to easily find when and what they teach.
+                        </p>
+    
+                        <div class="flex w-full gap-12">
+                            <!-- Selected Modules -->
+                            <div v-if="tutormodules && tutormodules.length > 0" class="mt-4 flex flex-col flex-1">
+                                <h3 class="text-lg font-semibold mb-2">Modules</h3>
+                                <ul>
+                                    <li v-for="module in tutormodules" :key="module.id" class="flex items-center even:bg-accent/5 px-4 py-2 text-gray-800">
+                                        <AcademicCapIcon class="mr-2 w-4 h-4 text-gray-700" />
+                                        {{ module.module_name }}
+                                    </li>
+                                </ul>
+                            </div>
+                            <div v-else class="mt-4 flex flex-col flex-1">
+                                <h3 class="text-lg font-medium mb-2">Modules</h3>
+                                <p class="mt-2 text-gray-600 h-full">No modules available.</p>
+                            </div>
+    
+                            <!-- Available Time -->
+                            <div v-if="sessions.length > 0" class="mt-4 flex flex-col flex-1">
+                                <h3 class="text-lg font-medium mb-2">Tutor Availability</h3>
+                                <ul>
+                                    <li
+                                        v-for="session in sessions"
+                                        :key="session.id"
+                                        class="flex justify-between even:bg-accent/5 px-4 py-2 text-gray-800 "
+                                    >
+                                        <div class="flex items-center">
+                                            <CalendarDateRangeIcon class="mr-2 w-4 h-4 text-gray-700" /> {{ formatDateToWords(session.session_date) }}
+                                        </div>
+                                        <div class="flex items-center">
+                                            {{ session.start_time }} - {{ session.end_time }}
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div v-else class="mt-4 flex flex-col flex-1">
+                                <h3 class="text-lg font-medium mb-2">Tutor Availability</h3>
+                                <p class="mt-2 text-gray-600 h-full">No sessions available.</p>
+                            </div>
                         </div>
                     </div>
                     <!-- Resource Shared Section -->
-                    <div class="flex flex-col flex-1 pb-5 px-6 mt-4">
-                        <h3 class="text-lg font-semibold mb-2">Resources Shared</h3>
-                        <div class="border rounded-md overflow-y-auto max-h-60 shadow-sm">
+                    <div class="flex flex-col flex-1 bg-white rounded-md mt-8 shadow h-fit py-4 px-6">
+                        <h2 class="text-2xl font-bold">Study Resources</h2>
+                        <p class="text-gray-700">
+                            Access a variety of materials and tools to support your learning and enhance your understanding.
+                        </p>
+                        <div class="overflow-y-auto max-h-60 shadow-sm">
                             <ul class="divide-y divide-gray-200">
                                 <li
                                     v-for="resource in resourcesShared"
@@ -226,8 +331,168 @@ const getDaySuffix = (day) => {
                         </div>
                     </div>
 
+                    <div class="flex flex-col flex-1 bg-white rounded-md mt-8 shadow h-fit py-4 px-6">
+                        <h2 class="text-2xl font-bold flex">Feedback and Ratings <span v-if="avgRating!==null" class="ml-2 flex items-center font-medium text-accent">(<StarIcon class="w-6 h-6" />{{ avgRating }} / 5)</span></h2>
+                        <p class="text-gray-700">
+                            Explore feedback and ratings from students to evaluate the tutor's teaching quality and effectiveness.
+                        </p>
+                        <div class="flex">
+                            <!-- Create feedback -->
+                            <div v-if="(hasCompletedGroupSession || hasCompletedSession) && userFeedback === null" class="flex flex-1 flex-col border-r border-gray-300 px-5 my-4 max-w-sm">
+                                <h3 class="text-lg font-medium">Provide Your Feedback</h3>
+                                <form @submit.prevent="submitCreateFeedback" class="mt-2 flex flex-col gap-4">
+                                    <!-- Rating Slider -->
+                                    <div>
+                                        <Slider
+                                            :min="1" 
+                                            :max="5" 
+                                            :value="form.rating" 
+                                            v-model="form.rating" 
+                                            sLabel="Rating" 
+                                        />
+                                    </div>
+    
+                                    <!-- Feedback Text Area -->
+                                    <div>
+                                        <InputLabel for="feedback" value="Feedback" />
+                                        <textarea 
+                                            id="feedback" 
+                                            v-model="form.feedback" 
+                                            rows="4" 
+                                            class="mt-1 block w-full text-lg shadow-sm border-gray-300 rounded-md hover:border-slate-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-slate-500"
+                                            placeholder="Write your feedback here..."
+                                        ></textarea>
+                                    </div>
+    
+                                    <!-- Submit Button -->
+                                    <div class="flex justify-end">
+                                        <PrimaryButton
+                                            type="submit" 
+                                            class="w-fit text-right"
+                                            id="submitReviewBtn"
+                                        >
+                                            Submit Feedback
+                                        </PrimaryButton>
+                                    </div>
+                                </form>
+                            </div>
+                            <!-- Your Feedback -->
+                            <div v-else-if="userFeedback !== null" class="flex flex-1 flex-col border-r border-gray-300 px-5 my-4">
+                                <div v-if="isEditing === false" class="my-auto">
+                                    <h3 class="text-lg font-medium mb-2">Your Feedback</h3>
+                                    <div
+                                        class="flex flex-col rounded-md shadow-md px-4 py-3 bg-secondary/5"
+                                    >
+                                        <div class="flex items-center mb-2 justify-between flex-1">
+                                            <div class="flex">
+                                                <img
+                                                    :src="userFeedback.pfp"
+                                                    alt="Profile Picture"
+                                                    class="w-8 h-8 mr-3 rounded-full object-cover"
+                                                />
+                                                <p class="text-lg font-semibold text-gray-800">{{ userFeedback.user_name }}</p>
+                                            </div>
+                                            <div class="flex flex-row gap-2">
+                                                <PrimaryButton class="!p-1.5 !rounded-full" id="editReviewBtn" @click="startEditing(userFeedback)">
+                                                    <PencilIcon class="w-4 h-4" />
+                                                </PrimaryButton>
+                                                <DangerButton class="!p-1.5 !rounded-full" id="deleteReviewButton" @click="deleteFeedback(userFeedback)">
+                                                    <TrashIcon class="w-4 h-4" />
+                                                </DangerButton>
+                                            </div>
+                                        </div>
+                                        <div class="px-2">
+                                            <div class="flex">
+                                                <StarIcon
+                                                    v-for="star in userFeedback.rating"
+                                                    :key="star"
+                                                    :class="star <= userFeedback.rating ? 'text-accent' : 'text-gray-400'"
+                                                    class="h-5 w-5"
+                                                />
+                                            </div>
+                                            <p class="text-lg text-gray-600">"{{ userFeedback.feedback }}"</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div v-if="isEditing === true" class="flex flex-1 flex-col max-w-sm">
+                                    <h3 class="text-lg font-medium">Edit Your Feedback</h3>
+                                    <form @submit.prevent="submitEditFeedback" class="mt-2 flex flex-col gap-4">
+                                        <!-- Rating Slider -->
+                                        <div>
+                                            <Slider
+                                                :min="1" 
+                                                :max="5" 
+                                                :value="editForm.rating" 
+                                                v-model="editForm.rating" 
+                                                sLabel="Rating" 
+                                            />
+                                        </div>
+        
+                                        <!-- Feedback Text Area -->
+                                        <div>
+                                            <InputLabel for="feedback" value="Feedback" />
+                                            <textarea 
+                                                id="feedback" 
+                                                v-model="editForm.feedback" 
+                                                rows="4" 
+                                                class="mt-1 block w-full text-lg shadow-sm border-gray-300 rounded-md hover:border-slate-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-slate-500"
+                                                placeholder="Write your feedback here..."
+                                            ></textarea>
+                                        </div>
+        
+                                        <!-- Submit Button -->
+                                        <div class="flex justify-end">
+                                            <PrimaryButton
+                                                type="submit" 
+                                                class="w-fit text-right"
+                                            >
+                                                Submit Feedback
+                                            </PrimaryButton>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            <!-- Error Message -->
+                            <div v-else class="mt-4 flex flex-col flex-1 px-5 my-4 border-r border-gray-300 max-w-sm">
+                                <p class="text-gray-700 m-auto text-center">You need to complete a session with this tutor before providing feedback.</p>
+                            </div>
+                            
+                            <div class="flex flex-1 flex-col px-5 my-4 min-h-60 max-h-96 w-fit">
+                                <div
+                                    v-if="feedbacks.length > 0"    
+                                    v-for="feedback in feedbacks"
+                                    class="flex flex-col flex-1 "
+                                >
+                                    <div class="flex flex-col rounded-md shadow-md px-4 py-3 bg-secondary/5 my-auto">
+                                        <div class="flex mb-2">
+                                            <img
+                                                :src="feedback.pfp"
+                                                alt="Profile Picture"
+                                                class="w-8 h-8 mr-3 rounded-full object-cover"
+                                            />
+                                            <p class="text-lg font-semibold text-gray-800">{{ feedback.user_name }}</p>
+                                        </div>
+                                        
+                                        <div class="px-2">
+                                            <div class="flex">
+                                                <StarIcon
+                                                    v-for="star in feedback.rating"
+                                                    :key="star"
+                                                    :class="star <= feedback.rating ? 'text-accent' : 'text-gray-400'"
+                                                    class="h-5 w-5"
+                                                />
+                                            </div>
+                                            <p class="text-lg text-gray-600">"{{ feedback.feedback }}"</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div v-else class="flex flex-1 px-5 my-4">
+                                    <p class="text-gray-700 m-auto text-center">No feedback submitted for this tutor yet</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-
             </div>
         </div>
     </AuthenticatedLayout>

@@ -9,9 +9,10 @@ return new class extends Migration {
     {
         Schema::create('feedback_ratings', function (Blueprint $table) {
             $table->id();
-            $table->decimal('rating');
-            $table->string('feedback')->nullable();
-            $table->foreignId('tutor_session_id');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // User who gives feedback
+            $table->foreignId('tutor_id')->constrained()->onDelete('cascade'); // Tutor receiving feedback
+            $table->unsignedTinyInteger('rating'); // Rating as an integer (e.g., 1-5)
+            $table->string('feedback')->nullable(); // Feedback text
             $table->timestamps();
         });
     }

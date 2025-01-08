@@ -60,27 +60,6 @@ class TutorController extends Controller
                                 ->where('status', 'booked')
                                 ->get();
         $tutorName = User::where('id', $tutor->user_id)->first();
-        // $bookingdetails = [];
-        // foreach ($bookings as $booking) {
-        //     $user = User::where('id', $booking->user_id)->first();
-        //     $module = Module::where('id', $booking->module_id)->first();
-        //     $profiles = Profile::where('user_id', $booking->user_id)->first();
-        //     $degree = DegreeProgram::where('id', $profiles->degree_id)->first();
-
-        //     $bookingdetails[] = [
-        //         'id' => $booking->id,
-        //         'user' => $user->name,
-        //         'tutor' => $tutorName->name,
-        //         'profile_pic' => $profiles->profile_pic,
-        //         'degree' => $degree->degree_name,
-        //         'notes' => $booking->notes,
-        //         'module_name' => $module ? $module->module_name : 'Unknown Module',
-        //         'meeting_url' => $booking->meeting_url,
-        //         'session_date' => $booking->session_date,
-        //         'start_time' => $booking->start_time,
-        //         'end_time' => $booking->end_time,
-        //     ];
-        // }
 
         $combinedBookings = [];
 

@@ -8,13 +8,19 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class FeedbackRating extends Model
 {
     protected $fillable = [
+        'user_id',
+        'tutor_id',
         'rating',
         'feedback',
-        'tutor_session_id',
     ];
 
-    public function tutorSession(): BelongsTo
+    public function user()
     {
-        return $this->belongsTo(TutorSession::class);
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function tutor()
+    {
+        return $this->belongsTo(User::class, 'tutor_id');
     }
 }

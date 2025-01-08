@@ -15,11 +15,7 @@ const props = defineProps({
     semstertutors: Array,
     allDegree: Array,
     tutors: Array,
-    sessions: {
-        type: Array,
-        required: true,
-        default: () => [],
-    },
+    sessions: Array,
     sModules: Array,
     peerGroups: Array,
 });

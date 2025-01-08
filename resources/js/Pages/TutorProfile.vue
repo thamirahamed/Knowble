@@ -22,6 +22,10 @@ const props = defineProps({
     studentModules: Array,
     isLeader: Array,
     peerGroups: Array,
+    resourcesShared: {
+        type: Object,
+        required: true,
+    }
 });
 
 console.log(JSON.stringify(props.peerGroups, null, 2));
@@ -52,7 +56,7 @@ const formatDateToWords = (date) => {
   const d = new Date(date);
   const day = d.getDate();
   const suffix = getDaySuffix(day);
-  
+
   const formatter = new Intl.DateTimeFormat('en-US', options);
   return `${formatter.format(d).replace(day, day + suffix)}`;
 };
@@ -90,6 +94,8 @@ const getDaySuffix = (day) => {
                             class="w-full h-auto shadow-[rgba(50,_50,_105,_0.15)_0px_2px_5px_0px,_rgba(0,_0,_0,_0.05)_0px_1px_1px_0px]"
                         />
                     </div>
+
+                    <!-- Book Session Buttons -->
                     <BookSession
                         :openModal="openModal"
                         :tutorid="tutor.id"
@@ -104,6 +110,7 @@ const getDaySuffix = (day) => {
                         :peerGroups="peerGroups"
                         :sessionSlots="sessions"
                     />
+
                     <!-- User Information Section -->
                     <div class="flex flex-col flex-1 pb-5 px-6">
                         <div class="border-y border-gray-300 py-3 px-1">
@@ -117,34 +124,9 @@ const getDaySuffix = (day) => {
                             <p class="text-lg text-gray-700">{{ degree.degree_name }}</p>
                             <p class="text-lg text-gray-700">{{ level.level_name }} | {{ semester.semester_name }}</p>
                         </div>
-
-                        <PrimaryButton 
-                            v-if="sessions.length > 0 && tutormodules.length > 0"
-                            id="bookSessionBtn" 
-                            class="mt-4 w-full" 
-                            @click="openModalWithData(tutor.id)"
-                        >
-                            <div class="flex items-center">
-                                <UserIcon class="text-white w-5 h-5 mr-2" />
-                                <span>
-                                    Book Session 
-                                </span>
-                            </div>
-                        </PrimaryButton>
-                        <PrimaryButton 
-                            v-if="sessions.length > 0 && tutormodules.length > 0 && isLeader"
-                            id="bookSessionBtn" 
-                            class="mt-4 w-full" 
-                            @click="openModalWithData1(tutor.id)"
-                        >   
-                            <div class="flex items-center">
-                                <UserGroupIcon class="text-white w-5 h-5 mr-2" />
-                                <span>
-                                    Book Session for Peer Group
-                                </span>
-                            </div>
-                        </PrimaryButton>
                     </div>
+
+
                 </div>
 
                 <!-- Tutor Details -->
@@ -174,13 +156,13 @@ const getDaySuffix = (day) => {
                         <div v-if="sessions.length > 0" class="mt-4 flex flex-col flex-1">
                             <h3 class="text-lg font-medium mb-2">Tutor Availability</h3>
                             <ul>
-                                <li 
-                                    v-for="session in sessions" 
-                                    :key="session.id" 
+                                <li
+                                    v-for="session in sessions"
+                                    :key="session.id"
                                     class="flex justify-between even:bg-accent/5 px-4 py-2 text-gray-800 "
                                 >
                                     <div class="flex items-center">
-                                        <CalendarDateRangeIcon class="mr-2 w-4 h-4 text-gray-700" /> {{ formatDateToWords(session.session_date) }} 
+                                        <CalendarDateRangeIcon class="mr-2 w-4 h-4 text-gray-700" /> {{ formatDateToWords(session.session_date) }}
                                     </div>
                                     <div class="flex items-center">
                                         {{ session.start_time }} - {{ session.end_time }}
@@ -193,9 +175,36 @@ const getDaySuffix = (day) => {
                             <p class="mt-2 text-gray-600 h-full">No sessions available.</p>
                         </div>
                     </div>
+                    <!-- Resource Shared Section -->
+                    <div class="flex flex-col flex-1 pb-5 px-6 mt-4">
+                        <h3 class="text-lg font-semibold mb-2">Resources Shared</h3>
+                        <div class="border rounded-md overflow-y-auto max-h-60 shadow-sm">
+                            <ul class="divide-y divide-gray-200">
+                                <li
+                                    v-for="resource in resourcesShared"
+                                    :key="resource.id"
+                                    class="flex justify-between items-center px-4 py-3 text-gray-800 "
+                                >
+                                    <!-- Resource Name -->
+                                    <span class="truncate">{{ resource.fileName }}</span>
+
+                                    <!-- Download Button -->
+                                    <a
+                                        :href="route('resource-shares.download', resource.id)"
+                                        class="text-blue-500 hover:underline"
+                                    >
+                                        Download
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
                 </div>
+
             </div>
         </div>
     </AuthenticatedLayout>
 </template>
+
 

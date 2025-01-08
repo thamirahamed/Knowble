@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Events\SessionStatusUpdated;
 use App\Models\DegreeProgram;
 use App\Models\Level;
+use App\Models\ResourceShare;
 use App\Models\Semester;
 use App\Models\Module;
 use App\Models\Profile;
@@ -32,7 +33,7 @@ class StudentController extends Controller
         }
 
         $semesterModules = Module::where('semester_id', $profile->semester_id)->where('degree_program_id', $profile->degree_id)->where('level_id', $profile->level_id)->get();
-      
+
         //get the semesterModules id
         $semesterModulesId = [];
         foreach ($semesterModules as $module) {
@@ -99,45 +100,46 @@ class StudentController extends Controller
             ];
         }
 
-        $allsessions = TutorSession::all();
-
-        // foreach ($allsessions as $session){
-        //     $sesssionendtime = $session->end_time;
-        //     $currenttime = Carbon::now();
-
-
-        //     if($currenttime > $sesssionendtime){
-        //         $session->status = 'completed';
-        //         $session->save();
-
-        //         broadcast(new SessionStatusUpdated($session));
-
-        //     }
-        // }
+//        $allsessions = TutorSession::all();
+//
+//        foreach ($allsessions as $session){
+//            $sesssionendtime = $session->end_time;
+//            $currenttime = Carbon::now();
+//
+//
+//            if($currenttime > $sesssionendtime){
+//                $session->status = 'completed';
+//                $session->save();
+//
+//                broadcast(new SessionStatusUpdated($session));
+//
+//            }
+//        }
 
         //upcomming sessions and status of the user
         $sessions = TutorSession::where('user_id', $userid)
                                 ->where('status', 'booked') // Filter for "booked" status
                                 ->get();
         $sessionDetails = [];
-        if($sessions->isNotEmpty()){
-            foreach ($sessions as $session) {
-                $tutor = Tutor::where('id', $session->tutor_id)->with('user')->first();
-                $profiles = Profile::where('user_id', $session->user_id)->first();
-                $module = Module::where('id', $session->module_id)->first();
-                $studentName = User::where('id', $userid)->first();
-                $sessionDetails[] = [
-                    'id' => $session->id,
-                    'student_name' => $studentName->name,
-                    'tutor_name' => $tutor ? $tutor->user->name : 'Unknown Tutor',
-                    'profile_pic' => $profiles->profile_pic,
-                    'meeting_url' => $session->meeting_url,
-                    'module_name' => $module ? $module->module_name : 'Unknown Module',
-                    'session_date' => $session->session_date,
-                    'start_time' => $session->start_time,
-                    'end_time' => $session->end_time,
-                ];
-            }
+        foreach ($sessions as $session) {
+
+
+
+            $tutor = Tutor::where('id', $session->tutor_id)->with('user')->first();
+            $profiles = Profile::where('user_id', $session->user_id)->first();
+            $module = Module::where('id', $session->module_id)->first();
+            $studentName = User::where('id', $userid)->first();
+            $sessionDetails[] = [
+                'id' => $session->id,
+                'student_name' => $studentName->name,
+                'tutor_name' => $tutor ? $tutor->user->name : 'Unknown Tutor',
+                'profile_pic' => $profiles->profile_pic,
+                'meeting_url' => $session->meeting_url,
+                'module_name' => $module ? $module->module_name : 'Unknown Module',
+                'session_date' => $session->session_date,
+                'start_time' => $session->start_time,
+                'end_time' => $session->end_time,
+            ];
         }
 
         // Sort session details by session_date and then by start_time
@@ -253,31 +255,13 @@ class StudentController extends Controller
             return $tutorSelectedModules->contains('module_name', $studentModule->module_name);
         });
 
+        $resourcesShared = ResourceShare::where('tutor_id', $id)->get();
+
         // Map to include only 'id' and 'module_name' if needed
         $commonModules = $commonModules->map(function ($module) {
             return [
                 'id' => $module->id,
                 'module_name' => $module->module_name,
-            ];
-        });
-
-        // Check if the user is a leader of any peer group
-        $isLeader = PeerGroup::where('leader', $userid)->exists();
-        
-        // Get the authenticated user
-        $user2 = auth()->user();
-
-        // Fetch all peer groups where the user is the leader, along with module names
-        $peerGroups = PeerGroup::where('leader', $user2->id)
-            ->with('module:id,module_name') // Assuming 'module' relationship exists in PeerGroup model
-            ->get(['id', 'name', 'module_id']);
-
-        // Transform the data to include module names
-        $peerGroups = $peerGroups->map(function ($peerGroup) {
-            return [
-                'id' => $peerGroup->id,
-                'name' => $peerGroup->name,
-                'moduleName' => $peerGroup->module ? $peerGroup->module->module_name : null,
             ];
         });
 
@@ -293,8 +277,7 @@ class StudentController extends Controller
             'sessions' => $tutorSessions,
             'commonModules' => $commonModules,
             'studentModules' => $studentModules,
-            'isLeader' => $isLeader,
-            'peerGroups' => $peerGroups,
+            'resourcesShared' => $resourcesShared,
         ]);
     }
 

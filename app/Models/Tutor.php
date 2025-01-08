@@ -37,4 +37,9 @@ class Tutor extends Model
     {
         return $this->hasMany(TutorSession::class);
     }
+
+    public function resourceShares()
+    {
+        return $this->hasMany(ResourceShare::class);
+    }
 }

@@ -6,6 +6,7 @@ import { ref } from "vue";
 import Overview from "@/Pages/Tutor/Overview.vue";
 import UpcomingBookings from "@/Pages/Tutor/UpcomingBookings.vue";
 import CompletedBookings from "./CompletedBookings.vue";
+import ResourceSharing from "@/Pages/Tutor/ResourceSharing.vue";
 
 // Track the currently active content
 const activeContent = ref("Overview");
@@ -36,6 +37,10 @@ const props = defineProps({
         required: true,
     },
     completedBookings: {
+        type: Object,
+        required: true,
+    },
+    resourceShares: {
         type: Object,
         required: true,
     },
@@ -72,7 +77,7 @@ const TutorRequest = (id) => {
                             </SidebarLink>
                         </li>
                         <li>
-                            <SidebarLink 
+                            <SidebarLink
                                 id="upcBookingsBtn"
                                 @click.prevent="activeContent = 'UpcomingBookings'"
                                 :active="activeContent === 'UpcomingBookings'"
@@ -81,12 +86,21 @@ const TutorRequest = (id) => {
                             </SidebarLink>
                         </li>
                         <li>
-                            <SidebarLink 
+                            <SidebarLink
                                 id="comBookingsBtn"
                                 @click.prevent="activeContent = 'CompletedBookings'"
                                 :active="activeContent === 'CompletedBookings'"
                             >
                                 Completed Bookings
+                            </SidebarLink>
+                        </li>
+                        <li>
+                            <SidebarLink
+                                id="overviewBtn"
+                                @click.prevent="activeContent = 'ResourceSharing'"
+                                :active="activeContent === 'ResourceSharing'"
+                            >
+                                Resource Sharing
                             </SidebarLink>
                         </li>
                     </ul>
@@ -113,6 +127,11 @@ const TutorRequest = (id) => {
                     <template v-else-if="activeContent === 'CompletedBookings'">
                         <CompletedBookings
                             :cBookings="props.completedBookings"
+                        />
+                    </template>
+                    <template v-else-if="activeContent === 'ResourceSharing'">
+                        <ResourceSharing
+                            :resourceShares="props.resourceShares"
                         />
                     </template>
                 </div>

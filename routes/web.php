@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminVerificationController;
 use App\Http\Controllers\MeetingController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\ResourceShareController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TutorController;
 use App\Http\Controllers\PeerGroupController;
@@ -74,9 +75,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/dashboard',[TutorController::class, 'index'])->name('tutor.dashboard');
         Route::post('select/{id}',[TutorController::class, 'selectModule'])->name('tutor.select.module');
         Route::post('remove/{id}',[TutorController::class, 'removeModule'])->name('tutor.remove.module');
-        Route::post('/sessions/create', [TutorController::class, 'createSession'])->name('tutor.session.create');   
-        Route::post('/sessions/cancel', [TutorController::class, 'cancelSession'])->name('tutor.session.cancel');   
-        Route::post('/sessions/delete/{id}', [TutorController::class, 'deleteSession'])->name('tutor.session.delete');   
+        Route::post('/sessions/create', [TutorController::class, 'createSession'])->name('tutor.session.create');
+        Route::post('/sessions/cancel', [TutorController::class, 'cancelSession'])->name('tutor.session.cancel');
+        Route::post('/sessions/delete/{id}', [TutorController::class, 'deleteSession'])->name('tutor.session.delete');
+        Route::post('/resource-shares', [ResourceShareController::class, 'store'])->name('resource-shares.store');
+        Route::delete('/resource-shares/{id}', [ResourceShareController::class, 'destroy'])->name('resource-shares.destroy');
+        Route::get('/resource-shares/download/{id}', [ResourceShareController::class, 'download'])->name('resource-shares.download');
     });
 });
 

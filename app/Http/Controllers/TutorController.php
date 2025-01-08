@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Profile;
+use App\Models\ResourceShare;
 use App\Models\Tutor;
 use App\Models\TutorSession;
 use App\Models\User;
@@ -134,13 +135,13 @@ class TutorController extends Controller
         foreach ($completedBookings as $cBooking) {
             $module = Module::where('id', $cBooking->module_id)->first();
             $type = $cBooking->peer_group_id ? 'group' : 'individual';
-        
+
             if ($type === 'individual') {
                 // Handle individual bookings
                 $user = User::where('id', $cBooking->user_id)->first();
                 $profiles = Profile::where('user_id', $cBooking->user_id)->first();
                 $degree = DegreeProgram::where('id', $profiles->degree_id)->first();
-        
+
                 $completedBookingDetails[] = [
                     'id' => $cBooking->id,
                     'type' => 'individual',
@@ -161,7 +162,7 @@ class TutorController extends Controller
                 $profiles = Profile::where('user_id', $leader->id)->first();
                 $degree = DegreeProgram::where('id', $profiles->degree_id)->first();
                 $memberCount = PeerGroupMember::where('peer_group_id', $peerGroup->id)->count() + 1;
-        
+
                 $completedBookingDetails[] = [
                     'id' => $cBooking->id,
                     'type' => 'group',
@@ -203,6 +204,9 @@ class TutorController extends Controller
             return $dateComparison;
         });
 
+        // Get all the shared resources of the tutor
+        $resourceShares = ResourceShare::where('tutor_id', $tutor->id)->get();
+
         return Inertia::render('Tutor/Dashboard',
         [
             'approvedModules' => $approvedModules,
@@ -212,6 +216,7 @@ class TutorController extends Controller
             'sessionSlots' => $tutorsessions,
             'bookings' => $combinedBookings,
             'completedBookings' => $completedBookingDetails,
+            'resourceShares' => $resourceShares,
         ]);
     }
 

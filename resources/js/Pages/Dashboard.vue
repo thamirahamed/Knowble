@@ -67,6 +67,7 @@ const displayedTutors = computed(() => {
 filteredTutors.value = props.tutors;
 </script>
 
+
 <template>
     <Head title="Dashboard" />
 
@@ -107,45 +108,67 @@ filteredTutors.value = props.tutors;
                 <!-- Tutor Listings -->
                 <div class="flex flex-col flex-1 bg-white rounded-md shadow-sm py-4 px-6 gap-5">
                     <!-- Filters -->
-                    <div class="flex flex-col gap-2">
-                        <!-- Title -->
-                        <h1 class="text-2xl font-bold text-slate-900">Tutors</h1>
-
-                        <!-- Module Dropdown -->
-                        <DynamicDropdown
-                            label="Module"
-                            id="module-dropdown"
-                            :options="sModules"
-                            v-model="selectedModule"
-                            :error="moduleError"
-                        />
-
-                        <!-- Search Input -->
-                        <TextInput
-                            id="searchTutor"
-                            type="text"
-                            v-model="searchQuery"
-                        class="mt-1 block w-full"
-                        placeholder="Search Tutor by Name"
-                        />
-                    </div>
-
-                    <!-- Tutor Listings -->
-                    <div class="flex flex-col overflow-y-auto gap-2">
-                        <!-- Display searched or filtered tutors -->
-
-                        <div v-if="displayedTutors.length > 0" class="flex flex-col gap-2">
-                            <TutorCard
-                                v-for="tutor in displayedTutors"
-                                :key="tutor.id"
-                                :tutorname="tutor.user.name"
-                                :cbnumber="tutor.profile.cb_number"
-                                :profile_pic="tutor.profile.profile_pic"
-                                :tutor_id="tutor.id"
-                                :school="getDegreeName(tutor.profile.degree_id)"
+                    <div class="flex flex-col flex-1 bg-white rounded-md shadow-sm py-4 px-6 gap-5">
+                        <!-- Filters -->
+                        <div class="flex flex-col gap-2">
+                            <!-- Title -->
+                            <h1 class="text-2xl font-bold text-slate-900">Tutors</h1>
+                            <DynamicDropdown
+                                label="Module"
+                                v-model="selectedModule"
+                                :options="sModules"
+                                :error="moduleError"
+                            />
+                            <TextInput
+                                v-model="searchQuery"
+                                placeholder="Search Tutor by Name"
                             />
                         </div>
-                        <p v-else class="text-gray-600 text-center">No tutors available.</p>
+
+                        <!-- Scrollable Tutor Listings -->
+                        <!-- Scrollable Tutor Listings -->
+                        <div class="flex flex-col gap-2 overflow-y-auto max-h-[400px]"> <!-- Scrollable Container -->
+
+                            <!-- Show Semester Tutors only when no search or filter is applied -->
+                            <div v-if="searchQuery === '' && selectedModule === ''">
+                                <div v-for="tutor in semstertutors" :key="tutor.id">
+                                    <TutorCard
+                                        v-if="tutor.tutor"
+                                        :tutorname="tutor.user.name"
+                                        :cbnumber="tutor.profile.cb_number"
+                                        :profile_pic="tutor.profile.profile_pic"
+                                        :tutor_id="tutor.tutor"
+                                        :school="getDegreeName(tutor.profile.degree_id)"
+                                    />
+                                </div>
+                                <TutorCard
+                                    v-for="tutor in displayedTutors"
+                                    :key="tutor.id"
+                                    :tutorname="tutor.user.name"
+                                    :cbnumber="tutor.profile.cb_number"
+                                    :profile_pic="tutor.profile.profile_pic"
+                                    :tutor_id="tutor.id"
+                                    :school="getDegreeName(tutor.profile.degree_id)"
+                                />
+                            </div>
+
+                            <!-- Filtered Tutors -->
+                            <div v-else-if="displayedTutors.length > 0" class="flex flex-col gap-2">
+                                <TutorCard
+                                    v-for="tutor in displayedTutors"
+                                    :key="tutor.id"
+                                    :tutorname="tutor.user.name"
+                                    :cbnumber="tutor.profile.cb_number"
+                                    :profile_pic="tutor.profile.profile_pic"
+                                    :tutor_id="tutor.id"
+                                    :school="getDegreeName(tutor.profile.degree_id)"
+                                />
+                            </div>
+
+                            <!-- Fallback Message -->
+                            <p v-else class="text-gray-600 text-center">No tutors available.</p>
+                        </div>
+
                     </div>
                 </div>
 

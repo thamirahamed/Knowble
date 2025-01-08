@@ -15,7 +15,11 @@ const props = defineProps({
     semstertutors: Array,
     allDegree: Array,
     tutors: Array,
-    sessions: Array,
+    sessions: {
+        type: Array,
+        required: true,
+        default: () => [],
+    },
     sModules: Array,
     peerGroups: Array,
 });
@@ -52,10 +56,10 @@ const moduleError = ref("");
 const joinMeeting = (booking) => {
     // Get the base meeting URL from the booking
     let meetingUrl = booking.meeting_url;
-    
+
     // Create the tutor's name (convert to lowercase and replace spaces with hyphens)
     const studentName = booking.student_name.replace(" ", "-").toLowerCase();  // Example: Emily Davis -> emily-davis
-    
+
     // append the 'name' parameter
     meetingUrl += `&name=${studentName}`;
 
@@ -68,7 +72,7 @@ const formatDateToWords = (date) => {
   const d = new Date(date);
   const day = d.getDate();
   const suffix = getDaySuffix(day);
-  
+
   const formatter = new Intl.DateTimeFormat('en-US', options);
   return `${formatter.format(d).replace(day, day + suffix)}`;
 };
@@ -106,7 +110,7 @@ const getDaySuffix = (day) => {
                         @click="() => (activeContent = 'solo')"
                         preserve-state
                         id="one-on-one"
-                    >   
+                    >
                         <UserIcon class="w-5 h-5 mr-2" />
                         One-on-One
                     </Link>
@@ -198,7 +202,7 @@ const getDaySuffix = (day) => {
                                     </div>
                                     <p class="text-lg text-gray-600">{{ session.module_name }}</p>
                                 </div>
-                                
+
                                 <!-- Join Meeting Button -->
                                 <div class="flex justify-between items-center">
                                     <div>
@@ -222,8 +226,8 @@ const getDaySuffix = (day) => {
                     <div class="flex flex-col gap-2">
                         <div class="inline-flex justify-between items-center">
                             <h1 class="text-2xl font-bold text-slate-900">Peer Groups</h1>
-                            <PrimaryButton 
-                                :icon="true" 
+                            <PrimaryButton
+                                :icon="true"
                                 iconPlacement="left"
                                 id="createPeerGrpBtn"
                                 @click="openModalWithData()"
@@ -257,14 +261,14 @@ const getDaySuffix = (day) => {
                     <div class="flex flex-col overflow-y-auto gap-2" v-if="peerGroups.length > 0">
                         <div v-for="group in peerGroups" :key="group.id" class="flex flex-col w-full">
                             <div v-if="group.isUserLeader === false && group.isUserMember === false && group.currentMembers < group.totalMembers">
-                                <PeerGroupCard 
+                                <PeerGroupCard
                                     :peerGroup="group"
                                 />
                             </div>
                         </div>
                     </div>
-                    
-                    <div v-else class="text-gray-600 mx-auto mt-6">    
+
+                    <div v-else class="text-gray-600 mx-auto mt-6">
                         <p class="">No peer groups found for your modules.</p>
                     </div>
                 </div>
@@ -273,12 +277,12 @@ const getDaySuffix = (day) => {
                         <h1 class="text-xl font-bold text-slate-900">Joined Groups</h1>
                     </div>
                     <div class="flex flex-col flex-1 overflow-y-auto gap-2">
-                        <div 
-                            v-for="group in peerGroups" 
+                        <div
+                            v-for="group in peerGroups"
                             :key="group.id"
                         >
                             <div v-if="group.isUserLeader === true || group.isUserMember === true">
-                                <PeerGroupCard 
+                                <PeerGroupCard
                                     :peerGroup="group"
                                 />
                             </div>

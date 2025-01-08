@@ -204,7 +204,6 @@ class ProfileController extends Controller
             $module = Module::where('id', $cBooking->module_id)->first();
             $profiles = Profile::where('user_id', $tutorName->id)->first();
 
-            $isFeedback = $cBooking->feedbackRating()->exists();
 
             $completedBookingDetails[] = [
                 'id' => $cBooking->id,

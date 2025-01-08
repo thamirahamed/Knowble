@@ -112,6 +112,48 @@ const displayedTutors = computed(() => {
 
 // Initialize tutors with all available tutors
 filteredTutors.value = props.tutors;
+
+
+
+// Peer Group
+const searchQueryPeer = ref("");
+const selectedModulePeer = ref("");
+
+// Filter peer groups based on module selection
+const filteredPeerGroups = ref([]);
+
+// Watch selected module for filtering
+watch(selectedModulePeer, (newValue) => {
+    const selectedModuleDetails = props.sModules.find((mod) => mod.id === newValue);
+
+    if (!selectedModuleDetails) {
+        filteredPeerGroups.value = []; // Clear filters if no module selected
+        return;
+    }
+
+    // Filter peer groups based on selected module
+    filteredPeerGroups.value = props.peerGroups.filter((group) =>
+        group.module === selectedModuleDetails.module_name
+    );
+});
+// Computed property to dynamically update displayed peer groups
+const displayedPeerGroups = computed(() => {
+    let peerGroupsToDisplay = filteredPeerGroups.value.length > 0 ? filteredPeerGroups.value : props.peerGroups;
+
+    // Apply search filter if searchQuery exists
+    if (searchQueryPeer.value.trim() !== "") {
+        peerGroupsToDisplay = peerGroupsToDisplay.filter((group) =>
+            group.name.toLowerCase().includes(searchQueryPeer.value.toLowerCase())
+        );
+    }
+
+    return peerGroupsToDisplay;
+});
+
+// Initialize peer groups with all available peer groups
+filteredPeerGroups.value = props.peerGroups;
+console.log(displayedPeerGroups);
+
 </script>
 
 
@@ -288,7 +330,7 @@ filteredTutors.value = props.tutors;
                             label="Module"
                             id="search-module-dropdown"
                             :options="sModules"
-                            v-model="selectedModule"
+                            v-model="selectedModulePeer"
                             :error="moduleError"
                         />
                         <TextInput
@@ -296,6 +338,7 @@ filteredTutors.value = props.tutors;
                             type="text"
                             class="mt-1 block w-full"
                             placeholder="Search Tutor"
+                            v-model="searchQueryPeer"
                         />
                         <CreatePeerGroup
                             :openModal="openModal"
@@ -304,19 +347,36 @@ filteredTutors.value = props.tutors;
                         />
                     </div>
 
-                    <div class="flex flex-col overflow-y-auto gap-2" v-if="peerGroups.length > 0">
-                        <div v-for="group in peerGroups" :key="group.id" class="flex flex-col w-full">
-                            <div v-if="group.isUserLeader === false && group.isUserMember === false && group.currentMembers < group.totalMembers">
-                                <PeerGroupCard
-                                    :peerGroup="group"
-                                />
+                    <!-- filter peer groups -->
+                    <div class="flex flex-col gap-2">
+                        <div v-if="displayedPeerGroups.length > 0">
+                            <div v-for="group in displayedPeerGroups" :key="group.id">
+                                <div v-if="group.isUserLeader === false">
+                                    <PeerGroupCard
+                                        :peerGroup="group"
+                                    />
+                                </div>
+
                             </div>
+                        </div>
+                        <div v-else class="text-gray-600 mx-auto mt-6">
+                            <p class="">No peer groups found for your modules.</p>
                         </div>
                     </div>
 
-                    <div v-else class="text-gray-600 mx-auto mt-6">
-                        <p class="">No peer groups found for your modules.</p>
-                    </div>
+<!--                    <div class="flex flex-col overflow-y-auto gap-2" v-if="peerGroups.length > 0">-->
+<!--                        <div v-for="group in peerGroups" :key="group.id" class="flex flex-col w-full">-->
+<!--                            <div v-if="group.isUserLeader === false && group.isUserMember === false && group.currentMembers < group.totalMembers">-->
+<!--                                <PeerGroupCard-->
+<!--                                    :peerGroup="group"-->
+<!--                                />-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+
+<!--                    <div v-else class="text-gray-600 mx-auto mt-6">-->
+<!--                        <p class="">No peer groups found for your modules.</p>-->
+<!--                    </div>-->
                 </div>
                 <div class="flex flex-col flex-1 max-w-xl bg-white rounded-md shadow-sm py-4 px-6 gap-5 min-h-60 h-fit overflow-y-auto max-h-full" >
                     <div>

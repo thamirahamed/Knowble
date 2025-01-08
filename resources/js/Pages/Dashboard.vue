@@ -8,6 +8,8 @@ import { Head, router } from "@inertiajs/vue3";
 import { computed, ref, watch } from "vue";
 import { UserGroupIcon, UserIcon } from "@heroicons/vue/24/solid";
 import { Link } from "@inertiajs/vue3";
+import CreatePeerGroup from "@/Components/CreatePeerGroup.vue";
+import PeerGroupCard from "@/Components/PeerGroupCard.vue";
 
 // Props
 const props = defineProps({
@@ -18,7 +20,13 @@ const props = defineProps({
     sModules: Array,
     peerGroups: Array,
 });
-
+const openModal = ref(null);
+const closeModal = () => {
+    openModal.value = null;
+};
+const openModalWithData = () => {
+    openModal.value = true;
+};
 // Reactive states
 const activeContent = ref("solo"); // Tracks active tab
 const searchQuery = ref(""); // Tracks search input
@@ -273,14 +281,14 @@ filteredTutors.value = props.tutors;
                                 <template #icon>
                                     <PlusIcon class="text-white" />
                                 </template>
-                                    Create Peer Group
+                                Create Peer Group
                             </PrimaryButton>
                         </div>
                         <DynamicDropdown
                             label="Module"
                             id="search-module-dropdown"
                             :options="sModules"
-                            v-model="selectedModulePeerGroup"
+                            v-model="selectedModule"
                             :error="moduleError"
                         />
                         <TextInput
@@ -288,7 +296,6 @@ filteredTutors.value = props.tutors;
                             type="text"
                             class="mt-1 block w-full"
                             placeholder="Search Tutor"
-                            v-model="peerSearchQuery"
                         />
                         <CreatePeerGroup
                             :openModal="openModal"

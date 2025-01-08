@@ -201,6 +201,7 @@ class StudentController extends Controller
         // Sort the peer groups to prioritize the user's degree program
         $sortedPeerGroups = $formattedPeerGroups->sortByDesc('isUserDegree')->values();
 
+
         return Inertia::render('Dashboard',[
             'semstertutors' => $tutordetails,
             'allDegree' => $allDegree,

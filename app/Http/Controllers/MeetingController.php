@@ -39,7 +39,7 @@ class MeetingController extends Controller
         $groupId = $booking->peer_group_id;
         $peerGroup = PeerGroup::where('id', $groupId)->first();
         $memberCount = null;
-        if(!is_null($student)){
+        if(!is_null($peerGroup)){
             $memberCount = PeerGroupMember::where('peer_group_id', $peerGroup->id)->count() + 1;
         }
 

@@ -27,30 +27,32 @@ class UpdateSessionStatuses extends Command
      */
     public function handle()
     {
-        // Get current timestamp
+        // Get the current timestamp
         $now = Carbon::now();
-        
-        // Update "pending" sessions if session_date and start_time combined have passed
-        $pendingSessions = TutorSession::where('status', 'pending')
-        ->whereRaw('datetime(session_date || " " || start_time) <= ?', [$now->toDateTimeString()])
-        ->get();
 
-        foreach ($pendingSessions as $session) {
-        $session->status = 'completed';
-        $session->meeting_url = null;
-        $session->save();
-        }
+        // Update "pending" sessions
+        TutorSession::where('status', 'pending')
+        ->where('session_date', '<=', $now->toDateString())
+        ->where(function ($query) use ($now) {
+            $query->where('session_date', '<', $now->toDateString()) // Past dates
+                ->orWhere(function ($query) use ($now) {
+                    $query->where('session_date', $now->toDateString()) // Today
+                            ->where('start_time', '<=', $now->toTimeString());
+                });
+        })
+        ->update(['status' => 'completed', 'meeting_url' => null]);
 
-        // Update "booked" sessions if session_date and end_time combined have passed
-        $bookedSessions = TutorSession::where('status', 'booked')
-        ->whereRaw('datetime(session_date || " " || end_time) <= ?', [$now->toDateTimeString()])
-        ->get();
-
-        foreach ($bookedSessions as $session) {
-        $session->status = 'completed';
-        $session->meeting_url = null;
-        $session->save();
-        }
+        // Update "booked" sessions
+        TutorSession::where('status', 'booked')
+        ->where('session_date', '<=', $now->toDateString())
+        ->where(function ($query) use ($now) {
+            $query->where('session_date', '<', $now->toDateString()) // Past dates
+                ->orWhere(function ($query) use ($now) {
+                    $query->where('session_date', $now->toDateString()) // Today
+                            ->where('end_time', '<=', $now->toTimeString());
+                });
+        })
+        ->update(['status' => 'completed', 'meeting_url' => null]);
 
         $this->info('Session statuses updated successfully. Current time: ' . $now);
     }

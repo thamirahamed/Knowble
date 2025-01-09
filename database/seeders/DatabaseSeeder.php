@@ -915,7 +915,7 @@ class DatabaseSeeder extends Seeder
                 'peer_group_id' => null,  // Set this if applicable
                 'module_id' => 80,  // Set module ID
                 'notes' => 'Another test session.',
-                'meeting_url' => 'https://anothermeetinglink.com',
+                'meeting_url' => null,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -929,7 +929,7 @@ class DatabaseSeeder extends Seeder
                 'peer_group_id' => null,  // Set this if applicable
                 'module_id' => 81,  // Set module ID
                 'notes' => 'Another test session.',
-                'meeting_url' => 'https://anothermeetinglink.com',
+                'meeting_url' => null,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -943,7 +943,7 @@ class DatabaseSeeder extends Seeder
                 'peer_group_id' => null,  // Set this if applicable
                 'module_id' => 80,  // Set module ID
                 'notes' => 'Another test session.',
-                'meeting_url' => 'https://anothermeetinglink.com',
+                'meeting_url' => null,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -957,7 +957,7 @@ class DatabaseSeeder extends Seeder
                 'peer_group_id' => null,  // Set this if applicable
                 'module_id' => 81,  // Set module ID
                 'notes' => 'Another test session.',
-                'meeting_url' => 'https://anothermeetinglink.com',
+                'meeting_url' => null,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -971,7 +971,7 @@ class DatabaseSeeder extends Seeder
                 'peer_group_id' => 3,  // Set this if applicable
                 'module_id' => 80,  // Set module ID
                 'notes' => 'Another test session.',
-                'meeting_url' => 'https://anothermeetinglink.com',
+                'meeting_url' => null,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],

@@ -49,6 +49,58 @@ class FeedbackRatingController extends Controller
             ->where('status', 'completed')
             ->exists();
 
+        $profanityList = [
+            'damn',
+            'hell',
+            'shit',
+            'fuck',
+            'asshole',
+            'bitch',
+            'bastard',
+            'crap',
+            'dick',
+            'piss',
+            'prick',
+            'slut',
+            'whore',
+            'cunt',
+            'faggot',
+            'motherfucker',
+            'nigger', // Offensive slurs
+            'retard', // Offensive slurs
+            'arse',
+            'bollocks',
+            'bugger',
+            'wanker',
+            'twat',
+            'pussy',
+            'jackass',
+            'cock',
+            'douche',
+            'nigga', // Offensive slurs
+            'tits',
+            'fucker',
+            'shithead',
+            'skank',
+            'cum',
+            'dildo',
+            'bimbo',
+            'ho',
+            'tit',
+            'boob',
+        ];
+        $feedback = $validatedData['feedback'];
+
+        if ($feedback) {
+            foreach ($profanityList as $profanity) {
+                if (stripos($feedback, $profanity) !== false) {
+                    return redirect()->back()->withErrors([
+                        'feedback' => 'Your feedback contains inappropriate language. Please revise it.',
+                    ]);
+                }
+            }
+        }
+
         // Combine the checks
         if (!$hasCompletedIndividualSession && !$hasCompletedGroupSession) {
             return redirect()->back()->withErrors([
@@ -99,6 +151,58 @@ class FeedbackRatingController extends Controller
             return redirect()->back()->withErrors([
                 'error' => 'Feedback not found. Please ensure you are editing an existing review.',
             ]);
+        }
+
+        $profanityList = [
+            'damn',
+            'hell',
+            'shit',
+            'fuck',
+            'asshole',
+            'bitch',
+            'bastard',
+            'crap',
+            'dick',
+            'piss',
+            'prick',
+            'slut',
+            'whore',
+            'cunt',
+            'faggot',
+            'motherfucker',
+            'nigger', // Offensive slurs
+            'retard', // Offensive slurs
+            'arse',
+            'bollocks',
+            'bugger',
+            'wanker',
+            'twat',
+            'pussy',
+            'jackass',
+            'cock',
+            'douche',
+            'nigga', // Offensive slurs
+            'tits',
+            'fucker',
+            'shithead',
+            'skank',
+            'cum',
+            'dildo',
+            'bimbo',
+            'ho',
+            'tit',
+            'boob',
+        ];
+        $feedback = $validatedData['feedback'];
+
+        if ($feedback) {
+            foreach ($profanityList as $profanity) {
+                if (stripos($feedback, $profanity) !== false) {
+                    return redirect()->back()->withErrors([
+                        'feedback' => 'Your feedback contains inappropriate language. Please revise it.',
+                    ]);
+                }
+            }
         }
 
         $feedback->rating = $validatedData['rating'];

@@ -330,8 +330,8 @@ class StudentController extends Controller
         
         // Calculate the average rating of the tutor's feedback
         $averageRating = FeedbackRating::where('tutor_id', $tutor->id)->exists()
-        ? FeedbackRating::where('tutor_id', $tutor->id)->avg('rating')
-        : null;
+            ? round(FeedbackRating::where('tutor_id', $tutor->id)->avg('rating'), 1)
+            : null;
 
         // Get the authenticated user
         $user2 = auth()->user();

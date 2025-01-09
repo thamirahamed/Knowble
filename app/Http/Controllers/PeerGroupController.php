@@ -26,11 +26,12 @@ class PeerGroupController extends Controller
                                 ->where('id', $id)
                                 ->first();
         $isLeader = PeerGroup::where('leader', $userid)
-                            ->where('peer_group_id', $id)
+                            ->where('id', $id)
                             ->first();
         $isMember = PeerGroupMember::where('user_id', $userid)
                                     ->where('peer_group_id', $id)
                                     ->exists();
+
         if(is_null($peerGroup)){
             return;
         }

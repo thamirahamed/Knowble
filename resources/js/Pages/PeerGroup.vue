@@ -12,9 +12,6 @@ const props = defineProps({
     pastGroupSessions: Array,
 });
 
-console.log(JSON.stringify(props.peerGroup, null, 2));
-console.log(JSON.stringify(props.pastGroupSessions, null, 2));
-
 const joinGroup = () => {
     // Prepare the data to be sent
     const payload = {

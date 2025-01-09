@@ -193,11 +193,11 @@ class FeedbackRatingController extends Controller
             'tit',
             'boob',
         ];
-        $feedback = $validatedData['feedback'];
+        $feedbackProfanity = $validatedData['feedback'];
 
-        if ($feedback) {
+        if ($feedbackProfanity) {
             foreach ($profanityList as $profanity) {
-                if (stripos($feedback, $profanity) !== false) {
+                if (stripos($feedbackProfanity, $profanity) !== false) {
                     return redirect()->back()->withErrors([
                         'feedback' => 'Your feedback contains inappropriate language. Please revise it.',
                     ]);

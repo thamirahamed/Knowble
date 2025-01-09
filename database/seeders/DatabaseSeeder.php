@@ -15,55 +15,40 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('users')->insert([
-            'name' => 'Admin',
-            'email' => 'admin@apiit.lk', 
-            'email_verified_at' => now(),
-            'password' => bcrypt('password'), 
-            'remember_token' => Str::random(10),
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        DB::table('users')->insert([
-            'name' => 'Thamir Ahamed',
-            'email' => 'cb012828@students.apiit.lk', 
-            'email_verified_at' => now(),
-            'password' => bcrypt('password'), 
-            'remember_token' => Str::random(10),
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        DB::table('users')->insert([
-            'name' => 'Nuski Ahamed Naleem',
-            'email' => 'cb012282@students.apiit.lk', 
-            'email_verified_at' => now(),
-            'password' => bcrypt('password'), 
-            'remember_token' => Str::random(10),
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        DB::table('users')->insert([
-            'name' => 'Shakeel Ahamed Shajahan',
-            'email' => 'cb009882@students.apiit.lk', 
-            'email_verified_at' => now(),
-            'password' => bcrypt('password'), 
-            'remember_token' => Str::random(10),
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        DB::table('users')->insert([
-            'name' => 'Ammar Mohamed Zubair',
-            'email' => 'cb011246@students.apiit.lk', 
-            'email_verified_at' => now(),
-            'password' => bcrypt('password'), 
-            'remember_token' => Str::random(10),
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        $users = [
+            [
+                'name' => 'Admin',
+                'email' => 'admin@apiit.lk',
+            ],
+            [
+                'name' => 'Thamir Ahamed',
+                'email' => 'cb012828@students.apiit.lk',
+            ],
+            [
+                'name' => 'Nuski Ahamed Naleem',
+                'email' => 'cb012282@students.apiit.lk',
+            ],
+            [
+                'name' => 'Shakeel Ahamed Shajahan',
+                'email' => 'cb009882@students.apiit.lk',
+            ],
+            [
+                'name' => 'Ammar Mohamed Zubair',
+                'email' => 'cb011246@students.apiit.lk',
+            ],
+        ];
+        
+        foreach ($users as $user) {
+            DB::table('users')->insert([
+                'name' => $user['name'],
+                'email' => $user['email'],
+                'email_verified_at' => now(),
+                'password' => bcrypt('password'),
+                'remember_token' => Str::random(10),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }        
 
         $schoolofstudy = [
             'School of Computing',
@@ -585,6 +570,53 @@ class DatabaseSeeder extends Seeder
             }
         };
 
+        $profiles = [
+            [
+                'cb_number' => 'CB012828',
+                'degree_id' => 8,
+                'school_id' => 1,
+                'level_id' => 1,
+                'semester_id' => 2,
+            ],
+            [
+                'cb_number' => 'CB012282',
+                'degree_id' => 6,
+                'school_id' => 1,
+                'level_id' => 1,
+                'semester_id' => 2,
+            ],
+            [
+                'cb_number' => 'CB009882',
+                'degree_id' => 7,
+                'school_id' => 1,
+                'level_id' => 1,
+                'semester_id' => 2,
+            ],
+            [
+                'cb_number' => 'CB011246',
+                'degree_id' => 8,
+                'school_id' => 1,
+                'level_id' => 1,
+                'semester_id' => 2,
+            ],
+        ];
+        
+        $user_id = 2; // Start with user_id 2, as admin (user_id 1) is excluded.
+        
+        foreach ($profiles as $profile) {
+            DB::table('profiles')->insert([
+                'user_id' => $user_id++,
+                'cb_number' => $profile['cb_number'],
+                'profile_pic' => 'https://knowblestorage.s3.ap-southeast-1.amazonaws.com/profile_pic/default.jpg',
+                'degree_id' => $profile['degree_id'],
+                'school_id' => $profile['school_id'],
+                'level_id' => $profile['level_id'],
+                'semester_id' => $profile['semester_id'],
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }        
+
         $tutors = [
             [
                 'name' => 'John Doe',
@@ -738,19 +770,6 @@ class DatabaseSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
-                    
-            // Insert default availability (customize as needed)
-            // $days = ['Monday', 'Wednesday', 'Friday'];
-            // foreach ($days as $day) {
-            //     DB::table('available_times')->insert([
-            //         'tutor_id' => $tutorId,
-            //         'day' => $day,
-            //         'start_time' => '10:00:00',
-            //         'end_time' => '12:00:00',
-            //         'created_at' => now(),
-            //         'updated_at' => now(),
-            //     ]);
-            // }
 
             // Insert approved modules into tutor_selected_modules table
             foreach ($tutor['approved_modules'] as $moduleId) {
@@ -762,5 +781,403 @@ class DatabaseSeeder extends Seeder
                 ]);
             }
         }
+
+        $peerGroups = [
+            [
+                'name' => 'The Innovators',  // Group name with meaning
+                'leader' => 3,  // Set leader user ID
+                'module_id' => 79,  // Set module ID
+                'total_members' => 3,  // Set total members
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'name' => 'The Trailblazers',  // Group name with meaning
+                'leader' => 3,  // Set leader user ID
+                'module_id' => 81,  // Set module ID
+                'total_members' => 4,  // Set total members
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'name' => 'The Pioneers',  // Group name with meaning
+                'leader' => 4,  // Set leader user ID
+                'module_id' => 80,  // Set module ID
+                'total_members' => 5,  // Set total members
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'name' => 'The Visionaries',  // Group name with meaning
+                'leader' => 4,  // Set leader user ID
+                'module_id' => 82,  // Set module ID
+                'total_members' => 3,  // Set total members
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'name' => 'The Achievers',  // Group name with meaning
+                'leader' => 5,  // Set leader user ID
+                'module_id' => 79,  // Set module ID
+                'total_members' => 4,  // Set total members
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'name' => 'The Mavericks',  // Group name with meaning
+                'leader' => 5,  // Set leader user ID
+                'module_id' => 82,  // Set module ID
+                'total_members' => 3,  // Set total members
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ];
+
+        DB::table('peer_groups')->insert($peerGroups);
+
+        $peerGroupMembers = [
+            [
+                'peer_group_id' => 1,  // Set the peer group ID (e.g., The Innovators)
+                'user_id' => 4,        // Set the user ID
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'peer_group_id' => 2,  // Set the peer group ID (e.g., The Innovators)
+                'user_id' => 5,        // Set the user ID
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'peer_group_id' => 3,  // Set the peer group ID (e.g., The Trailblazers)
+                'user_id' => 3,        // Set the user ID
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'peer_group_id' => 3,  // Set the peer group ID (e.g., The Trailblazers)
+                'user_id' => 5,        // Set the user ID
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'peer_group_id' => 5,  // Set the peer group ID (e.g., The Pioneers)
+                'user_id' => 3,        // Set the user ID
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'peer_group_id' => 6,  // Set the peer group ID (e.g., The Pioneers)
+                'user_id' => 4,        // Set the user ID
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ];
+
+        DB::table('peer_group_members')->insert($peerGroupMembers);
+
+        $tutorSessions = [
+            [
+                'tutor_id' => 5,  // Set tutor ID
+                'session_date' => '2024-12-15',  // Example date, modify as needed
+                'start_time' => '10:00:00',
+                'end_time' => '12:00:00',
+                'status' => 'booked',  // You can change the status as needed
+                'user_id' => 2,  // Set user ID or null for peer_group_id
+                'peer_group_id' => null,  // Set this if applicable
+                'module_id' => 80,  // Set module ID
+                'notes' => 'Test session notes',
+                'meeting_url' => 'https://meetinglink.com',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'tutor_id' => 5,  // Set tutor ID
+                'session_date' => '2024-12-16',  // Example date, modify as needed
+                'start_time' => '14:00:00',
+                'end_time' => '16:00:00',
+                'status' => 'booked',  // You can change the status as needed
+                'user_id' => 2,  // Set user ID or peer_group_id
+                'peer_group_id' => null,  // Set this if applicable
+                'module_id' => 81,  // Set module ID
+                'notes' => 'Another test session.',
+                'meeting_url' => 'https://anothermeetinglink.com',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'tutor_id' => 5,  // Set tutor ID
+                'session_date' => '2024-12-17',  // Example date, modify as needed
+                'start_time' => '14:00:00',
+                'end_time' => '16:00:00',
+                'status' => 'completed',  // You can change the status as needed
+                'user_id' => 3,  // Set user ID or peer_group_id
+                'peer_group_id' => null,  // Set this if applicable
+                'module_id' => 80,  // Set module ID
+                'notes' => 'Another test session.',
+                'meeting_url' => 'https://anothermeetinglink.com',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'tutor_id' => 5,  // Set tutor ID
+                'session_date' => '2024-12-18',  // Example date, modify as needed
+                'start_time' => '14:00:00',
+                'end_time' => '16:00:00',
+                'status' => 'completed',  // You can change the status as needed
+                'user_id' => 3,  // Set user ID or peer_group_id
+                'peer_group_id' => null,  // Set this if applicable
+                'module_id' => 81,  // Set module ID
+                'notes' => 'Another test session.',
+                'meeting_url' => 'https://anothermeetinglink.com',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'tutor_id' => 5,  // Set tutor ID
+                'session_date' => '2024-12-19',  // Example date, modify as needed
+                'start_time' => '14:00:00',
+                'end_time' => '16:00:00',
+                'status' => 'completed',  // You can change the status as needed
+                'user_id' => 4,  // Set user ID or peer_group_id
+                'peer_group_id' => null,  // Set this if applicable
+                'module_id' => 80,  // Set module ID
+                'notes' => 'Another test session.',
+                'meeting_url' => 'https://anothermeetinglink.com',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'tutor_id' => 5,  // Set tutor ID
+                'session_date' => '2024-12-20',  // Example date, modify as needed
+                'start_time' => '14:00:00',
+                'end_time' => '16:00:00',
+                'status' => 'completed',  // You can change the status as needed
+                'user_id' => 4,  // Set user ID or peer_group_id
+                'peer_group_id' => null,  // Set this if applicable
+                'module_id' => 81,  // Set module ID
+                'notes' => 'Another test session.',
+                'meeting_url' => 'https://anothermeetinglink.com',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'tutor_id' => 5,  // Set tutor ID
+                'session_date' => '2024-12-21',  // Example date, modify as needed
+                'start_time' => '14:00:00',
+                'end_time' => '16:00:00',
+                'status' => 'completed',  // You can change the status as needed
+                'user_id' => null,  // Set user ID or peer_group_id
+                'peer_group_id' => 3,  // Set this if applicable
+                'module_id' => 80,  // Set module ID
+                'notes' => 'Another test session.',
+                'meeting_url' => 'https://anothermeetinglink.com',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'tutor_id' => 5,  // Set tutor ID
+                'session_date' => '2025-01-10',  // Example date, modify as needed
+                'start_time' => '15:00:00',
+                'end_time' => '18:00:00',
+                'status' => 'pending',  // You can change the status as needed
+                'user_id' => null,  // Set user ID or peer_group_id
+                'peer_group_id' => null,  // Set this if applicable
+                'module_id' => null,  // Set module ID
+                'notes' => null,
+                'meeting_url' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'tutor_id' => 5,  // Set tutor ID
+                'session_date' => '2025-01-11',  // Example date, modify as needed
+                'start_time' => '15:00:00',
+                'end_time' => '18:00:00',
+                'status' => 'pending',  // You can change the status as needed
+                'user_id' => null,  // Set user ID or peer_group_id
+                'peer_group_id' => null,  // Set this if applicable
+                'module_id' => null,  // Set module ID
+                'notes' => null,
+                'meeting_url' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'tutor_id' => 6,  // Set tutor ID
+                'session_date' => '2025-01-10',  // Example date, modify as needed
+                'start_time' => '15:00:00',
+                'end_time' => '18:00:00',
+                'status' => 'pending',  // You can change the status as needed
+                'user_id' => null,  // Set user ID or peer_group_id
+                'peer_group_id' => null,  // Set this if applicable
+                'module_id' => null,  // Set module ID
+                'notes' => null,
+                'meeting_url' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'tutor_id' => 6,  // Set tutor ID
+                'session_date' => '2025-01-11',  // Example date, modify as needed
+                'start_time' => '15:00:00',
+                'end_time' => '18:00:00',
+                'status' => 'pending',  // You can change the status as needed
+                'user_id' => null,  // Set user ID or peer_group_id
+                'peer_group_id' => null,  // Set this if applicable
+                'module_id' => null,  // Set module ID
+                'notes' => null,
+                'meeting_url' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'tutor_id' => 4,  // Set tutor ID
+                'session_date' => '2025-01-10',  // Example date, modify as needed
+                'start_time' => '15:00:00',
+                'end_time' => '18:00:00',
+                'status' => 'pending',  // You can change the status as needed
+                'user_id' => null,  // Set user ID or peer_group_id
+                'peer_group_id' => null,  // Set this if applicable
+                'module_id' => null,  // Set module ID
+                'notes' => null,
+                'meeting_url' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'tutor_id' => 4,  // Set tutor ID
+                'session_date' => '2025-01-11',  // Example date, modify as needed
+                'start_time' => '15:00:00',
+                'end_time' => '18:00:00',
+                'status' => 'pending',  // You can change the status as needed
+                'user_id' => null,  // Set user ID or peer_group_id
+                'peer_group_id' => null,  // Set this if applicable
+                'module_id' => null,  // Set module ID
+                'notes' => null,
+                'meeting_url' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'tutor_id' => 3,  // Set tutor ID
+                'session_date' => '2025-01-10',  // Example date, modify as needed
+                'start_time' => '15:00:00',
+                'end_time' => '18:00:00',
+                'status' => 'pending',  // You can change the status as needed
+                'user_id' => null,  // Set user ID or peer_group_id
+                'peer_group_id' => null,  // Set this if applicable
+                'module_id' => null,  // Set module ID
+                'notes' => null,
+                'meeting_url' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'tutor_id' => 2,  // Set tutor ID
+                'session_date' => '2025-01-10',  // Example date, modify as needed
+                'start_time' => '15:00:00',
+                'end_time' => '18:00:00',
+                'status' => 'pending',  // You can change the status as needed
+                'user_id' => null,  // Set user ID or peer_group_id
+                'peer_group_id' => null,  // Set this if applicable
+                'module_id' => null,  // Set module ID
+                'notes' => null,
+                'meeting_url' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'tutor_id' => 2,  // Set tutor ID
+                'session_date' => '2025-01-11',  // Example date, modify as needed
+                'start_time' => '15:00:00',
+                'end_time' => '18:00:00',
+                'status' => 'pending',  // You can change the status as needed
+                'user_id' => null,  // Set user ID or peer_group_id
+                'peer_group_id' => null,  // Set this if applicable
+                'module_id' => null,  // Set module ID
+                'notes' => null,
+                'meeting_url' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'tutor_id' => 1,  // Set tutor ID
+                'session_date' => '2025-01-10',  // Example date, modify as needed
+                'start_time' => '15:00:00',
+                'end_time' => '18:00:00',
+                'status' => 'pending',  // You can change the status as needed
+                'user_id' => null,  // Set user ID or peer_group_id
+                'peer_group_id' => null,  // Set this if applicable
+                'module_id' => null,  // Set module ID
+                'notes' => null,
+                'meeting_url' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'tutor_id' => 1,  // Set tutor ID
+                'session_date' => '2025-01-11',  // Example date, modify as needed
+                'start_time' => '15:00:00',
+                'end_time' => '18:00:00',
+                'status' => 'pending',  // You can change the status as needed
+                'user_id' => null,  // Set user ID or peer_group_id
+                'peer_group_id' => null,  // Set this if applicable
+                'module_id' => null,  // Set module ID
+                'notes' => null,
+                'meeting_url' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'tutor_id' => 5,  // Set tutor ID
+                'session_date' => '2025-01-12',  // Example date, modify as needed
+                'start_time' => '15:00:00',
+                'end_time' => '18:00:00',
+                'status' => 'pending',  // You can change the status as needed
+                'user_id' => null,  // Set user ID or peer_group_id
+                'peer_group_id' => null,  // Set this if applicable
+                'module_id' => null,  // Set module ID
+                'notes' => null,
+                'meeting_url' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            // Add more sessions as needed
+        ];
+
+        foreach ($tutorSessions as $session) {
+            DB::table('tutor_sessions')->insert($session);
+        }
+
+        $feedbackRatings = [
+            [
+                'user_id' => 3,  // Set the user ID
+                'tutor_id' => 5,  // Set the tutor ID
+                'rating' => 5,  // Rating out of 5
+                'feedback' => 'Great session! The tutor was very helpful and explained everything clearly.',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'user_id' => 4,  // Set the user ID
+                'tutor_id' => 5,  // Set the tutor ID
+                'rating' => 2,  // Rating out of 5
+                'feedback' => 'The session was not as helpful as I expected. I had difficulty understanding some of the concepts.',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'user_id' => 5,  // Set the user ID
+                'tutor_id' => 5,  // Set the tutor ID
+                'rating' => 3,  // Rating out of 5
+                'feedback' => 'Good session, but the tutor could improve on the pacing.',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ];
+        
+        DB::table('feedback_ratings')->insert($feedbackRatings);
+
     }
 }

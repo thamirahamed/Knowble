@@ -23,6 +23,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Support\Facades\Storage;
 use PhpParser\Node\Expr\Print_;
+use Illuminate\Support\Facades\Artisan;
 
 
 class ProfileController extends Controller
@@ -181,6 +182,11 @@ class ProfileController extends Controller
     // New Method to display the profile
     public function show()
     {
+        $allsessions = TutorSession::all();
+
+        if ($allsessions->isNotEmpty()) {
+            Artisan::call('app:update-session-statuses');
+        }
         $userId = auth()->id();
         $profile = Profile::where('user_id', auth()->id())->first();
         if (is_null($profile)) {

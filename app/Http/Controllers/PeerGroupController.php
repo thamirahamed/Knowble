@@ -25,7 +25,9 @@ class PeerGroupController extends Controller
         $peerGroup = PeerGroup::with(['leader', 'module'])  // Eager load 'leader' and 'module'
                                 ->where('id', $id)
                                 ->first();
-        $isLeader = PeerGroup::where('leader', $userid)->first();
+        $isLeader = PeerGroup::where('leader', $userid)
+                            ->where('peer_group_id', $id)
+                            ->first();
         $isMember = PeerGroupMember::where('user_id', $userid)
                                     ->where('peer_group_id', $id)
                                     ->exists();

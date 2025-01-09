@@ -14,6 +14,7 @@ use App\Models\Module;
 use App\Models\DegreeProgram;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Artisan;
 
 class TutorController extends Controller
 {
@@ -23,7 +24,13 @@ class TutorController extends Controller
         $tutor = Tutor::where('user_id', $userId)->first();
 
         if (is_null($tutor)) {
-            return;
+            return redirect()->route('dashboard');
+        }
+
+        $allsessions = TutorSession::all();
+
+        if ($allsessions->isNotEmpty()) {
+            Artisan::call('app:update-session-statuses');
         }
 
         if ($tutor->status === 'pending') {

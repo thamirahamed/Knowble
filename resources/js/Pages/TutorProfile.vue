@@ -332,7 +332,7 @@ const getDaySuffix = (day) => {
                     </div>
 
                     <div class="flex flex-col flex-1 bg-white rounded-md mt-8 shadow h-fit py-4 px-6">
-                        <h2 class="text-2xl font-bold flex">Feedback and Ratings <span v-if="avgRating!==null" class="ml-2 flex items-center font-medium text-accent">(<StarIcon class="w-6 h-6" />{{ avgRating }} / 5)</span></h2>
+                        <h2 class="text-2xl font-bold flex">Feedback and Ratings <span v-if="avgRating!==null" class="ml-2 flex items-center font-medium text-accent">(<StarIcon class="w-6 h-6" />{{ avgRating.toFixed(1) }} / 5)</span></h2>
                         <p class="text-gray-700">
                             Explore feedback and ratings from students to evaluate the tutor's teaching quality and effectiveness.
                         </p>
@@ -457,7 +457,7 @@ const getDaySuffix = (day) => {
                                 <p class="text-gray-700 m-auto text-center">You need to complete a session with this tutor before providing feedback.</p>
                             </div>
                             
-                            <div class="flex flex-1 flex-col px-5 my-4 min-h-60 max-h-96 w-fit">
+                            <div class="flex flex-1 flex-col px-5 my-4 min-h-60 max-h-96 w-fit gap-3 overflow-y-auto">
                                 <div
                                     v-if="feedbacks.length > 0"    
                                     v-for="feedback in feedbacks"

@@ -20,13 +20,19 @@ const props = defineProps({
     sModules: Array,
     peerGroups: Array,
 });
+
+console.log(JSON.stringify(props.peerGroups, null, 2));
+
 const openModal = ref(null);
+
 const closeModal = () => {
     openModal.value = null;
 };
+
 const openModalWithData = () => {
     openModal.value = true;
 };
+
 // Reactive states
 const activeContent = ref("solo"); // Tracks active tab
 const searchQuery = ref(""); // Tracks search input
@@ -35,17 +41,14 @@ const moduleError = ref("");    // Tracks dropdown error
 
 // Filter tutors based on module selection
 const filteredTutors = ref([]); // Tracks filtered tutors dynamically
+console.log(filteredTutors);
 
 // Utility function to get degree name
 function getDegreeName(schoolId) {
     const school = props.allDegree.find((deg) => deg.id === schoolId);
     return school ? school.degree_name : "Not Found";
 }
-const error1 = ref("");
-// Define the state for the selected value
-const selectedModules = ref("");
-// Error message for validation
-const moduleErrors = ref("");
+
 // Redirect to Join Meeting with the meeting_url from a specific booking
 const joinMeeting = (booking) => {
     // Get the base meeting URL from the booking
@@ -56,6 +59,7 @@ const joinMeeting = (booking) => {
     meetingUrl += `&name=${studentName}`;
     router.visit(route("meetings.index", { meetingUrl, id: booking.id }));
 };
+
 // Function to format date to words with suffix
 const formatDateToWords = (date) => {
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
@@ -65,6 +69,7 @@ const formatDateToWords = (date) => {
     const formatter = new Intl.DateTimeFormat('en-US', options);
     return `${formatter.format(d).replace(day, day + suffix)}`;
 };
+
 // Function to get the day suffix (st, nd, rd, th)
 const getDaySuffix = (day) => {
     const j = day % 10;
@@ -91,14 +96,19 @@ watch(selectedModule, (newValue) => {
     }
 
     // Filter tutors based on selected module
-    filteredTutors.value = props.tutors.filter((tutor) =>
+    filteredTutors.value = [
+    ...props.semstertutors.filter((tutor) =>
         tutor.modules.some((module) => module.module_name === selectedModuleDetails.module_name)
-    );
+    ),
+    ...props.tutors.filter((tutor) =>
+        tutor.modules.some((module) => module.module_name === selectedModuleDetails.module_name)
+    ),
+];
 });
 
 // Computed property to dynamically update displayed tutors
 const displayedTutors = computed(() => {
-    let tutorsToDisplay = filteredTutors.value.length > 0 ? filteredTutors.value : props.tutors;
+    let tutorsToDisplay = filteredTutors.value.length > 0 ? filteredTutors.value : [...props.semstertutors, ...props.tutors ];
 
     // Apply search filter if searchQuery exists
     if (searchQuery.value.trim() !== "") {
@@ -106,14 +116,14 @@ const displayedTutors = computed(() => {
             tutor.user.name.toLowerCase().includes(searchQuery.value.toLowerCase())
         );
     }
-
+    
+    console.log(filteredTutors);
+    // console.log(JSON.stringify(tutorsToDisplay, null, 2));
     return tutorsToDisplay;
 });
 
 // Initialize tutors with all available tutors
-filteredTutors.value = props.tutors;
-
-
+filteredTutors.value = [...props.semstertutors, ...props.tutors ];
 
 // Peer Group
 const searchQueryPeer = ref("");
@@ -152,8 +162,6 @@ const displayedPeerGroups = computed(() => {
 
 // Initialize peer groups with all available peer groups
 filteredPeerGroups.value = props.peerGroups;
-console.log(displayedPeerGroups);
-
 </script>
 
 
@@ -193,11 +201,11 @@ console.log(displayedPeerGroups);
                 </div>
             </div>
             <!-- One on One Tutoring -->
-            <div v-if="activeContent === 'solo'" class="container flex flex-col lg:flex-row gap-10 h-[85vh]">
+            <div v-if="activeContent === 'solo'" class="container flex flex-col lg:flex-row gap-10 max-h-[85vh] min-h-[85vh]">
                 <!-- Tutor Listings -->
-                <div class="flex flex-col flex-1 bg-white rounded-md shadow-sm py-4 px-6 gap-5">
+                <div class="flex flex-col flex-1 bg-white rounded-md shadow-sm py-4 px-6">
                     <!-- Filters -->
-                    <div class="flex flex-col flex-1 bg-white rounded-md shadow-sm py-4 px-6 gap-5">
+                    <div class="flex flex-col flex-1 gap-5 max-h-full h-full">
                         <!-- Filters -->
                         <div class="flex flex-col gap-2">
                             <!-- Title -->
@@ -213,53 +221,50 @@ console.log(displayedPeerGroups);
                                 placeholder="Search Tutor by Name"
                             />
                         </div>
+                        <div class="flex">
+                            <span class="w-full h-0.5 bg-accent"></span>
+                        </div>
 
                         <!-- Scrollable Tutor Listings -->
-                        <!-- Scrollable Tutor Listings -->
-                        <div class="flex flex-col gap-2 overflow-y-auto max-h-[400px]"> <!-- Scrollable Container -->
-
-                            <!-- Show Semester Tutors only when no search or filter is applied -->
-                            <div v-if="searchQuery === '' && selectedModule === ''">
-                                <div v-for="tutor in semstertutors" :key="tutor.id">
-                                    <TutorCard
-                                        v-if="tutor.tutor"
-                                        :tutorname="tutor.user.name"
-                                        :cbnumber="tutor.profile.cb_number"
-                                        :profile_pic="tutor.profile.profile_pic"
-                                        :tutor_id="tutor.tutor"
-                                        :school="getDegreeName(tutor.profile.degree_id)"
-                                    />
-                                </div>
-                                <div v-for="tutor in displayedTutors" :key="tutor.id">
-                                    <TutorCard
-                                        v-if="tutor.tutor"
-                                        :tutorname="tutor.user.name"
-                                        :cbnumber="tutor.profile.cb_number"
-                                        :profile_pic="tutor.profile.profile_pic"
-                                        :tutor_id="tutor.tutor.id"
-                                        :school="getDegreeName(tutor.profile.degree_id)"
-                                    />
-                                </div>
-
-                            </div>
-
-                            <!-- Filtered Tutors -->
-                            <div v-else-if="displayedTutors.length > 0" class="flex flex-col gap-2">
+                        <!-- Show Semester Tutors only when no search or filter is applied -->
+                        <div v-if="searchQuery === '' && selectedModule === ''" class="flex flex-col flex-1 gap-3.5 max-h-full overflow-y-auto">
+                            <div v-for="tutor in semstertutors" :key="tutor.id">
                                 <TutorCard
-                                    v-for="tutor in displayedTutors"
-                                    :key="tutor.id"
+                                    v-if="tutor.tutor"
                                     :tutorname="tutor.user.name"
                                     :cbnumber="tutor.profile.cb_number"
                                     :profile_pic="tutor.profile.profile_pic"
-                                    :tutor_id="tutor.id"
+                                    :tutor_id="tutor.tutor"
                                     :school="getDegreeName(tutor.profile.degree_id)"
                                 />
                             </div>
-
-                            <!-- Fallback Message -->
-                            <p v-else class="text-gray-600 text-center">No tutors available.</p>
+                            <div v-for="tutor in tutors" :key="tutor.id">
+                                <TutorCard
+                                    v-if="tutor.tutor"
+                                    :tutorname="tutor.user.name"
+                                    :cbnumber="tutor.profile.cb_number"
+                                    :profile_pic="tutor.profile.profile_pic"
+                                    :tutor_id="tutor.tutor.id"
+                                    :school="getDegreeName(tutor.profile.degree_id)"
+                                />
+                            </div>    
                         </div>
 
+                        <!-- Filtered Tutors -->
+                        <div v-else-if="displayedTutors.length > 0" class="flex flex-col flex-1 gap-3.5 max-h-full overflow-y-auto">
+                            <TutorCard
+                                v-for="tutor in displayedTutors"
+                                :key="tutor.id"
+                                :tutorname="tutor.user.name"
+                                :cbnumber="tutor.profile.cb_number"
+                                :profile_pic="tutor.profile.profile_pic"
+                                :tutor_id="tutor.id"
+                                :school="getDegreeName(tutor.profile.degree_id)"
+                            />
+                        </div>
+                        <p v-else class="text-gray-600 text-center">No tutors available.</p>
+                        
+                        <!-- Fallback Message -->
                     </div>
                 </div>
 
@@ -309,7 +314,7 @@ console.log(displayedPeerGroups);
             </div>
 
             <!-- Peer Group -->
-            <div v-if="activeContent === 'peergroup'" class="container flex flex-col lg:flex-row gap-10 h-[85vh]">
+            <div v-if="activeContent === 'peergroup'" class="container flex flex-col lg:flex-row gap-10 max-h-[85vh] min-h-[85vh]">
                 <div class="flex flex-col flex-1 bg-white rounded-md shadow-sm py-4 px-6 gap-5 " >
                     <div class="flex flex-col gap-2">
                         <div class="inline-flex justify-between items-center">
@@ -346,17 +351,18 @@ console.log(displayedPeerGroups);
                             :sModules="sModules"
                         />
                     </div>
-
+                    <div class="flex">
+                        <span class="w-full h-0.5 bg-accent"></span>
+                    </div>
                     <!-- filter peer groups -->
-                    <div class="flex flex-col gap-2">
-                        <div v-if="displayedPeerGroups.length > 0">
+                    <div class="flex flex-col flex-1 max-h-full overflow-y-auto gap-3.5">
+                        <div v-if="displayedPeerGroups.length > 0" class="flex flex-col flex-1">
                             <div v-for="group in displayedPeerGroups" :key="group.id">
-                                <div v-if="group.isUserLeader === false">
+                                <div v-if="group.isUserLeader === false && group.isUserMember === false  && group.currentMembers < group.totalMembers">
                                     <PeerGroupCard
                                         :peerGroup="group"
                                     />
                                 </div>
-
                             </div>
                         </div>
                         <div v-else class="text-gray-600 mx-auto mt-6">

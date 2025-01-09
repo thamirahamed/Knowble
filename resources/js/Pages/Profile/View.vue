@@ -144,7 +144,7 @@ const getDaySuffix = (day) => {
                     </div>
 
                     <!-- Completed Session Details -->
-                    <div class="flex flex-col flex-1 bg-white rounded-md mt-8 shadow py-4 px-6">
+                    <div class="flex flex-col flex-1 bg-white rounded-md mt-8 shadow py-4 px-6 h-fit">
                         <h2 class="text-2xl font-bold">Past Sessions</h2>
                         <p class="text-gray-700">
                             View your log of past sessions, including those that were completed and cancelled.

@@ -57,7 +57,7 @@ watch(selectedValue, (newValue) => {
                 selectedValue === '' ? 'text-gray-500' : 'text-black'
             ]"
         >
-            <option disabled value="" >Select {{ label }}</option>
+            <option value="" >Select {{ label }}</option>
             <option
                 v-for="option in options"
                 :key="option.id"

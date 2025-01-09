@@ -20,6 +20,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Artisan;
 
 class StudentController extends Controller
 {
@@ -101,21 +102,11 @@ class StudentController extends Controller
             ];
         }
 
-//        $allsessions = TutorSession::all();
-//
-//        foreach ($allsessions as $session){
-//            $sesssionendtime = $session->end_time;
-//            $currenttime = Carbon::now();
-//
-//
-//            if($currenttime > $sesssionendtime){
-//                $session->status = 'completed';
-//                $session->save();
-//
-//                broadcast(new SessionStatusUpdated($session));
-//
-//            }
-//        }
+        $allsessions = TutorSession::all();
+
+        if ($allsessions->isNotEmpty()) {
+            Artisan::call('app:update-session-statuses');
+        }
 
         //upcomming sessions and status of the user
         $sessions = TutorSession::where('user_id', $userid)

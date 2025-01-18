@@ -195,7 +195,7 @@ const closeModal = () => {
                         </h2>
 
                         <p class="mt-1 text-md text-gray-600">
-                            To qualify as a tutor, you must be beyond Foundation Sem 1 or Degree Year 1 - Sem 1, with a minimum score of 60% per module.
+                            To qualify as a tutor, you must be beyond Degree Year 1 - Sem 1, with a minimum score of 60% per module.
                         </p>
 
                         <div class="mt-6 flex justify-end gap-4">

@@ -57,7 +57,7 @@ watch(selectedValue, (newValue) => {
                 selectedValue === '' ? 'text-gray-500' : 'text-black'
             ]"
         >
-            <option value="" >Select {{ label }}</option>
+            <option v-if="label !== ''" value="" >{{ label }}</option>
             <option
                 v-for="option in options"
                 :key="option.id"
@@ -65,7 +65,7 @@ watch(selectedValue, (newValue) => {
                 class="text-black"
                 :id="label + '-' + option.id"
             >
-                {{ option.level_name || option.degree_name || option.school_name || option.semester_name || option.module_name}}
+                {{ option.level_name || option.degree_name || option.school_name || option.semester_name || option.module_name || option.name}}
             </option>
         </select>
 

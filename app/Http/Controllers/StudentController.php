@@ -21,6 +21,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
+
 
 class StudentController extends Controller
 {
@@ -29,78 +31,108 @@ class StudentController extends Controller
         $userid = auth()->user()->id;
         $profile = Profile::where('user_id', $userid)->first();
 
-        // Check if profile is null
+        // Check if profile exists, before loading dashboard
         if (is_null($profile)) {
             return redirect()->route('profile.create');
         }
 
-        $semesterModules = Module::where('semester_id', $profile->semester_id)->where('degree_program_id', $profile->degree_id)->where('level_id', $profile->level_id)->get();
+        // Get student's current degree and school of study
+        $studentDegree = DegreeProgram::where('id', $profile->degree_id)->first();
+        $studentSchool = SchoolOfStudy::where('id', $profile->school_id)->value('id');
 
-        //get the semesterModules id
-        $semesterModulesId = [];
-        foreach ($semesterModules as $module) {
-            $semesterModulesId[] = $module->id;
-        }
+        // Get students modules based on profile
+        $studentModules = Module::where('semester_id', $profile->semester_id)
+                                ->where('degree_program_id', $profile->degree_id)
+                                ->where('level_id', $profile->level_id)
+                                ->get();
 
-        //get the tutors who have selected the modules in the semester
-        $tutors = Tutor::whereHas('selectedModules', function ($query) use ($semesterModulesId) {
-            $query->whereIn('module_id', $semesterModulesId);
-        })->where('user_id', '!=', $userid) // Exclude current user
+        // Extract module names based on the student's profile
+        $studentModuleNames = $studentModules->pluck('module_name'); // Get module names instead of IDs
+
+        // Fetch tutors who are approved and whose modules match the student's modules
+        $tutors = Tutor::whereIn('user_id', function ($query) use ($studentSchool) {
+            $query->select('user_id')
+                ->from('profiles')
+                ->where('school_id', $studentSchool);
+        })->where('user_id', '!=', $userid) // Exclude the authenticated user
+        ->where('status', 'approved') // Only fetch approved tutors
         ->get();
 
-        //get tutors profile
-        $tutorIds = [];
-        foreach ($tutors as $tutor) {
-            $tutorIds[] = $tutor->user_id;
-        }
+        // Fetch tutor selected modules for these tutors
+        $formattedTutors = $tutors->map(function ($tutor) {
+            $userid = auth()->user()->id;
+            $profile = Profile::where('user_id', $userid)->first();
+            $tutorAcc = User::where('id', $tutor->user_id)->first();
+            $tutorProfile = Profile::where('user_id', $tutor->user_id)->first();
+            $tutorDegree = DegreeProgram::where('id', $tutorProfile->degree_id)->first();
+            $studentModuleNames = Module::where('semester_id', $profile->semester_id)
+                             ->where('degree_program_id', $profile->degree_id)
+                             ->where('level_id', $profile->level_id)
+                             ->pluck('module_name'); // Extract module names
+            
+            // Fetch module names for the current tutor in one query
+            $moduleNames = DB::table('tutor_selected_modules')
+                            ->where('tutor_id', $tutor->id)
+                            ->join('modules', 'modules.id', '=', 'tutor_selected_modules.module_id')
+                            ->pluck('module_name');
+                            
+            // Filter tutors whose selected modules match the student's modules
+            $matchingModules = $moduleNames->intersect($studentModuleNames);
 
-        //send the tutors with the user details and profile details
-        $allDegree = DegreeProgram::where('school_id', $profile->school_id)->get();
-        $tutordetails = [];
-        foreach ($tutors as $tutor) {
-            $tutordetails[] = [
-                'user' => $tutor->user,
-                'profile' => Profile::where('user_id', $tutor->user_id)->first(),
-                'modules' => $tutor->selectedModules,
-                'tutor' => $tutor->id,
-            ];
-        }
+            // Calculate the average rating of the tutor's feedback
+            $averageRating = FeedbackRating::where('tutor_id', $tutor->id)->exists()
+            ? round(FeedbackRating::where('tutor_id', $tutor->id)->avg('rating'), 1)
+            : null;
 
-        //get all modules of the school
-        $degrees = DegreeProgram::where('school_id', $profile->school_id)->get();
-        $degreeModules = [];
-        foreach ($degrees as $degree) {
-            $degreeModules[] = Module::where('degree_program_id', $degree->id)->get();
-        }
-        // get the tutor who have selected the modules
-        $degreeModulesId = [];
-        foreach ($degreeModules as $module) {
-            foreach ($module as $mod) {
-                $degreeModulesId[] = $mod->id;
+            $averageCancellation = TutorSession::where('tutor_id', $tutor->id)
+                                                ->whereIn('status', ['completed', 'cancelled']) // Filter only "completed" and "cancelled" statuses
+                                                ->exists()
+                                                ? round(
+                                                    (TutorSession::where('tutor_id', $tutor->id)->where('status', 'cancelled')->count() /
+                                                    TutorSession::where('tutor_id', $tutor->id)->whereIn('status', ['completed', 'cancelled'])->count()) * 100,
+                                                    1
+                                                )
+                                                : null;
+
+            // Only include tutors with matching modules
+            if ($matchingModules->isNotEmpty()) {
+                return [
+                    'id' => $tutor->id,
+                    'name' => $tutorAcc->name,
+                    'profilePic' => $tutorProfile->profile_pic,
+                    'degree' => $tutorDegree->degree_name,
+                    'rating' => $averageRating,
+                    'cancellation' => $averageCancellation,
+                    'modules' => $matchingModules,
+                    'matchesUserDegree' => $tutorDegree->id === $profile->degree_id, // Flag if tutor matches the user's degree
+                ];
             }
-        }
 
-        $degreetutors = Tutor::whereHas('selectedModules', function ($query) use ($degreeModulesId) {
-            $query->whereIn('module_id', $degreeModulesId);
-        })->whereNotIn('user_id', $tutorIds) // Exclude tutors from the first set
-        ->where('user_id', '!=', $userid) // Exclude current user
-        ->get();
+            return null; // No matching modules, so return null (to be filtered out)
+        });
 
-        $degreetutorIds = [];
-        foreach ($degreetutors as $tutor) {
-            $degreetutorIds[] = $tutor->user_id;
-        }
+        // Filter out null values (tutors with no matching modules)
+        $formattedTutors = $formattedTutors->filter()->toArray();
 
-        $degreetutordetails = [];
-        foreach ($degreetutorIds as $tutor) {
-            $degreetutordetail = Tutor::where('user_id', $tutor)->first();
-            $degreetutordetails[] = [
-                'user' => $degreetutordetail->user,
-                'profile' => Profile::where('user_id', $degreetutordetail->user_id)->first(),
-                'modules' => $degreetutordetail->selectedModules,
-                'tutor' => $degreetutordetail,
-            ];
-        }
+        // Sort tutors so that those who match the user's degree come first
+        usort($formattedTutors, function ($a, $b) {
+            // First, check if degree matches
+            if ($a['matchesUserDegree'] === $b['matchesUserDegree']) {
+                // If both match the degree, sort by rating (higher rating first)
+                $ratingA = $a['rating'] ?? 0; // Default to 0 if null
+                $ratingB = $b['rating'] ?? 0; // Default to 0 if null
+
+                // Compare ratings, higher rating first
+                if ($ratingA == $ratingB) {
+                    return 0; // If ratings are equal, return 0
+                }
+                
+                return ($ratingB > $ratingA) ? 1 : -1; // Descending order
+            }
+            
+            // Tutors who match the degree come first (return negative value for $a)
+            return ($a['matchesUserDegree'] === true) ? -1 : 1;
+        });
 
         $allsessions = TutorSession::all();
 
@@ -144,17 +176,6 @@ class StudentController extends Controller
             return $dateComparison;
         });
 
-        // get students current modules
-        $userid = auth()->user()->id;
-        $studentprofile = Profile::where('user_id', $userid)->first();
-        $studentModules = Module::where('semester_id', $studentprofile->semester_id)
-                                ->where('degree_program_id', $studentprofile->degree_id)
-                                ->where('level_id', $studentprofile->level_id)
-                                ->get();
-
-        // Extract module names based on the student's profile
-        $studentModuleNames = $studentModules->pluck('module_name'); // Get module names instead of IDs
-
         // Fetch all peer groups for the student's modules by matching module names
         $peerGroups = PeerGroup::with(['leader', 'module'])
                                 ->whereHas('module', function ($query) use ($studentModuleNames) {
@@ -195,9 +216,7 @@ class StudentController extends Controller
 
 
         return Inertia::render('Dashboard',[
-            'semstertutors' => $tutordetails,
-            'allDegree' => $allDegree,
-            'tutors' => $degreetutordetails,
+            'tutors' => $formattedTutors,
             'sessions' => $sessionDetails,
             'sModules' => $studentModules,
             'peerGroups'=>$sortedPeerGroups

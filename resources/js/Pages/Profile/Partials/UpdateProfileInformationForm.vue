@@ -191,7 +191,7 @@ const removeProfilePic = async () => {
                     <div>
                         <InputLabel for="school" value="School of Study"/>
                         <DynamicDropdown
-                            label="School of Study"
+                            label="Select School of Study"
                             id="school"
                             :options="school"
                             v-model="form.school_id"
@@ -203,7 +203,7 @@ const removeProfilePic = async () => {
                     <div>
                         <InputLabel for="degree" value="Degree Program"/>
                         <DynamicDropdown
-                            label="Degree Program"
+                            label="Select Degree Program"
                             id="degree"
                             :options="filteredLevels"
                             v-model="form.degree_id"
@@ -214,7 +214,7 @@ const removeProfilePic = async () => {
                     <div>
                         <InputLabel for="level" value="Level"/>
                         <DynamicDropdown
-                            label="Level"
+                            label="Select Level"
                             id="level"
                             :options="level"
                             v-model="form.level_id"
@@ -225,7 +225,7 @@ const removeProfilePic = async () => {
                     <div>
                         <InputLabel for="semester" value="Semester"/>
                         <DynamicDropdown
-                            label="Semester"
+                            label="Select Semester"
                             id="semester"
                             :options="semester"
                             v-model="form.semester_id"

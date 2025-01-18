@@ -13,15 +13,13 @@ import PeerGroupCard from "@/Components/PeerGroupCard.vue";
 
 // Props
 const props = defineProps({
-    semstertutors: Array,
-    allDegree: Array,
     tutors: Array,
     sessions: Array,
     sModules: Array,
     peerGroups: Array,
 });
 
-console.log(JSON.stringify(props.peerGroups, null, 2));
+console.log(JSON.stringify(props.tutors, null, 2));
 
 const openModal = ref(null);
 
@@ -33,21 +31,34 @@ const openModalWithData = () => {
     openModal.value = true;
 };
 
-// Reactive states
 const activeContent = ref("solo"); // Tracks active tab
+
 const searchQuery = ref(""); // Tracks search input
 const selectedModule = ref(""); // Tracks selected module
 const moduleError = ref("");    // Tracks dropdown error
+const selectedSorting = ref(1); // Tracks selected module
+const sortError = ref("");    // Tracks dropdown error
 
 // Filter tutors based on module selection
 const filteredTutors = ref([]); // Tracks filtered tutors dynamically
-console.log(filteredTutors);
+// Initialize tutors with all available tutors
+filteredTutors.value = props.tutors;
 
-// Utility function to get degree name
-function getDegreeName(schoolId) {
-    const school = props.allDegree.find((deg) => deg.id === schoolId);
-    return school ? school.degree_name : "Not Found";
-}
+// Sorting Options
+const sortOptions = [
+  { id: 1, name: "Sort by Relevance" },
+  { id: 2, name: "Sort by Rating" },
+  { id: 3, name: "Sort by Cancellation %" }
+];
+
+// Peer Group
+const searchQueryPeer = ref("");
+const selectedModulePeer = ref("");
+
+// Filter peer groups based on module selection
+const filteredPeerGroups = ref([]);
+// Initialize peer groups with all available peer groups
+filteredPeerGroups.value = props.peerGroups;
 
 // Redirect to Join Meeting with the meeting_url from a specific booking
 const joinMeeting = (booking) => {
@@ -86,6 +97,7 @@ const getDaySuffix = (day) => {
     return 'th';
 };
 
+
 // Watch selected module for filtering
 watch(selectedModule, (newValue) => {
     const selectedModuleDetails = props.sModules.find((mod) => mod.id === newValue);
@@ -96,41 +108,70 @@ watch(selectedModule, (newValue) => {
     }
 
     // Filter tutors based on selected module
-    filteredTutors.value = [
-    ...props.semstertutors.filter((tutor) =>
-        tutor.modules.some((module) => module.module_name === selectedModuleDetails.module_name)
-    ),
-    ...props.tutors.filter((tutor) =>
-        tutor.modules.some((module) => module.module_name === selectedModuleDetails.module_name)
-    ),
-];
+    filteredTutors.value = props.tutors.filter((tutor) =>
+        Object.values(tutor.modules).includes(selectedModuleDetails.module_name)
+    );
 });
+
+watch(selectedSorting, (newValue) => {
+    const selectedRating = sortOptions.find((sort) => sort.id === newValue);
+    
+    if (selectedRating && selectedRating.id === 1) {
+        // Clear the filteredTutors if newValue is 1
+        filteredTutors.value.sort((a, b) => {
+            // First, check if degree matches
+            if (a.matchesUserDegree === b.matchesUserDegree) {
+                // If both match the degree, sort by rating (higher rating first)
+                const ratingA = a.rating || 0; // Default to 0 if rating is null
+                const ratingB = b.rating || 0; // Default to 0 if rating is null
+
+                // Compare ratings, higher rating first
+                if (ratingA === ratingB) {
+                    return 0; // If ratings are equal, return 0
+                }
+
+                return ratingB > ratingA ? 1 : -1; // Descending order
+            }
+
+            // Tutors who match the degree come first (return negative value for a)
+            return a.matchesUserDegree ? -1 : 1;
+        });
+        return;
+    }
+
+    if (selectedRating && selectedRating.id === 2) {
+        // Create a sorted copy of the tutors list to avoid mutating the original list
+        filteredTutors.value.sort((a, b) => {
+            const ratingA = a.rating || 0; // Default to 0 if rating is null
+            const ratingB = b.rating || 0; // Default to 0 if rating is null
+            return ratingB - ratingA; // Sort in descending order
+        });
+    }
+
+    if (selectedRating && selectedRating.id === 3) {
+        // Create a sorted copy of the tutors list to avoid mutating the original list
+        filteredTutors.value.sort((a, b) => {
+            const cancelA = a.cancellation || 0; // Default to 0 if rating is null
+            const cancelB = b.cancellation || 0; // Default to 0 if rating is null
+            return cancelB - cancelA; // Sort in descending order
+        });
+    }
+});
+
 
 // Computed property to dynamically update displayed tutors
 const displayedTutors = computed(() => {
-    let tutorsToDisplay = filteredTutors.value.length > 0 ? filteredTutors.value : [...props.semstertutors, ...props.tutors ];
+    let tutorsToDisplay = filteredTutors.value.length > 0 ? filteredTutors.value : props.tutors;
 
     // Apply search filter if searchQuery exists
     if (searchQuery.value.trim() !== "") {
         tutorsToDisplay = tutorsToDisplay.filter((tutor) =>
-            tutor.user.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+            tutor.name.toLowerCase().includes(searchQuery.value.toLowerCase())
         );
     }
     
-    console.log(filteredTutors);
-    // console.log(JSON.stringify(tutorsToDisplay, null, 2));
     return tutorsToDisplay;
 });
-
-// Initialize tutors with all available tutors
-filteredTutors.value = [...props.semstertutors, ...props.tutors ];
-
-// Peer Group
-const searchQueryPeer = ref("");
-const selectedModulePeer = ref("");
-
-// Filter peer groups based on module selection
-const filteredPeerGroups = ref([]);
 
 // Watch selected module for filtering
 watch(selectedModulePeer, (newValue) => {
@@ -146,6 +187,7 @@ watch(selectedModulePeer, (newValue) => {
         group.module === selectedModuleDetails.module_name
     );
 });
+
 // Computed property to dynamically update displayed peer groups
 const displayedPeerGroups = computed(() => {
     let peerGroupsToDisplay = filteredPeerGroups.value.length > 0 ? filteredPeerGroups.value : props.peerGroups;
@@ -159,9 +201,6 @@ const displayedPeerGroups = computed(() => {
 
     return peerGroupsToDisplay;
 });
-
-// Initialize peer groups with all available peer groups
-filteredPeerGroups.value = props.peerGroups;
 </script>
 
 
@@ -210,44 +249,43 @@ filteredPeerGroups.value = props.peerGroups;
                         <div class="flex flex-col gap-2">
                             <!-- Title -->
                             <h1 class="text-2xl font-bold text-slate-900">Tutors</h1>
-                            <DynamicDropdown
-                                label="Module"
-                                v-model="selectedModule"
-                                :options="sModules"
-                                :error="moduleError"
-                            />
                             <TextInput
                                 v-model="searchQuery"
                                 placeholder="Search Tutor by Name"
                             />
+                            <div class="flex gap-3 flex-col xl:flex-row">
+                                <DynamicDropdown
+                                    label="Search by Module"
+                                    v-model="selectedModule"
+                                    :options="sModules"
+                                    :error="moduleError"
+                                    class="flex flex-1"
+                                />
+                                <DynamicDropdown
+                                    label=""
+                                    v-model="selectedSorting"
+                                    :options="sortOptions"
+                                    :error="sortError"
+                                    class="flex flex-1"
+                                />
+                            </div>
                         </div>
                         <div class="flex">
                             <span class="w-full h-0.5 bg-accent"></span>
                         </div>
 
                         <!-- Scrollable Tutor Listings -->
-                        <!-- Show Semester Tutors only when no search or filter is applied -->
-                        <div v-if="searchQuery === '' && selectedModule === ''" class="flex flex-col flex-1 gap-3.5 max-h-full overflow-y-auto">
-                            <div v-for="tutor in semstertutors" :key="tutor.id">
-                                <TutorCard
-                                    v-if="tutor.tutor"
-                                    :tutorname="tutor.user.name"
-                                    :cbnumber="tutor.profile.cb_number"
-                                    :profile_pic="tutor.profile.profile_pic"
-                                    :tutor_id="tutor.tutor"
-                                    :school="getDegreeName(tutor.profile.degree_id)"
-                                />
-                            </div>
+                        <!-- Show tutors when no search or filter is applied -->
+                        <div v-if="searchQuery === '' && selectedModule === ''" class="flex flex-col flex-1 gap-3.5 max-h-full overflow-y-auto">   
                             <div v-for="tutor in tutors" :key="tutor.id">
                                 <TutorCard
-                                    v-if="tutor.tutor"
-                                    :tutorname="tutor.user.name"
-                                    :cbnumber="tutor.profile.cb_number"
-                                    :profile_pic="tutor.profile.profile_pic"
-                                    :tutor_id="tutor.tutor.id"
-                                    :school="getDegreeName(tutor.profile.degree_id)"
+                                    :tutorname="tutor.name"
+                                    :profile_pic="tutor.profilePic"
+                                    :tutor_id="tutor.id"
+                                    :degree="tutor.degree"
+                                    :rating="tutor.rating"
                                 />
-                            </div>    
+                            </div>
                         </div>
 
                         <!-- Filtered Tutors -->
@@ -255,11 +293,11 @@ filteredPeerGroups.value = props.peerGroups;
                             <TutorCard
                                 v-for="tutor in displayedTutors"
                                 :key="tutor.id"
-                                :tutorname="tutor.user.name"
-                                :cbnumber="tutor.profile.cb_number"
-                                :profile_pic="tutor.profile.profile_pic"
+                                :tutorname="tutor.name"
+                                :profile_pic="tutor.profilePic"
                                 :tutor_id="tutor.id"
-                                :school="getDegreeName(tutor.profile.degree_id)"
+                                :degree="tutor.degree"
+                                :rating="tutor.rating"
                             />
                         </div>
                         <p v-else class="text-gray-600 text-center">No tutors available.</p>

@@ -1,14 +1,14 @@
 <script setup>
-import { CheckBadgeIcon } from '@heroicons/vue/24/solid';
+import { CheckBadgeIcon, StarIcon } from '@heroicons/vue/24/solid';
 import PrimaryButton from './PrimaryButton.vue';
 import { router } from '@inertiajs/vue3';
 
 const props = defineProps({
     tutorname: String,
-    cbnumber: String,
+    rating: String,
     profile_pic: String,
     tutor_id: Number,
-    school: String,
+    degree: String,
 });
 
 const viewProfile = (tutorid) => {
@@ -30,8 +30,9 @@ const viewProfile = (tutorid) => {
                 <h1 class="text-slate-900 font-semibold">{{ tutorname }}</h1>
                 <CheckBadgeIcon class="ml-1 w-5 h-5 text-accent" />
             </div>
-            <h2 class="text-slate-500 font-light">{{ cbnumber }}</h2>
-            <h2 class="text-slate-500 font-light">{{ school }}</h2>
+            <h2 class="text-slate-500 font-light">{{ degree }}</h2>
+            <h2 v-if="rating !== null" class="text-slate-500 font-light flex items-center"><StarIcon class="w-4 h-4 text-accent mr-1"/>({{ rating }})</h2>
+            <h2 v-else class="text-slate-500 font-light flex items-center"><StarIcon class="w-4 h-4 text-accent mr-1"/>(-)</h2>
         </div>
         <div>
             <PrimaryButton 

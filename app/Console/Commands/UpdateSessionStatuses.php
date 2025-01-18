@@ -40,7 +40,7 @@ class UpdateSessionStatuses extends Command
                             ->where('start_time', '<=', $now->toTimeString());
                 });
         })
-        ->update(['status' => 'completed', 'meeting_url' => null]);
+        ->update(['status' => 'unbooked', 'meeting_url' => null]);
 
         // Update "booked" sessions
         TutorSession::where('status', 'booked')

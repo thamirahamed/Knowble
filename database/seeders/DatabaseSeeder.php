@@ -910,7 +910,35 @@ class DatabaseSeeder extends Seeder
                 'session_date' => '2024-12-17',  // Example date, modify as needed
                 'start_time' => '14:00:00',
                 'end_time' => '16:00:00',
-                'status' => 'completed',  // You can change the status as needed
+                'status' => 'cancelled',  // You can change the status as needed
+                'user_id' => 3,  // Set user ID or peer_group_id
+                'peer_group_id' => null,  // Set this if applicable
+                'module_id' => 46,  // Set module ID
+                'notes' => 'Another test session.',
+                'meeting_url' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'tutor_id' => 3,  // Set tutor ID
+                'session_date' => '2024-12-17',  // Example date, modify as needed
+                'start_time' => '14:00:00',
+                'end_time' => '16:00:00',
+                'status' => 'cancelled',  // You can change the status as needed
+                'user_id' => 4,  // Set user ID or peer_group_id
+                'peer_group_id' => null,  // Set this if applicable
+                'module_id' => 48,  // Set module ID
+                'notes' => 'Another test session.',
+                'meeting_url' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'tutor_id' => 3,  // Set tutor ID
+                'session_date' => '2024-12-17',  // Example date, modify as needed
+                'start_time' => '14:00:00',
+                'end_time' => '16:00:00',
+                'status' => 'cancelled',  // You can change the status as needed
                 'user_id' => 3,  // Set user ID or peer_group_id
                 'peer_group_id' => null,  // Set this if applicable
                 'module_id' => 80,  // Set module ID
@@ -977,7 +1005,7 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'tutor_id' => 5,  // Set tutor ID
-                'session_date' => '2025-01-10',  // Example date, modify as needed
+                'session_date' => '2025-01-30',  // Example date, modify as needed
                 'start_time' => '15:00:00',
                 'end_time' => '18:00:00',
                 'status' => 'pending',  // You can change the status as needed
@@ -991,7 +1019,7 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'tutor_id' => 5,  // Set tutor ID
-                'session_date' => '2025-01-11',  // Example date, modify as needed
+                'session_date' => '2025-01-31',  // Example date, modify as needed
                 'start_time' => '15:00:00',
                 'end_time' => '18:00:00',
                 'status' => 'pending',  // You can change the status as needed
@@ -1005,7 +1033,7 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'tutor_id' => 6,  // Set tutor ID
-                'session_date' => '2025-01-10',  // Example date, modify as needed
+                'session_date' => '2025-01-30',  // Example date, modify as needed
                 'start_time' => '15:00:00',
                 'end_time' => '18:00:00',
                 'status' => 'pending',  // You can change the status as needed
@@ -1019,7 +1047,7 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'tutor_id' => 6,  // Set tutor ID
-                'session_date' => '2025-01-11',  // Example date, modify as needed
+                'session_date' => '2025-01-31',  // Example date, modify as needed
                 'start_time' => '15:00:00',
                 'end_time' => '18:00:00',
                 'status' => 'pending',  // You can change the status as needed
@@ -1033,7 +1061,7 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'tutor_id' => 4,  // Set tutor ID
-                'session_date' => '2025-01-10',  // Example date, modify as needed
+                'session_date' => '2025-01-30',  // Example date, modify as needed
                 'start_time' => '15:00:00',
                 'end_time' => '18:00:00',
                 'status' => 'pending',  // You can change the status as needed
@@ -1047,7 +1075,7 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'tutor_id' => 4,  // Set tutor ID
-                'session_date' => '2025-01-11',  // Example date, modify as needed
+                'session_date' => '2025-01-31',  // Example date, modify as needed
                 'start_time' => '15:00:00',
                 'end_time' => '18:00:00',
                 'status' => 'pending',  // You can change the status as needed
@@ -1061,7 +1089,35 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'tutor_id' => 3,  // Set tutor ID
-                'session_date' => '2025-01-10',  // Example date, modify as needed
+                'session_date' => '2025-01-30',  // Example date, modify as needed
+                'start_time' => '15:00:00',
+                'end_time' => '18:00:00',
+                'status' => 'pending',  // You can change the status as needed
+                'user_id' => null,  // Set user ID or peer_group_id
+                'peer_group_id' => null,  // Set this if applicable
+                'module_id' => null,  // Set module ID
+                'notes' => null,
+                'meeting_url' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'tutor_id' => 3,  // Set tutor ID
+                'session_date' => '2025-01-30',  // Example date, modify as needed
+                'start_time' => '15:00:00',
+                'end_time' => '18:00:00',
+                'status' => 'completed',  // You can change the status as needed
+                'user_id' => 2,  // Set user ID or peer_group_id
+                'peer_group_id' => null,  // Set this if applicable
+                'module_id' => 46,  // Set module ID
+                'notes' => null,
+                'meeting_url' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'tutor_id' => 2,  // Set tutor ID
+                'session_date' => '2025-01-30',  // Example date, modify as needed
                 'start_time' => '15:00:00',
                 'end_time' => '18:00:00',
                 'status' => 'pending',  // You can change the status as needed
@@ -1075,21 +1131,7 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'tutor_id' => 2,  // Set tutor ID
-                'session_date' => '2025-01-10',  // Example date, modify as needed
-                'start_time' => '15:00:00',
-                'end_time' => '18:00:00',
-                'status' => 'pending',  // You can change the status as needed
-                'user_id' => null,  // Set user ID or peer_group_id
-                'peer_group_id' => null,  // Set this if applicable
-                'module_id' => null,  // Set module ID
-                'notes' => null,
-                'meeting_url' => null,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'tutor_id' => 2,  // Set tutor ID
-                'session_date' => '2025-01-11',  // Example date, modify as needed
+                'session_date' => '2025-01-31',  // Example date, modify as needed
                 'start_time' => '15:00:00',
                 'end_time' => '18:00:00',
                 'status' => 'pending',  // You can change the status as needed
@@ -1103,7 +1145,7 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'tutor_id' => 1,  // Set tutor ID
-                'session_date' => '2025-01-10',  // Example date, modify as needed
+                'session_date' => '2025-01-30',  // Example date, modify as needed
                 'start_time' => '15:00:00',
                 'end_time' => '18:00:00',
                 'status' => 'pending',  // You can change the status as needed
@@ -1117,7 +1159,7 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'tutor_id' => 1,  // Set tutor ID
-                'session_date' => '2025-01-11',  // Example date, modify as needed
+                'session_date' => '2025-01-31',  // Example date, modify as needed
                 'start_time' => '15:00:00',
                 'end_time' => '18:00:00',
                 'status' => 'pending',  // You can change the status as needed
@@ -1131,7 +1173,7 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'tutor_id' => 5,  // Set tutor ID
-                'session_date' => '2025-01-12',  // Example date, modify as needed
+                'session_date' => '2025-02-01',  // Example date, modify as needed
                 'start_time' => '15:00:00',
                 'end_time' => '18:00:00',
                 'status' => 'pending',  // You can change the status as needed
@@ -1172,6 +1214,14 @@ class DatabaseSeeder extends Seeder
                 'tutor_id' => 5,  // Set the tutor ID
                 'rating' => 3,  // Rating out of 5
                 'feedback' => 'Good session, but the tutor could improve on the pacing.',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'user_id' => 3,  // Set the user ID
+                'tutor_id' => 3,  // Set the tutor ID
+                'rating' => 4,  // Rating out of 5
+                'feedback' => 'Good session, Very helpful.',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],

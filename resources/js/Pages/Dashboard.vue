@@ -17,9 +17,11 @@ const props = defineProps({
     sessions: Array,
     sModules: Array,
     peerGroups: Array,
+    peerGroupsAsMember: Array,
 });
 
-console.log(JSON.stringify(props.tutors, null, 2));
+console.log(JSON.stringify(props.peerGroups, null, 2));
+console.log(JSON.stringify(props.peerGroupsAsMember, null, 2));
 
 const openModal = ref(null);
 
@@ -50,15 +52,6 @@ const sortOptions = [
   { id: 2, name: "Sort by Rating" },
   { id: 3, name: "Sort by Cancellation %" }
 ];
-
-// Peer Group
-const searchQueryPeer = ref("");
-const selectedModulePeer = ref("");
-
-// Filter peer groups based on module selection
-const filteredPeerGroups = ref([]);
-// Initialize peer groups with all available peer groups
-filteredPeerGroups.value = props.peerGroups;
 
 // Redirect to Join Meeting with the meeting_url from a specific booking
 const joinMeeting = (booking) => {
@@ -171,35 +164,6 @@ const displayedTutors = computed(() => {
     }
     
     return tutorsToDisplay;
-});
-
-// Watch selected module for filtering
-watch(selectedModulePeer, (newValue) => {
-    const selectedModuleDetails = props.sModules.find((mod) => mod.id === newValue);
-
-    if (!selectedModuleDetails) {
-        filteredPeerGroups.value = []; // Clear filters if no module selected
-        return;
-    }
-
-    // Filter peer groups based on selected module
-    filteredPeerGroups.value = props.peerGroups.filter((group) =>
-        group.module === selectedModuleDetails.module_name
-    );
-});
-
-// Computed property to dynamically update displayed peer groups
-const displayedPeerGroups = computed(() => {
-    let peerGroupsToDisplay = filteredPeerGroups.value.length > 0 ? filteredPeerGroups.value : props.peerGroups;
-
-    // Apply search filter if searchQuery exists
-    if (searchQueryPeer.value.trim() !== "") {
-        peerGroupsToDisplay = peerGroupsToDisplay.filter((group) =>
-            group.name.toLowerCase().includes(searchQueryPeer.value.toLowerCase())
-        );
-    }
-
-    return peerGroupsToDisplay;
 });
 </script>
 
@@ -369,20 +333,6 @@ const displayedPeerGroups = computed(() => {
                                 Create Peer Group
                             </PrimaryButton>
                         </div>
-                        <DynamicDropdown
-                            label="Module"
-                            id="search-module-dropdown"
-                            :options="sModules"
-                            v-model="selectedModulePeer"
-                            :error="moduleError"
-                        />
-                        <TextInput
-                            id="searchTutor"
-                            type="text"
-                            class="mt-1 block w-full"
-                            placeholder="Search Peer Groups"
-                            v-model="searchQueryPeer"
-                        />
                         <CreatePeerGroup
                             :openModal="openModal"
                             :closeModal="closeModal"
@@ -394,7 +344,12 @@ const displayedPeerGroups = computed(() => {
                     </div>
                     <!-- filter peer groups -->
                     <div class="flex flex-col flex-1 max-h-full overflow-y-auto gap-3.5">
-                        <div v-if="displayedPeerGroups.length > 0" class="flex flex-col flex-1">
+                        <PeerGroupCard
+                            v-for="group in peerGroups"
+                            :key="group.peerGroupId"
+                            :peerGroup="group"
+                        />
+                        <!-- <div v-if="displayedPeerGroups.length > 0" class="flex flex-col flex-1">
                             <div v-for="group in displayedPeerGroups" :key="group.id">
                                 <div v-if="group.isUserLeader === false && group.isUserMember === false  && group.currentMembers < group.totalMembers">
                                     <PeerGroupCard
@@ -402,32 +357,18 @@ const displayedPeerGroups = computed(() => {
                                     />
                                 </div>
                             </div>
-                        </div>
-                        <div v-else class="text-gray-600 mx-auto mt-6">
+                        </div> -->
+                        <!-- <div v-else class="text-gray-600 mx-auto mt-6">
                             <p class="">No peer groups found for your modules.</p>
-                        </div>
+                        </div> -->
                     </div>
-
-<!--                    <div class="flex flex-col overflow-y-auto gap-2" v-if="peerGroups.length > 0">-->
-<!--                        <div v-for="group in peerGroups" :key="group.id" class="flex flex-col w-full">-->
-<!--                            <div v-if="group.isUserLeader === false && group.isUserMember === false && group.currentMembers < group.totalMembers">-->
-<!--                                <PeerGroupCard-->
-<!--                                    :peerGroup="group"-->
-<!--                                />-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                    </div>-->
-
-<!--                    <div v-else class="text-gray-600 mx-auto mt-6">-->
-<!--                        <p class="">No peer groups found for your modules.</p>-->
-<!--                    </div>-->
                 </div>
                 <div class="flex flex-col flex-1 max-w-xl bg-white rounded-md shadow-sm py-4 px-6 gap-5 min-h-60 h-fit overflow-y-auto max-h-full" >
                     <div>
                         <h1 class="text-xl font-bold text-slate-900">Joined Groups</h1>
                     </div>
                     <div class="flex flex-col flex-1 overflow-y-auto gap-2">
-                        <div
+                        <!-- <div
                             v-for="group in peerGroups"
                             :key="group.id"
                         >
@@ -436,7 +377,7 @@ const displayedPeerGroups = computed(() => {
                                     :peerGroup="group"
                                 />
                             </div>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
             </div>

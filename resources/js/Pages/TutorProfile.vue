@@ -38,9 +38,7 @@ const props = defineProps({
     }
 });
 
-console.log(JSON.stringify(props.hasCompletedSession, null, 2));
-console.log(JSON.stringify(props.hasCompletedGroupSession, null, 2));
-console.log(JSON.stringify(props.userFeedback, null, 2));
+console.log(JSON.stringify(props.peerGroups, null, 2));
 
 const openModal = ref(null);
 
@@ -238,7 +236,7 @@ const getDaySuffix = (day) => {
                             </div>
                         </PrimaryButton>
                         <PrimaryButton
-                            v-if="sessions.length > 0 && tutormodules.length > 0 && isLeader"
+                            v-if="sessions.length > 0 && tutormodules.length > 0 && isLeader && peerGroups.length > 0"
                             id="bookGroupSessionBtn"
                             class="mt-4 w-full"
                             @click="openModalWithData1(tutor.id)"
@@ -303,6 +301,7 @@ const getDaySuffix = (day) => {
                             </div>
                         </div>
                     </div>
+
                     <!-- Resource Shared Section -->
                     <div class="flex flex-col flex-1 bg-white rounded-md mt-8 shadow h-fit py-4 px-6">
                         <h2 class="text-2xl font-bold">Study Resources</h2>

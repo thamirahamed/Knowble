@@ -17,6 +17,7 @@ class PeerGroup extends Model
         'name',
         'leader',
         'module_id',
+        'status',
         'total_members',
     ];
 

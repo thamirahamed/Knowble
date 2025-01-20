@@ -106,7 +106,8 @@ Route::middleware(['auth' ,'studentportal'])->group(function () {
         Route::get('/{id}',[PeerGroupController::class, 'index'])->name('peergroup');
         // Create, Join, Leave, Delete Group
         Route::post('/create', [PeerGroupController::class, 'createGroup'])->name('peergroup.create');
-        Route::post('/join', [PeerGroupController::class, 'joinGroup'])->name('peergroup.join');
+        Route::post('/add', [PeerGroupController::class, 'addMember'])->name('peergroup.add');
+        Route::post('/remove', [PeerGroupController::class, 'removeMember'])->name('peergroup.remove');
         Route::post('/leave', [PeerGroupController::class, 'leaveGroup'])->name('peergroup.leave');
         Route::post('/delete', [PeerGroupController::class, 'deleteGroup'])->name('peergroup.delete');
         Route::post('/book', [PeerGroupController::class, 'bookSession'])->name('peergroup.book.session');

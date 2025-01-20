@@ -1,34 +1,56 @@
 <script setup>
+import AddMembersModal from '@/Components/AddMembersModal.vue';
 import DangerButton from '@/Components/DangerButton.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { TrashIcon, UserPlusIcon, ArrowLeftEndOnRectangleIcon, UserGroupIcon, CheckBadgeIcon } from '@heroicons/vue/24/solid';
-import { router } from '@inertiajs/vue3';
+import { TrashIcon, UserPlusIcon, ArrowLeftEndOnRectangleIcon, UserGroupIcon, CheckBadgeIcon, UserMinusIcon } from '@heroicons/vue/24/solid';
+import { router, Head } from '@inertiajs/vue3';
+import { defineProps, ref } from "vue";
 
 const props = defineProps({
     peerGroup: Array,
     peerGroupMembers: Array,
     groupSessions: Array,
     pastGroupSessions: Array,
+    peers: Array,
 });
 
-const joinGroup = () => {
-    // Prepare the data to be sent
-    const payload = {
-        peer_group_id: props.peerGroup.id
-    };
+console.log(JSON.stringify(props.peerGroupMembers, null, 2));
 
-    // Submit the form using router.post
-    router.post('/peer-group/join', payload, {
-        onSuccess: () => {
-            alert('Joined peer group successfully!');
-        },
-        onError: (errors) => {
-            console.log(errors); // Log errors to the console for debugging
-            // Check if the error response contains specific error messages
-            alert('Failed to join peer group: ' + Object.values(errors).join(', '));
-        },
-    });
+const openModal = ref(null);
+
+const closeModal = () => {
+    openModal.value = null;
+};
+
+const openModalWithData = () => {
+    openModal.value = true;
+};
+
+const isPeerGroupFull = () => {
+    return props.peerGroup.currentMembers >= props.peerGroup.totalMembers;
+};
+
+const removePeer = (peerId) => {
+    if (confirm("Are you sure you want to remove this member?")) {
+        // Prepare the data to be sent
+        const payload = {
+            peer_group_id: props.peerGroup.id,
+            peer_id: peerId
+        };
+    
+        // Submit the form using router.post
+        router.post('/peer-group/remove', payload, {
+            onSuccess: () => {
+                alert('Peer member removed successfully!');
+            },
+            onError: (errors) => {
+                console.log(errors); // Log errors to the console for debugging
+                // Check if the error response contains specific error messages
+                alert('Failed to remove peer: ' + Object.values(errors).join(', '));
+            },
+        });
+    }
 };
 
 const leaveGroup = () => {
@@ -114,6 +136,7 @@ const getDaySuffix = (day) => {
 </script>
 
 <template>
+<Head :title='peerGroup.name' />
 <AuthenticatedLayout>
     <div class="flex flex-col items-center w-full">
         <div class="flex flex-col max-w-[85rem] w-full mt-8 ">
@@ -124,18 +147,18 @@ const getDaySuffix = (day) => {
                     <h2 class="text-xl text-slate-500">{{ peerGroup.module }}</h2>
                     <h2 class="text-xl text-slate-500 inline-flex items-center"><UserGroupIcon class="w-6 h-6 mr-2" /> {{ peerGroup.currentMembers }} / {{ peerGroup.totalMembers }}</h2>
                 </div>
-                <div>
+                <div class="flex gap-2">
                     <PrimaryButton
                         :icon="true" 
                         iconPlacement="left"
-                        @click="joinGroup"
-                        id="joinGroupBtn"
-                        v-if="peerGroup.isUserLeader === 'No' && peerGroup.isUserMember === 'No' && peerGroup.currentMembers < peerGroup.totalMembers"
+                        @click="openModalWithData"
+                        id="addMembersBtn"
+                        v-if="peerGroup.isUserLeader === 'Yes' && !isPeerGroupFull() "
                     >
                         <template #icon>
                             <UserPlusIcon class="text-white" />
                         </template>
-                        Join Group
+                        Add Members
                     </PrimaryButton>
                     <DangerButton
                         :icon="true" 
@@ -162,6 +185,13 @@ const getDaySuffix = (day) => {
                         Leave Group
                     </DangerButton>
                 </div>
+                <AddMembersModal
+                    :openModal="openModal"
+                    :closeModal="closeModal"
+                    :peers="peers"
+                    :groupId="peerGroup.id"
+                    :isGroupFull="isPeerGroupFull()"
+                />
             </div>
             <span class="w-full h-0.5 bg-accent mb-4"></span>
             <div class="flex gap-8">
@@ -267,6 +297,15 @@ const getDaySuffix = (day) => {
                         <div class="flex flex-1 flex-col text-lg">
                             <h1 class="text-slate-900 font-semibold flex items-center">{{ members.name }}<span v-if="members.isUser === 'Yes'" class="font-normal text-sm ml-2 text-accentdark/95">(You)</span></h1>
                             <h2 class="text-slate-500 font-light">{{ members.degree }}</h2>
+                        </div>
+                        <div v-if="peerGroup.isUserLeader === 'Yes'" class="flex">
+                            <DangerButton 
+                                :id="'removePeerBtn-' + members.id" 
+                                class="!p-2 !rounded-full" 
+                                @click="removePeer(members.id)"
+                            >
+                                <UserMinusIcon class="w-5 h-5 text-white" />
+                            </DangerButton>
                         </div>
                     </div>
                 </div>

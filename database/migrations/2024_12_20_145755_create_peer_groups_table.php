@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->unsignedBigInteger('leader'); // Foreign key to the users table
             $table->unsignedBigInteger('module_id'); // Foreign key to a modules table
+            $table->enum('status', ['opened', 'closed'])->default('opened');
             $table->integer('total_members')->default(2); 
             $table->timestamps();
         

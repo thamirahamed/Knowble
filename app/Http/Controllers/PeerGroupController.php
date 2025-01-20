@@ -35,6 +35,58 @@ class PeerGroupController extends Controller
         if(is_null($peerGroup)){
             return;
         }
+
+        // Extract the module details
+        $pgModule = $peerGroup->module;
+        $school = DegreeProgram::where('id', $pgModule->degree_program_id)->first();
+
+        // Prepare the module details
+        $moduleDetails = [
+            'module_name' => $pgModule->module_name,
+            'school_id' => $school->school_id,
+            'semester_id' => $pgModule->semester_id,
+            'level_id' => $pgModule->level_id
+        ];
+
+        // Fetch all users from the profiles table where school_id, level_id, and semester_id match
+        $userProfiles = Profile::where('school_id', $moduleDetails['school_id'])
+                                    ->where('level_id', $moduleDetails['level_id'])
+                                    ->where('semester_id', $moduleDetails['semester_id'])
+                                    ->where('user_id', '!=', $userid)
+                                    ->get();
+
+        // Check if there are any profiles
+        if (!($userProfiles->isEmpty())) {
+            // Fetch all profiles where the user matches the peer group's school, semester, and level
+            $peers = $userProfiles->map(function ($profile) use ($pgModule, $id) {
+                // Fetch the modules the user is enrolled in based on their profile details
+                $modules = Module::where('semester_id', $profile->semester_id)
+                                ->where('degree_program_id', $profile->degree_id)
+                                ->where('level_id', $profile->level_id)
+                                ->get();
+                
+                // Filter the modules that match the peer group module by name
+                $commonModules = $modules->filter(function ($module) use ($pgModule) {
+                    return $module->module_name === $pgModule->module_name;
+                });
+    
+                // Only return user if they have common modules with the peer group
+                if ($commonModules->isNotEmpty()) {
+                    // Check if the user is already part of the peer group
+                    $isAlreadyMember = PeerGroupMember::where('peer_group_id', $id)
+                                                    ->where('user_id', $profile->user_id)
+                                                    ->exists();
+                    return [
+                        'user_id' => $profile->user_id,
+                        'name' => User::find($profile->user_id)->name,  // Get the user name
+                        'profilePic' => $profile->profile_pic,
+                        'degreeName' => DegreeProgram::find($profile->degree_id)->degree_name,
+                        'isMember' => $isAlreadyMember ? 'True' : 'False'
+                    ];
+                }
+            });
+        }
+
         $leader = User::where('id', $peerGroup->leader)->first();
         $leaderProfile = Profile::where('user_id', $leader->id)->first();
         $leaderDegree = DegreeProgram::where('id', $leaderProfile->degree_id)->first();
@@ -77,6 +129,7 @@ class PeerGroupController extends Controller
             ];
         });
 
+       
         // Get all booked sessions for the specified peer group
         $groupSessions = TutorSession::where('peer_group_id', $id)
                                     ->where('status', 'booked')  // Filter for "booked" status
@@ -164,6 +217,7 @@ class PeerGroupController extends Controller
             'peerGroupMembers'=>$formattedMembers,
             'groupSessions' => $groupSessionDetails,
             'pastGroupSessions' => $pastGroupSessionDetails,
+            'peers' => $peers,
         ]);
     }
 
@@ -198,15 +252,17 @@ class PeerGroupController extends Controller
         return redirect()->route('dashboard');
     }
 
-    // Join a peer group
-    public function joinGroup(Request $request)
+    // Add member to group
+    public function addMember(Request $request)
     {
         $userId = auth()->user()->id;
         $peerGroupId = $request->peer_group_id; // Get the peer group ID from the request
+        $peerId = $request->peer_id;
 
         // Validate the data
         $validated = $request->validate([
             'peer_group_id' => 'required|exists:peer_groups,id', // Check if the group exists
+            'peer_id' => 'required|exists:users,id', // Check if the group exists
         ]);
 
         // Check if the peer group exists and isn't full
@@ -214,11 +270,6 @@ class PeerGroupController extends Controller
 
         if (!$peerGroup) {
             return back()->withErrors(['peer_group' => 'Peer group not found.']);
-        }
-
-        // Check if the user is the leader of the peer group
-        if ($peerGroup->leader == $userId) {
-            return back()->withErrors(['peer_group' => 'You are the leader of this peer group and cannot join as a regular member.']);
         }
 
         // Calculate the current member count (including the leader)
@@ -229,21 +280,56 @@ class PeerGroupController extends Controller
         }
 
         // Check if the user is already a member of the peer group
-        $existingMember = PeerGroupMember::where('user_id', $userId)
+        $existingMember = PeerGroupMember::where('user_id', $peerId)
                                         ->where('peer_group_id', $peerGroupId)
                                         ->exists();
 
         if ($existingMember) {
-            return back()->withErrors(['peer_group' => 'You are already a member of this group.']);
+            return back()->withErrors(['peer_group' => 'This peer is already a member of this group.']);
         }
 
         // Add the user as a member of the peer group
         PeerGroupMember::create([
-            'user_id' => $userId,
+            'user_id' => $peerId,
             'peer_group_id' => $peerGroupId,
         ]);
 
-        return redirect()->route('peergroup', ['id' => $peerGroupId])->with('success', 'Successfully joined the peer group.');
+        return redirect()->route('peergroup', ['id' => $peerGroupId]);
+    }
+
+    // Remove member from group
+    public function removeMember(Request $request)
+    {
+        $userId = auth()->user()->id;
+        $peerGroupId = $request->peer_group_id; // Get the peer group ID from the request
+        $peerId = $request->peer_id;
+
+        // Validate the data
+        $validated = $request->validate([
+            'peer_group_id' => 'required|exists:peer_groups,id', // Check if the group exists
+            'peer_id' => 'required|exists:users,id', // Check if the group exists
+        ]);
+
+        // Check if the peer group exists
+        $peerGroup = PeerGroup::find($peerGroupId);
+
+        if (!$peerGroup) {
+            return back()->withErrors(['peer_group' => 'Peer group not found.']);
+        }
+
+        // Check if the user is a member of the peer group
+        $member = PeerGroupMember::where('user_id', $peerId)
+                                ->where('peer_group_id', $peerGroupId)
+                                ->first();
+
+        if (!$member) {
+            return back()->withErrors(['peer_group' => 'This peer is not a member of this group.']);
+        }
+
+        // Remove the user from the peer group
+        $member->delete();
+
+        return redirect()->route('peergroup', ['id' => $peerGroupId]);
     }
 
     // Leave peer group

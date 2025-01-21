@@ -221,7 +221,7 @@ const getDaySuffix = (day) => {
                                 :icon="true" 
                                 iconPlacement="left"
                                 @click="openModalWithData1"
-                                id="addMembersBtn"
+                                id="bookTutorBtn"
                                 v-if="peerGroup.isUserLeader === 'Yes'"
                             >
                                 <template #icon>

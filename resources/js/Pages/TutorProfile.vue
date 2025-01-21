@@ -444,6 +444,7 @@ const getDaySuffix = (day) => {
                                             <PrimaryButton
                                                 type="submit" 
                                                 class="w-fit text-right"
+                                                id="submitEditedFeedbackBtn"
                                             >
                                                 Submit Feedback
                                             </PrimaryButton>

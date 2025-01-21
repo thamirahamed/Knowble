@@ -1,5 +1,6 @@
 <script setup>
 import AddMembersModal from '@/Components/AddMembersModal.vue';
+import BookTutorModal from '@/Components/BookTutorModal.vue';
 import DangerButton from '@/Components/DangerButton.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
@@ -13,9 +14,9 @@ const props = defineProps({
     groupSessions: Array,
     pastGroupSessions: Array,
     peers: Array,
+    tutors: Array,
+    sModules: Array
 });
-
-console.log(JSON.stringify(props.peerGroupMembers, null, 2));
 
 const openModal = ref(null);
 
@@ -25,6 +26,16 @@ const closeModal = () => {
 
 const openModalWithData = () => {
     openModal.value = true;
+};
+
+const openModal1 = ref(null);
+
+const closeModal1 = () => {
+    openModal1.value = null;
+};
+
+const openModalWithData1 = () => {
+    openModal1.value = true;
 };
 
 const isPeerGroupFull = () => {
@@ -192,13 +203,33 @@ const getDaySuffix = (day) => {
                     :groupId="peerGroup.id"
                     :isGroupFull="isPeerGroupFull()"
                 />
+                <BookTutorModal
+                    :openModal="openModal1"
+                    :closeModal="closeModal1"
+                    :tutors="tutors"
+                    :sModules="sModules"
+                />
             </div>
             <span class="w-full h-0.5 bg-accent mb-4"></span>
             <div class="flex gap-8">
                 <!-- Upcoming Sessions -->
                 <div class="flex flex-col flex-1">
                     <div v-if="peerGroup.isUserLeader === 'Yes' || peerGroup.isUserMember === 'Yes'" class="flex flex-col flex-1 bg-white rounded-md shadow px-6 py-4 mb-4 min-h-72 max-h-[30rem] overflow-y-auto">
-                        <h1 class="text-xl text-slate-900 font-bold mb-4">Upcoming Sessions</h1>
+                        <div class="flex flex-row justify-between">
+                            <h1 class="text-xl text-slate-900 font-bold mb-4">Upcoming Sessions</h1>
+                            <PrimaryButton
+                                :icon="true" 
+                                iconPlacement="left"
+                                @click="openModalWithData1"
+                                id="addMembersBtn"
+                                v-if="peerGroup.isUserLeader === 'Yes'"
+                            >
+                                <template #icon>
+                                    <UserPlusIcon class="text-white" />
+                                </template>
+                                Book Tutor
+                            </PrimaryButton>
+                        </div>
                         <div v-if="groupSessions.length > 0" class="flex flex-col gap-3 overflow-y-auto">
                             <div
                                 v-for="(session, index) in groupSessions"

@@ -7,13 +7,16 @@ use App\Models\PeerGroupMember;
 use App\Models\User;
 use App\Models\Profile;
 use App\Models\DegreeProgram;
+use App\Models\SchoolOfStudy;
 use App\Models\Module;
+use App\Models\FeedbackRating;
 use App\Models\Tutor;
 use App\Models\TutorSession;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\DB;
 
 class PeerGroupController extends Controller
 {
@@ -35,6 +38,111 @@ class PeerGroupController extends Controller
         if(is_null($peerGroup)){
             return;
         }
+
+        $profile = Profile::where('user_id', $userid)->first();
+
+        // Check if profile exists, before loading dashboard
+        if (is_null($profile)) {
+            return redirect()->route('profile.create');
+        }
+
+        // Get student's current degree and school of study
+        $studentDegree = DegreeProgram::where('id', $profile->degree_id)->first();
+        $studentSchool = SchoolOfStudy::where('id', $profile->school_id)->value('id');
+
+        // Get students modules based on profile
+        $studentModules = Module::where('semester_id', $profile->semester_id)
+                                ->where('degree_program_id', $profile->degree_id)
+                                ->where('level_id', $profile->level_id)
+                                ->get();
+
+        // Extract module names based on the student's profile
+        $studentModuleNames = $studentModules->pluck('module_name'); // Get module names instead of IDs
+
+        // Fetch tutors who are approved and whose modules match the student's modules
+        $tutors = Tutor::whereIn('user_id', function ($query) use ($studentSchool) {
+            $query->select('user_id')
+                ->from('profiles')
+                ->where('school_id', $studentSchool);
+        })->where('user_id', '!=', $userid) // Exclude the authenticated user
+        ->where('status', 'approved') // Only fetch approved tutors
+        ->get();
+
+        // Fetch tutor selected modules for these tutors
+        $formattedTutors = $tutors->map(function ($tutor) {
+            $userid = auth()->user()->id;
+            $profile = Profile::where('user_id', $userid)->first();
+            $tutorAcc = User::where('id', $tutor->user_id)->first();
+            $tutorProfile = Profile::where('user_id', $tutor->user_id)->first();
+            $tutorDegree = DegreeProgram::where('id', $tutorProfile->degree_id)->first();
+            $studentModuleNames = Module::where('semester_id', $profile->semester_id)
+                             ->where('degree_program_id', $profile->degree_id)
+                             ->where('level_id', $profile->level_id)
+                             ->pluck('module_name'); // Extract module names
+            
+            // Fetch module names for the current tutor in one query
+            $moduleNames = DB::table('tutor_selected_modules')
+                            ->where('tutor_id', $tutor->id)
+                            ->join('modules', 'modules.id', '=', 'tutor_selected_modules.module_id')
+                            ->pluck('module_name');
+                            
+            // Filter tutors whose selected modules match the student's modules
+            $matchingModules = $moduleNames->intersect($studentModuleNames);
+
+            // Calculate the average rating of the tutor's feedback
+            $averageRating = FeedbackRating::where('tutor_id', $tutor->id)->exists()
+            ? round(FeedbackRating::where('tutor_id', $tutor->id)->avg('rating'), 1)
+            : null;
+
+            $averageCancellation = TutorSession::where('tutor_id', $tutor->id)
+                                                ->whereIn('status', ['completed', 'cancelled']) // Filter only "completed" and "cancelled" statuses
+                                                ->exists()
+                                                ? round(
+                                                    (TutorSession::where('tutor_id', $tutor->id)->where('status', 'cancelled')->count() /
+                                                    TutorSession::where('tutor_id', $tutor->id)->whereIn('status', ['completed', 'cancelled'])->count()) * 100,
+                                                    1
+                                                )
+                                                : null;
+
+            // Only include tutors with matching modules
+            if ($matchingModules->isNotEmpty()) {
+                return [
+                    'id' => $tutor->id,
+                    'name' => $tutorAcc->name,
+                    'profilePic' => $tutorProfile->profile_pic,
+                    'degree' => $tutorDegree->degree_name,
+                    'rating' => $averageRating,
+                    'cancellation' => $averageCancellation,
+                    'modules' => $matchingModules,
+                    'matchesUserDegree' => $tutorDegree->id === $profile->degree_id, // Flag if tutor matches the user's degree
+                ];
+            }
+
+            return null; // No matching modules, so return null (to be filtered out)
+        });
+
+        // Filter out null values (tutors with no matching modules)
+        $formattedTutors = $formattedTutors->filter()->toArray();
+
+        // Sort tutors so that those who match the user's degree come first
+        usort($formattedTutors, function ($a, $b) {
+            // First, check if degree matches
+            if ($a['matchesUserDegree'] === $b['matchesUserDegree']) {
+                // If both match the degree, sort by rating (higher rating first)
+                $ratingA = $a['rating'] ?? 0; // Default to 0 if null
+                $ratingB = $b['rating'] ?? 0; // Default to 0 if null
+
+                // Compare ratings, higher rating first
+                if ($ratingA == $ratingB) {
+                    return 0; // If ratings are equal, return 0
+                }
+                
+                return ($ratingB > $ratingA) ? 1 : -1; // Descending order
+            }
+            
+            // Tutors who match the degree come first (return negative value for $a)
+            return ($a['matchesUserDegree'] === true) ? -1 : 1;
+        });
 
         // Extract the module details
         $pgModule = $peerGroup->module;
@@ -218,6 +326,8 @@ class PeerGroupController extends Controller
             'groupSessions' => $groupSessionDetails,
             'pastGroupSessions' => $pastGroupSessionDetails,
             'peers' => $peers,
+            'tutors' => $formattedTutors,
+            'sModules' => $studentModules,
         ]);
     }
 
@@ -236,6 +346,7 @@ class PeerGroupController extends Controller
         // Check if the user already has a peer group for the selected module
         $existingGroup = PeerGroup::where('leader', $userid)
                         ->where('module_id', $validated['module'])
+                        ->where('status', 'opened')
                         ->exists();
 
         if ($existingGroup) {
@@ -388,11 +499,9 @@ class PeerGroupController extends Controller
             return back()->withErrors(['peer_group' => 'Only the leader of the group can delete it.']);
         }
 
-        // Delete all members of the peer group
-        PeerGroupMember::where('peer_group_id', $peerGroupId)->delete();
-
         // Delete the peer group
-        $peerGroup->delete();
+        $peerGroup->status = 'closed';
+        $peerGroup->save();
 
         return redirect()->route('dashboard');
     }

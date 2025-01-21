@@ -189,13 +189,18 @@ class StudentController extends Controller
         // Format the peer groups data
         $formattedPeerGroups = $peerGroups->map(function ($group) {
             $memberCount = PeerGroupMember::where('peer_group_id', $group->id)->count() + 1;
+            $leaderId = $group->leader; 
+            $leaderProfile = Profile::where('user_id', $leaderId)->first();
+            $leaderDegree = DegreeProgram::where('id', $leaderProfile->degree_id)->first();
 
             return [
                 'peerGroupId' => $group->id,
                 'peerGroupName' => $group->name,
                 'moduleName' => $group->module->module_name ?? 'N/A', // Access module name safely
+                'degree' => $leaderDegree->degree_name,
                 'currentMembers' => $memberCount,
                 'totalMembers' => $group->total_members,
+                'isLeader' => 'true'
             ];
         });
 
@@ -203,13 +208,18 @@ class StudentController extends Controller
         $formattedPeerGroupAsMember = $peerGroupAsMember->map(function ($membership) {
             $peerGroup = $membership->peerGroup; // Access the associated peer group
             $module = $peerGroup->module; // Access the associated module
+            $leaderId = $peerGroup->leader; 
+            $leaderProfile = Profile::where('user_id', $leaderId)->first();
+            $leaderDegree = DegreeProgram::where('id', $leaderProfile->degree_id)->first();
 
             return [
                 'peerGroupId' => $peerGroup->id,
                 'peerGroupName' => $peerGroup->name,
                 'moduleName' => $module->module_name ?? 'N/A', // Safely access module name
+                'degree' => $leaderDegree->degree_name,
                 'currentMembers' => PeerGroupMember::where('peer_group_id', $peerGroup->id)->count() + 1,
                 'totalMembers' => $peerGroup->total_members,
+                'isLeader' => 'false'
             ];
         });
 

@@ -90,7 +90,6 @@ const getDaySuffix = (day) => {
     return 'th';
 };
 
-
 // Watch selected module for filtering
 watch(selectedModule, (newValue) => {
     const selectedModuleDetails = props.sModules.find((mod) => mod.id === newValue);
@@ -144,13 +143,27 @@ watch(selectedSorting, (newValue) => {
     if (selectedRating && selectedRating.id === 3) {
         // Create a sorted copy of the tutors list to avoid mutating the original list
         filteredTutors.value.sort((a, b) => {
-            const cancelA = a.cancellation || 0; // Default to 0 if rating is null
-            const cancelB = b.cancellation || 0; // Default to 0 if rating is null
-            return cancelB - cancelA; // Sort in descending order
+            const cancelA = a.cancellation;
+            const cancelB = b.cancellation;
+
+            // If both values are null, keep their original order
+            if (cancelA === null && cancelB === null) {
+                return 0;
+            }
+
+            // Place null values at the end
+            if (cancelA === null) {
+                return 1;
+            }
+            if (cancelB === null) {
+                return -1;
+            }
+
+            // Sort non-null values in ascending order
+            return cancelA - cancelB;
         });
     }
 });
-
 
 // Computed property to dynamically update displayed tutors
 const displayedTutors = computed(() => {
@@ -320,7 +333,10 @@ const displayedTutors = computed(() => {
                 <div class="flex flex-col flex-1 bg-white rounded-md shadow-sm py-4 px-6 gap-5 " >
                     <div class="flex flex-col gap-2">
                         <div class="inline-flex justify-between items-center">
-                            <h1 class="text-2xl font-bold text-slate-900">Peer Groups</h1>
+                            <div>
+                                <h1 class="text-2xl font-bold text-slate-900">My Peer Groups</h1>
+                                <p class="text-gray-600">List of peer groups under your leadership.</p>
+                            </div>
                             <PrimaryButton
                                 :icon="true"
                                 iconPlacement="left"
@@ -343,41 +359,36 @@ const displayedTutors = computed(() => {
                         <span class="w-full h-0.5 bg-accent"></span>
                     </div>
                     <!-- filter peer groups -->
-                    <div class="flex flex-col flex-1 max-h-full overflow-y-auto gap-3.5">
+                    <div class="flex flex-col flex-1 max-h-full overflow-y-auto gap-2">
                         <PeerGroupCard
+                            v-if="peerGroups.length > 0"
                             v-for="group in peerGroups"
                             :key="group.peerGroupId"
                             :peerGroup="group"
                         />
-                        <!-- <div v-if="displayedPeerGroups.length > 0" class="flex flex-col flex-1">
-                            <div v-for="group in displayedPeerGroups" :key="group.id">
-                                <div v-if="group.isUserLeader === false && group.isUserMember === false  && group.currentMembers < group.totalMembers">
-                                    <PeerGroupCard
-                                        :peerGroup="group"
-                                    />
-                                </div>
-                            </div>
-                        </div> -->
-                        <!-- <div v-else class="text-gray-600 mx-auto mt-6">
-                            <p class="">No peer groups found for your modules.</p>
-                        </div> -->
+                        <div v-else class="text-gray-600 mx-auto mt-6">
+                            <p class="">No peer groups created for you.</p>
+                        </div>
                     </div>
                 </div>
-                <div class="flex flex-col flex-1 max-w-xl bg-white rounded-md shadow-sm py-4 px-6 gap-5 min-h-60 h-fit overflow-y-auto max-h-full" >
+                <div class="flex flex-col flex-1 max-w-2xl bg-white rounded-md shadow-sm py-4 px-6 gap-5" >
                     <div>
-                        <h1 class="text-xl font-bold text-slate-900">Joined Groups</h1>
+                        <h1 class="text-2xl font-bold text-slate-900">Joined Peer Groups</h1>
+                        <p class="text-gray-600">List of peer groups you are a member of.</p>
                     </div>
-                    <div class="flex flex-col flex-1 overflow-y-auto gap-2">
-                        <!-- <div
-                            v-for="group in peerGroups"
-                            :key="group.id"
-                        >
-                            <div v-if="group.isUserLeader === true || group.isUserMember === true">
-                                <PeerGroupCard
-                                    :peerGroup="group"
-                                />
-                            </div>
-                        </div> -->
+                    <div class="flex">
+                        <span class="w-full h-0.5 bg-accent"></span>
+                    </div>
+                    <div class="flex flex-col flex-1 max-h-full overflow-y-auto gap-2">
+                        <PeerGroupCard
+                            v-if="peerGroupsAsMember.length > 0"
+                            v-for="group in peerGroupsAsMember"
+                            :key="group.peerGroupId"
+                            :peerGroup="group"
+                        />
+                        <div v-else class="text-gray-600 mx-auto mt-6">
+                            <p class="">You are not currently a member of any peer group.</p>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -237,7 +237,50 @@ class PeerGroupController extends Controller
             ];
         });
 
-       
+        $cancelRequestSessions = TutorSession::where('peer_group_id', $id)
+                                            ->where('status', 'cancelRequest') 
+                                            ->get();
+
+        $formattedCancelRequests = [];
+
+        if ($cancelRequestSessions->isNotEmpty()) {
+            $formattedCancelRequests = $cancelRequestSessions->map(function ($session) use ($id) {
+                $tutor = Tutor::where('id', $session->tutor_id)->with('user')->first();
+                $profiles = Profile::where('user_id', $tutor->user_id)->first();
+                $altSession = TutorSession::find($session->alt_session_id);
+                $module = Module::where('id', $session->module_id)->first();
+        
+                return [
+                    'sessionId' => $session->id,
+                    'peerGroupId' => $id,
+                    'tutor_name' => $tutor ? $tutor->user->name : 'Unknown Tutor',
+                    'profile_pic' => $profiles->profile_pic ?? null,
+                    'module' => $module->module_name ?? 'Unknown Module',
+                    'reason' => $session->notes,
+                    'sessionDate' => $session->session_date,
+                    'sessionStartTime' => $session->start_time,
+                    'sessionEndTime' => $session->end_time,
+                    'altSessionId' => $altSession->id ?? null,
+                    'altDate' => $altSession->session_date ?? null,
+                    'altStartTime' => $altSession->start_time ?? null,
+                    'altEndTime' => $altSession->end_time ?? null,
+                ];
+            })->toArray(); // Convert collection to an array for `usort`
+        }
+        
+        // Sort session details by sessionDate and then by sessionStartTime
+        if (!empty($formattedCancelRequests)) {
+            usort($formattedCancelRequests, function ($a, $b) {
+                // Compare sessionDate first
+                $dateComparison = strtotime($a['sessionDate']) - strtotime($b['sessionDate']);
+                if ($dateComparison === 0) {
+                    // If sessionDate is the same, compare sessionStartTime
+                    return strtotime($a['sessionStartTime']) - strtotime($b['sessionStartTime']);
+                }
+                return $dateComparison;
+            });
+        }
+
         // Get all booked sessions for the specified peer group
         $groupSessions = TutorSession::where('peer_group_id', $id)
                                     ->where('status', 'booked')  // Filter for "booked" status
@@ -324,6 +367,7 @@ class PeerGroupController extends Controller
             'peerGroup'=>$formattedPeerGroup,
             'peerGroupMembers'=>$formattedMembers,
             'groupSessions' => $groupSessionDetails,
+            'cancelledSessions' => $formattedCancelRequests,
             'pastGroupSessions' => $pastGroupSessionDetails,
             'peers' => $peers,
             'tutors' => $formattedTutors,
@@ -549,6 +593,58 @@ class PeerGroupController extends Controller
         $session->save();
 
         return redirect()->route('tutor.profile', ['id' => $session->tutor_id]);
+    }
+
+    public function acceptCancelRequest (Request $request)
+    {
+        $userid = auth()->user()->id;
+        $session = TutorSession::find($request->sessionId);
+        $peerGroup = PeerGroup::find($request->peerGroupId);
+
+        // Base URL
+        $baseUrl = "https://sfu.mirotalk.com/join";
+
+        // Generate room name: "Peer Group Session for <Peer Group Name>"
+        $roomName = Str::slug("Peer Group Session for {$peerGroup->name}", '-');
+
+        // Function to generate random 6-character password
+        function generateRandomPassword($length = 6) {
+            return substr(str_shuffle("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"), 0, $length);
+        }
+
+        // Generate room password
+        $roomPassword = generateRandomPassword();
+
+        // Construct the full URL
+        $roomUrl = "{$baseUrl}?room={$roomName}&roomPassword={$roomPassword}&audio=0&video=0&screen=0&notify=0&duration=unlimited";
+
+        $session->status = 'cancelled';
+        $session->save();
+
+        $altSession = TutorSession::find($request->altSessionId);
+        $altSession->peer_group_id = $peerGroup->id;
+        $altSession->module_id = $session->module_id;
+        $altSession->status = 'booked';
+        $altSession->meeting_url = $roomUrl;
+        $altSession->notes = "Rescheduled session of {$session->session_date} | {$session->start_time} - {$session->end_time}";
+        $altSession->save();
+
+        return redirect()->route('peergroup', ['id' => $request->peerGroupId]);
+    }
+
+    public function denyCancelRequest (Request $request)
+    {
+        $userid = auth()->user()->id;
+        $session = TutorSession::find($request->sessionId);
+
+        $session->status = 'cancelled';
+        $session->save();
+
+        $altSession = TutorSession::find($request->altSessionId);
+        $altSession->status = 'pending';
+        $altSession->save();
+
+        return redirect()->route('peergroup', ['id' => $request->peerGroupId]);
     }
 
 }

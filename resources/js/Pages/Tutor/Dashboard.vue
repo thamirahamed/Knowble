@@ -136,6 +136,7 @@ const TutorRequest = (id) => {
                     <template v-else-if="activeContent === 'UpcomingBookings'">
                         <UpcomingBookings
                             :bookings="props.bookings"
+                            :sessionSlots="props.sessionSlots"
                         />
                     </template>
                     <template v-else-if="activeContent === 'CompletedBookings'">

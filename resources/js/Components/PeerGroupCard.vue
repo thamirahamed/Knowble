@@ -6,9 +6,6 @@ import { router } from '@inertiajs/vue3';
 const props = defineProps({
     peerGroup: Array,
 });
-
-console.log(props.peerGroup);
-
 const viewGroup = (grpid) => {
     router.visit(route('peergroup', { id: grpid }));
 }  

@@ -42,6 +42,30 @@ class UpdateSessionStatuses extends Command
         })
         ->update(['status' => 'unbooked', 'meeting_url' => null]);
 
+        // Update "cancelRequest" sessions
+        TutorSession::where('status', 'cancelRequest')
+        ->where('session_date', '<=', $now->toDateString())
+        ->where(function ($query) use ($now) {
+            $query->where('session_date', '<', $now->toDateString()) // Past dates
+                ->orWhere(function ($query) use ($now) {
+                    $query->where('session_date', $now->toDateString()) // Today
+                        ->where('start_time', '<=', $now->toTimeString());
+                });
+        })
+        ->update(['status' => 'cancelled', 'meeting_url' => null]);
+
+        // Update "alt" sessions
+        TutorSession::where('status', 'alt')
+        ->where('session_date', '<=', $now->toDateString())
+        ->where(function ($query) use ($now) {
+            $query->where('session_date', '<', $now->toDateString()) // Past dates
+                ->orWhere(function ($query) use ($now) {
+                    $query->where('session_date', $now->toDateString()) // Today
+                        ->where('start_time', '<=', $now->toTimeString());
+                });
+        })
+        ->update(['status' => 'unbooked', 'meeting_url' => null]);
+
         // Update "booked" sessions
         TutorSession::where('status', 'booked')
         ->where('session_date', '<=', $now->toDateString())

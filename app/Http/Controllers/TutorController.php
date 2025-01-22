@@ -250,13 +250,11 @@ class TutorController extends Controller
         // Retrieve the tutor associated with the authenticated user
         $tutor = Tutor::where('user_id', auth()->id())->first();
 
-        $tutorsessionslots = $tutor->sessions()->get();
-        // $tutorsessionslots->each->delete();
-
         if (!$tutor) {
-            return redirect()->route('tutor.dashboard')
-                ->with('error', 'No associated tutor account found. Please contact support.');
+            return redirect()->route('dashboard');
         }
+
+        $tutorsessionslots = $tutor->sessions()->get();
 
         // Validate the request
         $request->validate([
@@ -267,28 +265,52 @@ class TutorController extends Controller
         ]);
 
         // Extract the single session from the array
-        $session = $request->sessions[0];
+        $newSession = $request->sessions[0];
+
+        // Check for overlapping sessions
+        $overlappingSession = TutorSession::where('tutor_id', $tutor->id)
+            ->where('session_date', $newSession['session_date'])
+            ->where(function ($query) use ($newSession) {
+                $query->whereBetween('start_time', [$newSession['start_time'], $newSession['end_time']])
+                    ->orWhereBetween('end_time', [$newSession['start_time'], $newSession['end_time']])
+                    ->orWhere(function ($query) use ($newSession) {
+                        $query->where('start_time', '<=', $newSession['start_time'])
+                            ->where('end_time', '>=', $newSession['end_time']);
+                    });
+            })
+            ->first();
+
+        if ($overlappingSession) {
+            return back()->withErrors([
+                'sessions' => 'The session overlaps with an existing session. Please choose a different time.',
+            ]);
+        }
 
         // Store the session
         TutorSession::create([
             'tutor_id' => $tutor->id,
-            'session_date' => $session['session_date'],
-            'start_time' => $session['start_time'],
-            'end_time' => $session['end_time'],
+            'session_date' => $newSession['session_date'],
+            'start_time' => $newSession['start_time'],
+            'end_time' => $newSession['end_time'],
         ]);
 
         return redirect()->route('tutor.dashboard');
     }
 
-    public function cancelSession (Request $request)
+    public function cancelRequest (Request $request)
     {
         $userid = auth()->user()->id;
         $session = TutorSession::find($request->sessionId);
+        $altSession = TutorSession::find($request->altSessionId);
 
-        $session->status = 'cancelled';
+        $session->status = 'cancelRequest';
         $session->meeting_url = null;
         $session->notes = $request->notes;
+        $session->alt_session_id = $request->altSessionId;
         $session->save();
+
+        $altSession->status = 'alt';
+        $altSession->save();
 
         return redirect()->route('tutor.dashboard');
     }

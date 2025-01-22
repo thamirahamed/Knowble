@@ -77,7 +77,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('select/{id}',[TutorController::class, 'selectModule'])->name('tutor.select.module');
         Route::post('remove/{id}',[TutorController::class, 'removeModule'])->name('tutor.remove.module');
         Route::post('/sessions/create', [TutorController::class, 'createSession'])->name('tutor.session.create');
-        Route::post('/sessions/cancel', [TutorController::class, 'cancelSession'])->name('tutor.session.cancel');
+        Route::post('/sessions/cancel', [TutorController::class, 'cancelRequest'])->name('tutor.session.cancel');
         Route::post('/sessions/delete/{id}', [TutorController::class, 'deleteSession'])->name('tutor.session.delete');
         Route::post('/resource-shares', [ResourceShareController::class, 'store'])->name('resource-shares.store');
         Route::delete('/resource-shares/{id}', [ResourceShareController::class, 'destroy'])->name('resource-shares.destroy');
@@ -101,6 +101,8 @@ Route::middleware(['auth' ,'studentportal'])->group(function () {
 
     // Book a session
     Route::post('/tutor/sessions/book', [StudentController::class, 'bookSession'])->name('tutor.session.book');
+    Route::post('/tutor/sessions/acceptCancel', [StudentController::class, 'acceptCancelRequest'])->name('tutor.session.acceptCancel');
+    Route::post('/tutor/sessions/denyCancel', [StudentController::class, 'denyCancelRequest'])->name('tutor.session.denyCancel');
 
     Route::prefix('peer-group')->group(function () {
         Route::get('/{id}',[PeerGroupController::class, 'index'])->name('peergroup');
@@ -111,6 +113,8 @@ Route::middleware(['auth' ,'studentportal'])->group(function () {
         Route::post('/leave', [PeerGroupController::class, 'leaveGroup'])->name('peergroup.leave');
         Route::post('/delete', [PeerGroupController::class, 'deleteGroup'])->name('peergroup.delete');
         Route::post('/book', [PeerGroupController::class, 'bookSession'])->name('peergroup.book.session');
+        Route::post('/sessions/acceptCancel', [PeerGroupController::class, 'acceptCancelRequest'])->name('peerGroup.session.acceptCancel');
+        Route::post('/sessions/denyCancel', [PeerGroupController::class, 'denyCancelRequest'])->name('peerGroup.session.denyCancel');
     });
     
     Route::prefix('feedback')->group(function () {

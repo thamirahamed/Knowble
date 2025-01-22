@@ -120,6 +120,10 @@ const handleSubmit = () => {
           }
         }, 100);
     },
+    onError: (errors) => {
+        console.log(errors); // Log errors to the console for debugging
+        alert('Failed to create session: ' + Object.values(errors).join(', ')); // Show error messages
+    },
   });
 };
 

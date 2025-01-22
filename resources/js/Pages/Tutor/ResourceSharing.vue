@@ -60,6 +60,8 @@ const deleteFile = (id) => {
 };
 </script>
 <template>
+    <h1 class="text-xl font-bold text-gray-800">Resource Sharing</h1>
+    <p class="text-gray-500 mb-4">Share resources with your peers to enhance collaboration and learning.</p>
     <form @submit.prevent="submitForm" class="flex justify-between items-center align-middle space-x-4">
         <!-- File Name Input -->
         <div class="flex flex-col w-1/2">

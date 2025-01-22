@@ -4,7 +4,7 @@ import BookTutorModal from '@/Components/BookTutorModal.vue';
 import DangerButton from '@/Components/DangerButton.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { TrashIcon, UserPlusIcon, ArrowLeftEndOnRectangleIcon, UserGroupIcon, CheckBadgeIcon, UserMinusIcon } from '@heroicons/vue/24/solid';
+import { TrashIcon, UserPlusIcon, ArrowLeftEndOnRectangleIcon, UserGroupIcon, CheckBadgeIcon, UserMinusIcon, XMarkIcon, CheckIcon } from '@heroicons/vue/24/solid';
 import { router, Head } from '@inertiajs/vue3';
 import { defineProps, ref } from "vue";
 
@@ -12,6 +12,7 @@ const props = defineProps({
     peerGroup: Array,
     peerGroupMembers: Array,
     groupSessions: Array,
+    cancelledSessions: Array,
     pastGroupSessions: Array,
     peers: Array,
     tutors: Array,
@@ -144,6 +145,30 @@ const getDaySuffix = (day) => {
   return 'th';
 };
 
+const acceptCancellation = (session) => {
+    // Submit the form using router.post
+    router.post('/peer-group/sessions/acceptCancel', session, {
+        onSuccess: () => {
+            alert('Session rescheduled successfully!');
+        },
+        onError: (errors) => {
+            alert('Failed to reschedule session:', errors);
+        },
+    });
+};
+
+const denyCancellation = (session) => {
+    // Submit the form using router.post
+    router.post('/peer-group/sessions/denyCancel', session, {
+        onSuccess: () => {
+            alert('Session cancelled successfully!');
+        },
+        onError: (errors) => {
+            alert('Failed to cancel session:', errors);
+        },
+    });
+};
+
 </script>
 
 <template>
@@ -211,12 +236,12 @@ const getDaySuffix = (day) => {
                 />
             </div>
             <span class="w-full h-0.5 bg-accent mb-4"></span>
-            <div class="flex gap-8">
+            <div class="flex gap-8 flex-1 h-full">
                 <!-- Upcoming Sessions -->
-                <div class="flex flex-col flex-1">
-                    <div v-if="peerGroup.isUserLeader === 'Yes' || peerGroup.isUserMember === 'Yes'" class="flex flex-col flex-1 bg-white rounded-md shadow px-6 py-4 mb-4 min-h-72 max-h-[30rem] overflow-y-auto">
-                        <div class="flex flex-row justify-between">
-                            <h1 class="text-xl text-slate-900 font-bold mb-4">Upcoming Sessions</h1>
+                <div class="flex flex-col flex-1 h-full">
+                    <div v-if="peerGroup.isUserLeader === 'Yes' || peerGroup.isUserMember === 'Yes'" class="flex flex-col flex-1 bg-white rounded-md shadow px-6 py-4 mb-4 min-h-[24rem] max-h-[34rem] space-y-4">
+                        <div class="flex flex-row justify-between items-center">
+                            <h1 class="text-xl text-slate-900 font-bold">Upcoming Sessions</h1>
                             <PrimaryButton
                                 :icon="true" 
                                 iconPlacement="left"
@@ -230,11 +255,63 @@ const getDaySuffix = (day) => {
                                 Book Tutor
                             </PrimaryButton>
                         </div>
-                        <div v-if="groupSessions.length > 0" class="flex flex-col gap-3 overflow-y-auto">
+                        <div v-if="cancelledSessions.length > 0" class="flex flex-col gap-3 overflow-y-auto h-auto max-h-96">
+                            <div
+                                v-for="session in cancelledSessions"
+                                :key="session.sessionId"
+                                class="flex flex-col bg-secondary/5 p-3 rounded-md shadow-md"
+                            >
+                                <!-- Tutor Name -->
+                                <div class="flex items-center">
+                                    <img
+                                        :src="session.profile_pic"
+                                        alt="Profile Picture"
+                                        class="w-8 h-8 mr-3 rounded-full object-cover"
+                                    />
+                                    <p class="text-lg font-semibold text-gray-800">{{ session.tutor_name }}</p>
+                                    <CheckBadgeIcon class="ml-1 w-5 h-5 text-accent" />
+                                </div>
+                                <div>
+                                    <p class="text-lg text-gray-600">{{ session.module }}</p>
+                                    <p class="text-lg text-gray-600">{{ formatDateToWords(session.sessionDate) }} | {{ session.sessionStartTime }} - {{ session.sessionEndTime }}</p>
+                                    <p class="text-lg text-red-500">CANCELLED</p>
+                                    <p class="text-lg text-gray-600">Reason: {{ session.reason }}</p>
+                                </div>
+                                <div class="flex my-2">
+                                    <span class="w-full h-0.5 bg-accentdark"></span>
+                                </div>
+                                <div class="flex flex-1 justify-between items-center">
+                                    <div>
+                                        <p class="text-lg text-gray-600">Proposed Reschedule:</p>
+                                        <p class="text-lg text-gray-600">{{ formatDateToWords(session.altDate) }} | {{ session.altStartTime }} - {{ session.altEndTime }}</p>
+                                    </div>
+                                    <div v-if="peerGroup.isUserLeader === 'Yes'" class="flex gap-3 h-fit">
+                                        <PrimaryButton 
+                                            :id="'acceptCancel-' + session.sessionId" 
+                                            class="!p-1.5 !rounded-full"
+                                            @click="acceptCancellation(session)"
+                                        >
+                                            <CheckIcon class="w-5 h-5"/>
+                                        </PrimaryButton>
+                                        <DangerButton
+                                            :id="'denyCancel-' + session.sessionId" 
+                                            class="!p-1.5 !rounded-full" 
+                                            @click="denyCancellation(session)"
+                                        >   
+                                            <XMarkIcon class="w-5 h-5"/>
+                                        </DangerButton>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex">
+                            <span class="w-full h-0.5 bg-accentdark"></span>
+                        </div>
+                        <div v-if="groupSessions.length > 0" class="flex flex-col overflow-y-auto">
                             <div
                                 v-for="(session, index) in groupSessions"
                                 :key="index"
-                                class="flex flex-col bg-secondary/5 px-5 py-4 rounded-md shadow-md"
+                                class="flex flex-col bg-secondary/5 px-5 py-4 rounded-md shadow-md mb-3"
                             >
                                 <div class="flex justify-between items-center">
                                     <div>
@@ -260,8 +337,9 @@ const getDaySuffix = (day) => {
                             <p class="text-base text-gray-600">Group leader has to place booking.</p>
                         </div>
                     </div>
-                    <div class="flex flex-col flex-1 bg-white rounded-md shadow px-6 py-4 mb-4 min-h-64 h-fit max-h-[30rem] overflow-y-auto">
+                    <div class="flex flex-col flex-1 bg-white rounded-md shadow px-6 py-4 mb-4 min-h-72 max-h-[34rem] overflow-y-auto">
                         <h1 class="text-xl text-slate-900 font-bold mb-4">Past Sessions</h1>
+
                         <div v-if="pastGroupSessions.length > 0" class="flex flex-col gap-3 overflow-y-auto flex-wrap">
                             <div   
                                 v-for="session in pastGroupSessions"

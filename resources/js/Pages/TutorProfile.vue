@@ -27,6 +27,7 @@ const props = defineProps({
     studentModules: Array,
     isLeader: Array,
     peerGroups: Array,
+    canBookGroupSessions: String,
     hasCompletedSession: Array,
     hasCompletedGroupSession: Array,
     userFeedback: Array,
@@ -236,7 +237,7 @@ const getDaySuffix = (day) => {
                             </div>
                         </PrimaryButton>
                         <PrimaryButton
-                            v-if="sessions.length > 0 && tutormodules.length > 0 && isLeader && peerGroups.length > 0"
+                            v-if="sessions.length > 0 && tutormodules.length > 0 && isLeader && canBookGroupSessions === 'true'"
                             id="bookGroupSessionBtn"
                             class="mt-4 w-full"
                             @click="openModalWithData1(tutor.id)"
@@ -305,10 +306,10 @@ const getDaySuffix = (day) => {
                     <!-- Resource Shared Section -->
                     <div class="flex flex-col flex-1 bg-white rounded-md mt-8 shadow h-fit py-4 px-6">
                         <h2 class="text-2xl font-bold">Study Resources</h2>
-                        <p class="text-gray-700">
+                        <p class="text-gray-700 mb-4">
                             Access a variety of materials and tools to support your learning and enhance your understanding.
                         </p>
-                        <div class="overflow-y-auto max-h-60 shadow-sm">
+                        <div v-if="resourcesShared.length > 0" class="overflow-y-auto max-h-60 shadow-sm">
                             <ul class="divide-y divide-gray-200">
                                 <li
                                     v-for="resource in resourcesShared"
@@ -327,6 +328,9 @@ const getDaySuffix = (day) => {
                                     </a>
                                 </li>
                             </ul>
+                        </div>
+                        <div v-else >
+                            <p class="text-gray-700 m-auto text-center">No resources have been uploaded by the tutor at this time.</p>
                         </div>
                     </div>
 

@@ -1,21 +1,20 @@
 <script setup>
-import { ref } from 'vue';
 import { router, useForm } from '@inertiajs/vue3';
 import InputLabel from './InputLabel.vue';
-import PrimaryButton from './PrimaryButton.vue';
-import { UserGroupIcon, XMarkIcon } from '@heroicons/vue/24/solid';
-import { onMounted } from 'vue';
+import { UserGroupIcon, XMarkIcon, ExclamationCircleIcon } from '@heroicons/vue/24/solid';
 import DangerButton from './DangerButton.vue';
 
 const props = defineProps({
     openModal: Boolean,
     closeModal: Function,
     booking: Array,
+    sessionSlots: Array
 });
 
 // Initialize the form
 const form = useForm({
     notes: '',
+    sessionSlot: ''
 });
 
 const submitSessionCancel = () => {
@@ -24,12 +23,13 @@ const submitSessionCancel = () => {
     const payload = {
         sessionId: props.booking.id,
         notes: form.notes,
+        altSessionId: form.sessionSlot
     };
 
     // Submit the form using router.post
     router.post('/tutor/sessions/cancel', payload, {
         onSuccess: () => {
-            alert('Session cancelled successfully!');
+            alert('Session cancellation request sent successfully!');
             props.closeModal(); // Close the modal on success
             form.reset(); // Reset the form fields
         },
@@ -84,7 +84,34 @@ const getDaySuffix = (day) => {
                 <p class="text-lg text-gray-700">{{ booking.module_name }}</p>
                 <p class="text-lg text-gray-700">{{ formatDateToWords(booking.session_date) }} | {{ booking.start_time }} - {{ booking.end_time }}</p>
                 <p class="text-lg text-gray-700" v-if="booking.notes">Notes: {{ booking.notes }}</p>
-                <form @submit.prevent="submitSessionCancel" class="mt-2 pt-2 border-t border-gray-300">
+                <div class="flex mb-2 mt-2">
+                    <span class="w-full h-0.5 bg-accent"></span>
+                </div>
+                <p class="text-gray-600 flex items-center"> 
+                    <ExclamationCircleIcon class="w-5 h-5 mr-1.5" />
+                    Offer a session as compensation for the cancellation.
+                </p>
+                <form @submit.prevent="submitSessionCancel" class="mt-2 pt-2">
+                    <div class="mb-4">
+                        <InputLabel for="session-slot" value="Session Slot" />
+                        <select
+                            id="session_slots"
+                            class="cursor-pointer mt-1 block w-full text-lg shadow-sm border-gray-300 rounded-md hover:border-slate-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-slate-500"
+                            required
+                            v-model="form.sessionSlot"
+                        >
+                            <option value="">Select Session</option>
+                            <option
+                                v-for="slots in sessionSlots"
+                                :key="slots.id"
+                                :value="slots.id"
+                                :id="'session-'+slots.id"
+                            >
+                                {{ formatDateToWords(slots.session_date) }} - {{ slots.start_time }} to {{ slots.end_time }}
+                            </option>
+                            <InputError class="mt-2" :message="form.errors.sessionSlot" />
+                        </select>
+                    </div>
                     <div class="mb-4">
                         <inputLabel for="notes" value="Reason for Cancellation" />
                         <textarea

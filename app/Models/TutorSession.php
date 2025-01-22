@@ -17,6 +17,7 @@ class TutorSession extends Model
         'peer_group_id',
         'module_id',
         'meeting_url',
+        'alt_session_id',
         'notes',
     ];
 

@@ -169,7 +169,9 @@ const displayedTutors = computed(() => {
 
                     <!-- Scrollable Tutor Listings -->
                     <!-- Show tutors when no search or filter is applied -->
-                    <div v-if="searchQuery === '' && selectedModule === ''" class="flex flex-col flex-1 gap-3.5 max-h-[32rem] overflow-y-auto">   
+                    <p v-if="!(tutors.length > 0)" class="text-gray-600 text-center">No tutors are currently available for your registered modules.</p>
+
+                    <div v-else-if="searchQuery === '' && selectedModule === ''" class="flex flex-col flex-1 gap-3.5 max-h-[32rem] overflow-y-auto">   
                         <div v-for="tutor in tutors" :key="tutor.id">
                             <TutorCard
                                 :tutorname="tutor.name"
@@ -193,7 +195,7 @@ const displayedTutors = computed(() => {
                             :rating="tutor.rating"
                         />
                     </div>
-                    <p v-else class="text-gray-600 text-center">No tutors available.</p>
+                    <p v-else class="text-gray-600 text-center"> No tutors match the search criteria. Please adjust your search and try again.</p>
                     
                     <!-- Fallback Message -->
                 </div>

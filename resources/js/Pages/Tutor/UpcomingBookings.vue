@@ -9,6 +9,7 @@ import { UserGroupIcon } from "@heroicons/vue/24/solid";
 // Props
 const props = defineProps({
     bookings: Array,      // Array of booked sessions
+    sessionSlots: Array,      // Array of booked sessions
 });
 
 const openModal = ref(null);
@@ -135,6 +136,7 @@ const getDaySuffix = (day) => {
             :openModal="openModal"
             :closeModal="closeModal"
             :booking="selectedBooking"
+            :sessionSlots="sessionSlots"
         />
     </div>
 </template>

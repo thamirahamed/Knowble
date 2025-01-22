@@ -6,22 +6,23 @@ import TutorCard from "@/Components/TutorCard.vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head, router } from "@inertiajs/vue3";
 import { computed, ref, watch } from "vue";
-import { UserGroupIcon, UserIcon, PlusIcon } from "@heroicons/vue/24/solid";
+import { UserGroupIcon, UserIcon, PlusIcon, CheckIcon, XMarkIcon, CheckBadgeIcon } from "@heroicons/vue/24/solid";
 import { Link } from "@inertiajs/vue3";
 import CreatePeerGroup from "@/Components/CreatePeerGroup.vue";
 import PeerGroupCard from "@/Components/PeerGroupCard.vue";
+import DangerButton from "@/Components/DangerButton.vue";
 
 // Props
 const props = defineProps({
     tutors: Array,
     sessions: Array,
+    cancelledSessions: Array,
     sModules: Array,
     peerGroups: Array,
     peerGroupsAsMember: Array,
 });
 
-console.log(JSON.stringify(props.peerGroups, null, 2));
-console.log(JSON.stringify(props.peerGroupsAsMember, null, 2));
+console.log(JSON.stringify(props.tutors, null, 2));
 
 const openModal = ref(null);
 
@@ -178,6 +179,30 @@ const displayedTutors = computed(() => {
     
     return tutorsToDisplay;
 });
+
+const acceptCancellation = (session) => {
+    // Submit the form using router.post
+    router.post('/tutor/sessions/acceptCancel', session, {
+        onSuccess: () => {
+            alert('Session rescheduled successfully!');
+        },
+        onError: (errors) => {
+            alert('Failed to reschedule session:', errors);
+        },
+    });
+};
+
+const denyCancellation = (session) => {
+    // Submit the form using router.post
+    router.post('/tutor/sessions/denyCancel', session, {
+        onSuccess: () => {
+            alert('Session cancelled successfully!');
+        },
+        onError: (errors) => {
+            alert('Failed to cancel session:', errors);
+        },
+    });
+};
 </script>
 
 
@@ -226,6 +251,7 @@ const displayedTutors = computed(() => {
                         <div class="flex flex-col gap-2">
                             <!-- Title -->
                             <h1 class="text-2xl font-bold text-slate-900">Tutors</h1>
+                            <p class="text-gray-600 -mt-2 mb-2">Find and book sessions with tutors for your modules.</p>
                             <TextInput
                                 v-model="searchQuery"
                                 placeholder="Search Tutor by Name"
@@ -253,7 +279,9 @@ const displayedTutors = computed(() => {
 
                         <!-- Scrollable Tutor Listings -->
                         <!-- Show tutors when no search or filter is applied -->
-                        <div v-if="searchQuery === '' && selectedModule === ''" class="flex flex-col flex-1 gap-3.5 max-h-full overflow-y-auto">   
+                        <p v-if="!(tutors.length > 0)" class="text-gray-600 text-center">No tutors are currently available for your registered modules.</p>
+    
+                        <div v-else-if="searchQuery === '' && selectedModule === ''" class="flex flex-col flex-1 gap-3.5 max-h-full overflow-y-auto">   
                             <div v-for="tutor in tutors" :key="tutor.id">
                                 <TutorCard
                                     :tutorname="tutor.name"
@@ -277,7 +305,7 @@ const displayedTutors = computed(() => {
                                 :rating="tutor.rating"
                             />
                         </div>
-                        <p v-else class="text-gray-600 text-center">No tutors available.</p>
+                        <p v-else class="text-gray-600 text-center"> No tutors match the search criteria. Please adjust your search and try again.</p>
                         
                         <!-- Fallback Message -->
                     </div>
@@ -285,13 +313,67 @@ const displayedTutors = computed(() => {
 
 
                 <!-- Upcoming sessions -->
-                <div class="flex flex-1 bg-white rounded-md shadow-sm py-4 px-6 max-w-[30rem] min-h-60 h-fit overflow-y-auto max-h-full">
-                    <div class="flex flex-col w-full">
+                <div class="flex flex-1 bg-white rounded-md shadow-sm py-4 px-6 max-w-[30rem] min-h-60 overflow-y-auto max-h-full h-auto">
+                    <div class="flex flex-col w-full h-auto space-y-4">
                         <!-- Section Header -->
-                        <h1 class="text-xl font-bold mb-4 text-slate-900">Upcoming Sessions</h1>
+                        <h1 class="text-xl font-bold text-slate-900">Upcoming Sessions</h1>
+
+                        <div v-if="cancelledSessions.length > 0" class="flex flex-col gap-3 overflow-y-auto h-auto max-h-96">
+                            <div
+                                v-for="session in cancelledSessions"
+                                :key="session.sessionId"
+                                class="flex flex-col bg-secondary/5 p-3 rounded-md shadow-md"
+                            >
+                                <!-- Tutor Name -->
+                                <div class="flex items-center">
+                                    <img
+                                        :src="session.profile_pic"
+                                        alt="Profile Picture"
+                                        class="w-8 h-8 mr-3 rounded-full object-cover"
+                                    />
+                                    <p class="text-lg font-semibold text-gray-800">{{ session.tutor_name }}</p>
+                                    <CheckBadgeIcon class="ml-1 w-5 h-5 text-accent" />
+                                </div>
+                                <div>
+                                    <p class="text-lg text-gray-600">{{ session.module }}</p>
+                                    <p class="text-lg text-gray-600">{{ formatDateToWords(session.sessionDate) }} | {{ session.sessionStartTime }} - {{ session.sessionEndTime }}</p>
+                                    <p class="text-lg text-red-500">CANCELLED</p>
+                                    <p class="text-lg text-gray-600">Reason: {{ session.reason }}</p>
+                                </div>
+                                <div class="flex my-2">
+                                    <span class="w-full h-0.5 bg-accentdark"></span>
+                                </div>
+                                <div class="flex flex-1 justify-between items-center">
+                                    <div>
+                                        <p class="text-lg text-gray-600">Proposed Reschedule:</p>
+                                        <p class="text-lg text-gray-600">{{ formatDateToWords(session.altDate) }} | {{ session.altStartTime }} - {{ session.altEndTime }}</p>
+                                    </div>
+                                    <div class="flex gap-3 h-fit">
+                                        <PrimaryButton 
+                                            :id="'acceptCancel-' + session.sessionId" 
+                                            class="!p-1.5 !rounded-full"
+                                            @click="acceptCancellation(session)"
+                                        >
+                                            <CheckIcon class="w-5 h-5"/>
+                                        </PrimaryButton>
+                                        <DangerButton
+                                            :id="'denyCancel-' + session.sessionId" 
+                                            class="!p-1.5 !rounded-full" 
+                                            @click="denyCancellation(session)"
+                                        >   
+                                            <XMarkIcon class="w-5 h-5"/>
+                                        </DangerButton>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex">
+                            <span class="w-full h-0.5 bg-accentdark"></span>
+                        </div>
 
                         <!-- Session List -->
-                        <div v-if="sessions.length > 0" class="flex flex-col gap-3 overflow-y-auto h-full">
+                        <div v-if="sessions.length > 0" class="flex flex-col gap-3 overflow-y-auto h-auto max-h-full">
                             <div
                                 v-for="(session, index) in sessions"
                                 :key="index"
@@ -319,10 +401,13 @@ const displayedTutors = computed(() => {
                                     </div>
                                     <PrimaryButton :id="'joinMeeting-' + session.id" class="!text-sm" @click="joinMeeting(session)">Join Now</PrimaryButton>
                                 </div>
+                                <div>
+                                    <p v-if="session.reason" class="text-lg text-gray-600">Notes: {{ session.reason }}</p>
+                                </div>
                             </div>
                         </div>
                         <div v-else class="flex flex-col w-full">
-                            <p class="text-gray-600">No upcoming sessions with tutor.</p>
+                            <p class="text-gray-600 text-center">No upcoming sessions with tutor.</p>
                         </div>
                     </div>
                 </div>

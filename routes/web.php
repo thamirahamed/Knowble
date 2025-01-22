@@ -68,6 +68,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/api/chat/users', [ChatController::class, 'getUsers']);
     Route::post('/api/chat/start', [ChatController::class, 'startChat']);
     Route::post('/api/chat/message', [ChatController::class, 'sendMessage']);
+    Route::get('/api/chat/chatwithcurrentuser', [ChatController::class, 'chatusers']);
 
     Route::get('/api/chat/messages/{chatId}', [ChatController::class, 'getMessages']);
 
@@ -116,7 +117,7 @@ Route::middleware(['auth' ,'studentportal'])->group(function () {
         Route::post('/sessions/acceptCancel', [PeerGroupController::class, 'acceptCancelRequest'])->name('peerGroup.session.acceptCancel');
         Route::post('/sessions/denyCancel', [PeerGroupController::class, 'denyCancelRequest'])->name('peerGroup.session.denyCancel');
     });
-    
+
     Route::prefix('feedback')->group(function () {
         Route::post('/create', [FeedbackRatingController::class, 'createFeedback'])->name('feedback.create');
         Route::post('/edit', [FeedbackRatingController::class, 'editFeedback'])->name('feedback.edit');

@@ -6,67 +6,80 @@ import { Head } from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import TextInput from "@/Components/TextInput.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import { ArrowUpRightIcon, MagnifyingGlassIcon } from "@heroicons/vue/24/solid";
+import { ArrowUpRightIcon } from "@heroicons/vue/24/solid";
 
+// Props
 const props = defineProps({
-    users: Array,
-    activeChat: Object,
-    messages: Array,
-    newMessage: String,
-    currentUserId: Number,
-    isTyping: Boolean,
     auth: Object,
 });
 
+// Reactive Variables
 const users = ref([]);
 const activeChat = ref(null);
 const messages = ref([]);
 const newMessage = ref("");
 const currentUserId = ref(null);
-const isTyping = ref(false); // Typing indicator state
-let refreshInterval = null;
-const profilePhoto = ref(null);
+const isTyping = ref(false);
+const chatWithCurrentUsers = ref([]);
+const searchQuery = ref("");
 
-const searchQuery = ref(""); // Holds the search input
-
-// Computed property to filter users based on the search query
+// Computed Property to Filter Users
 const filteredUsers = computed(() => {
-    // if (!searchQuery.value) return;
-    return users.value.filter(
-        (user) =>
-            user.name.toLowerCase().includes(searchQuery.value.toLowerCase()) 
-            // user.profile.cb_number
-            //     .toLowerCase()
-            //     .includes(searchQuery.value.toLowerCase()),
+    if (!searchQuery.value) return users.value;
+    return users.value.filter((user) =>
+        user.name.toLowerCase().includes(searchQuery.value.toLowerCase())
     );
 });
 
-// Fetch users list
+// Fetch Users List
 const fetchUsers = async () => {
-    const response = await axios.get("/api/chat/users");
-    users.value = response.data;
-};
-
-// Start chat with a specific user
-const startChat = async (userId) => {
-    const response = await axios.post("/api/chat/start", { user_id: userId });
-    activeChat.value = response.data.chat;
-    messages.value = response.data.messages;
-    fetchMessages(); // Fetch messages immediately when starting a chat
-    console.log(activeChat.value);
-};
-
-// Fetch messages for the active chat
-const fetchMessages = async () => {
-    if (activeChat.value) {
-        const response = await axios.get(
-            `/api/chat/messages/${activeChat.value.id}`,
-        );
-        messages.value = response.data.messages;
+    try {
+        const response = await axios.get("/api/chat/users");
+        users.value = response.data;
+        console.log(users.value);
+    } catch (error) {
+        console.error("Error fetching users:", error);
     }
 };
 
-// Send a message
+// Fetch Current Chat Users
+const fetchCurrentChatUser = async () => {
+    try {
+        const response = await axios.get("/api/chat/chatwithcurrentuser");
+        chatWithCurrentUsers.value = response.data;
+        console.log(chatWithCurrentUsers.value);
+    } catch (error) {
+        console.error("Error fetching current chat users:", error);
+    }
+};
+
+// Start Chat with a Specific User
+const startChat = async (userId) => {
+    try {
+        const response = await axios.post("/api/chat/start", { user_id: userId });
+        activeChat.value = response.data.chat;
+        messages.value = response.data.messages;
+        fetchMessages(); // Fetch messages immediately after starting a chat
+    } catch (error) {
+        console.error("Error starting chat:", error);
+    }
+};
+
+// Fetch Messages for the Active Chat
+const fetchMessages = async () => {
+    if (activeChat.value) {
+        try {
+            const response = await axios.get(
+                `/api/chat/messages/${activeChat.value.id}`
+            );
+            messages.value = response.data.messages;
+        } catch (error) {
+            console.error("Error fetching messages:", error);
+        }
+    }
+};
+
+// Send a Message
 const sendMessage = async () => {
     if (!newMessage.value) return;
 
@@ -75,74 +88,52 @@ const sendMessage = async () => {
             chat_id: activeChat.value.id,
             message: newMessage.value,
         });
+        newMessage.value = ""; // Clear the input after sending the message
     } catch (error) {
-        // Clear the message input field after sending the message
-        newMessage.value = ""; 
         console.error("Failed to send message:", error);
     }
 };
 
-// Handle typing indicator
-// const handleTyping = () => {
-//     if (activeChat.value) {
-//         window.Echo.channel('chat').whisper('UserTyping', {
-//             chat_id: activeChat.value.id,
-//             is_typing: newMessage.value.length > 0, // Send typing state based on input
-//         });
-//     }
-// };
-fetchUsers();
-// Setup Echo and event listeners for real-time updates
+
+// Lifecycle Hooks
 onMounted(() => {
     fetchUsers();
+    fetchCurrentChatUser();
 
-    // Ensure pageProps and auth are available
+    // Assign the authenticated user's ID
     if (props.auth && props.auth.id) {
         currentUserId.value = props.auth.id;
-    } else {
-        console.error(
-            "Auth data is missing or malformed in props:",
-            props.auth,
-        );
     }
 
-    // Initialize Echo for real-time features
+    // Initialize Echo for real-time updates
     window.Echo = new Echo({
         broadcaster: "pusher",
-        key: "8b3c3cd9313f2c8cdd03", // Replace with your Pusher key or other broadcaster configuration
-        cluster: "ap2", // Replace with the cluster if you're using Pusher
+        key: "8b3c3cd9313f2c8cdd03",
+        cluster: "ap2",
         encrypted: true,
     });
-    // Start the interval to refresh messages every 3 seconds
-    refreshInterval = setInterval(fetchMessages, 1000);
 
-    // // Listen for new messages
-    // Echo.channel('chat')
-    //     .listen('MessageSent', (event) => {
-    //         if (activeChat.value && event.chat_id === activeChat.value.id) {
-    //             messages.value.push(event.message);
-    //         }
-    //     })
-    //     .listen('UserTyping', (event) => {
-    //         if (event.chat_id === activeChat.value.id) {
-    //             isTyping.value = event.is_typing; // Update typing state
-    //         }
-    //     })
-    //     .listen('UserPresence', (event) => {
-    //         const user = users.value.find((user) => user.id === event.user_id);
-    //         if (user) {
-    //             user.is_online = event.is_online;
-    //         }
-    //     });
+    // Refresh messages periodically
+    setInterval(fetchMessages, 3000);
 });
 
-// Cleanup interval on component unmount
 onBeforeUnmount(() => {
-    if (refreshInterval) {
-        clearInterval(refreshInterval);
+    if (window.Echo) {
+        window.Echo.disconnect();
     }
 });
+const activeChatUser = computed(() => {
+    if (!activeChat.value || !users.value.length) return null;
+
+    const otherUserId =
+        activeChat.value.user_id_1 === currentUserId.value
+            ? activeChat.value.user_id_2
+            : activeChat.value.user_id_1;
+
+    return users.value.find((user) => user.id === otherUserId) || null;
+});
 </script>
+
 
 <template>
     <Head title="Chat" />
@@ -165,26 +156,46 @@ onBeforeUnmount(() => {
                         />
                     </div>
 
-                    <!-- Filtered Users List -->
+                    <!-- Conditionally Render User Lists -->
                     <ul class="px-4 overflow-y-auto">
-                        <li
-                            v-for="user in filteredUsers"
-                            :key="user.id"
-                            @click="startChat(user.id)"
-                            class="flex cursor-pointer items-center p-2 py-4 transition hover:bg-secondary/15 border-t border-gray-200"
-                        >
-                            <!-- <img
-                                class="mr-3 h-10 w-10 rounded-full object-cover"
-                                :src="user.profile.profile_pic"
-                                :alt="user.name"
-                            /> -->
-                            <div>
-                                <p class="font-medium text-lg">{{ user.name }}</p>
-                                <!-- <span class="text-sm text-gray-500">{{
-                                    user.profile.cb_number
-                                }}</span> -->
-                            </div>
-                        </li>
+                        <!-- Show Currently Chatted Users if no search query -->
+                        <template v-if="!searchQuery">
+                            <li
+                                v-for="chatUser in chatWithCurrentUsers"
+                                :key="chatUser.id"
+                                @click="startChat(chatUser.id)"
+                                class="flex cursor-pointer items-center p-2 py-4 transition hover:bg-secondary/15 border-t border-gray-200"
+                            >
+                                <div class="flex justify-evenly items-center">
+                                    <img
+                                        :src="chatUser.profile.profile_pic"
+                                        alt="User Avatar"
+                                        class="w-12 h-12 rounded-full"
+                                    />
+                                    <p class="font-medium text-lg pl-5">{{ chatUser.name }}</p>
+                                    <span class="text-sm text-gray-500">{{ chatUser.last_message }}</span>
+                                </div>
+                            </li>
+                        </template>
+
+                        <!-- Show Filtered Users if there is a search query -->
+                        <template v-else>
+                            <li
+                                v-for="user in filteredUsers"
+                                :key="user.id"
+                                @click="startChat(user.id)"
+                                class="flex cursor-pointer items-center p-2 py-4 transition hover:bg-secondary/15 border-t border-gray-200"
+                            >
+                                <div class="flex justify-evenly items-center">
+                                    <img
+                                        :src="user.profile.profile_pic"
+                                        alt="User Avatar"
+                                        class="w-12 h-12 rounded-full"
+                                    />
+                                    <p class="font-medium text-lg pl-5">{{ user.name }}</p>
+                                </div>
+                            </li>
+                        </template>
                     </ul>
                 </div>
 
@@ -192,9 +203,22 @@ onBeforeUnmount(() => {
                 <div class="flex flex-1 h-full border-l border-gray-300 text-lg">
                     <div class="p-6 flex h-full w-full">
                         <div v-if="activeChat" class="flex flex-col w-full gap-4">
-                            <!-- <h1 class=" text-xl font-bold">
-                                {{ activeChat.name }}
-                            </h1> -->
+                            <div class="flex items-center gap-4 p-4 bg-gray-100 rounded-lg shadow">
+                                <img
+                                    v-if="activeChatUser"
+                                    :src="activeChatUser.profile.profile_pic"
+                                    alt="User Avatar"
+                                    class="w-12 h-12 rounded-full"
+                                />
+                                <div>
+                                    <p class="font-bold text-xl">
+                                        {{ activeChatUser ? activeChatUser.name : "Loading..." }}
+                                    </p>
+                                    <p class="text-sm text-gray-500">
+                                        {{ activeChatUser ? activeChatUser.status || "Active now" : "" }}
+                                    </p>
+                                </div>
+                            </div>
 
                             <!-- Messages Section -->
                             <div

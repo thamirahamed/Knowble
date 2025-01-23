@@ -6,7 +6,7 @@ import { Head } from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import TextInput from "@/Components/TextInput.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import { ArrowUpRightIcon } from "@heroicons/vue/24/solid";
+import { PaperAirplaneIcon, CheckBadgeIcon } from "@heroicons/vue/24/solid";
 
 // Props
 const props = defineProps({
@@ -19,7 +19,6 @@ const activeChat = ref(null);
 const messages = ref([]);
 const newMessage = ref("");
 const currentUserId = ref(null);
-const isTyping = ref(false);
 const chatWithCurrentUsers = ref([]);
 const searchQuery = ref("");
 
@@ -27,7 +26,7 @@ const searchQuery = ref("");
 const filteredUsers = computed(() => {
     if (!searchQuery.value) return users.value;
     return users.value.filter((user) =>
-        user.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+        user.user.toLowerCase().includes(searchQuery.value.toLowerCase())
     );
 });
 
@@ -38,7 +37,7 @@ const fetchUsers = async () => {
         users.value = response.data;
         console.log(users.value);
     } catch (error) {
-        console.error("Error fetching users:", error);
+        console.log("Error fetching users:", error);
     }
 };
 
@@ -61,7 +60,7 @@ const startChat = async (userId) => {
         messages.value = response.data.messages;
         fetchMessages(); // Fetch messages immediately after starting a chat
     } catch (error) {
-        console.error("Error starting chat:", error);
+        console.log("Error starting chat:", error);
     }
 };
 
@@ -73,6 +72,16 @@ const fetchMessages = async () => {
                 `/api/chat/messages/${activeChat.value.id}`
             );
             messages.value = response.data.messages;
+            const options = { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Kolkata" };
+
+            messages.value = messages.value.map((msg) => {
+            return {
+                ...msg,
+                created_at_IST: new Intl.DateTimeFormat("en-US", options).format(new Date(msg.created_at)),
+                updated_at_IST: new Intl.DateTimeFormat("en-US", options).format(new Date(msg.updated_at)),
+            };
+            });
+            console.log(messages.value);
         } catch (error) {
             console.error("Error fetching messages:", error);
         }
@@ -114,7 +123,7 @@ onMounted(() => {
     });
 
     // Refresh messages periodically
-    setInterval(fetchMessages, 3000);
+    setInterval(fetchMessages, 1000);
 });
 
 onBeforeUnmount(() => {
@@ -147,13 +156,16 @@ const activeChatUser = computed(() => {
                     <h1 class="p-4 text-3xl font-bold">Users</h1>
 
                     <!-- Search Bar -->
-                    <div class="mb-4 px-4">
+                    <div class="px-4">
                         <TextInput
                             v-model="searchQuery"
                             type="text"
-                            placeholder="Search users..."
+                            placeholder="Search users to chat"
                             class=" w-full p-2 !text-base"
                         />
+                    </div>
+                    <div class="flex my-4 px-4">
+                        <span class="w-full h-0.5 bg-accent"></span>
                     </div>
 
                     <!-- Conditionally Render User Lists -->
@@ -168,12 +180,15 @@ const activeChatUser = computed(() => {
                             >
                                 <div class="flex justify-evenly items-center">
                                     <img
-                                        :src="chatUser.profile.profile_pic"
+                                        :src="chatUser.profile_pic"
                                         alt="User Avatar"
-                                        class="w-12 h-12 rounded-full"
+                                        class="w-12 h-12 rounded-full object-cover"
                                     />
-                                    <p class="font-medium text-lg pl-5">{{ chatUser.name }}</p>
-                                    <span class="text-sm text-gray-500">{{ chatUser.last_message }}</span>
+                                    <div class="flex flex-col">
+                                        <div class="font-medium text-lg pl-5 flex flex-row items-center">{{ chatUser.user }} <CheckBadgeIcon v-if="chatUser.isTutor === 'Yes'" class="w-5 h-5 text-accent ml-1.5"/></div>
+                                        <p class="text-gray-600 text-base pl-5">{{ chatUser.degree }}</p>
+                                        <p v-if="chatUser.lastMessage != null" class="text-gray-600 text-base pl-5 italic">"{{ chatUser.lastMessage }}"</p>
+                                    </div>
                                 </div>
                             </li>
                         </template>
@@ -181,6 +196,7 @@ const activeChatUser = computed(() => {
                         <!-- Show Filtered Users if there is a search query -->
                         <template v-else>
                             <li
+                                v-if="filteredUsers.length > 0"
                                 v-for="user in filteredUsers"
                                 :key="user.id"
                                 @click="startChat(user.id)"
@@ -188,13 +204,19 @@ const activeChatUser = computed(() => {
                             >
                                 <div class="flex justify-evenly items-center">
                                     <img
-                                        :src="user.profile.profile_pic"
+                                        :src="user.profile_pic"
                                         alt="User Avatar"
-                                        class="w-12 h-12 rounded-full"
+                                        class="w-12 h-12 rounded-full object-cover"
                                     />
-                                    <p class="font-medium text-lg pl-5">{{ user.name }}</p>
+                                    <div class="flex flex-col">
+                                        <div class="font-medium text-lg pl-5 flex flex-row items-center">{{ user.user }} <CheckBadgeIcon v-if="user.isTutor === 'Yes'" class="w-5 h-5 text-accent ml-1.5"/></div>
+                                        <p class="text-gray-600 text-base pl-5">{{ user.degree }}</p>
+                                    </div>
                                 </div>
                             </li>
+                            <p v-else class="text-gray-600 text-center mt-8">
+                                No matching user found. Please try again.
+                            </p>
                         </template>
                     </ul>
                 </div>
@@ -206,16 +228,16 @@ const activeChatUser = computed(() => {
                             <div class="flex items-center gap-4 p-4 bg-gray-100 rounded-lg shadow">
                                 <img
                                     v-if="activeChatUser"
-                                    :src="activeChatUser.profile.profile_pic"
+                                    :src="activeChatUser.profile_pic"
                                     alt="User Avatar"
-                                    class="w-12 h-12 rounded-full"
+                                    class="w-12 h-12 rounded-full object-cover"
                                 />
-                                <div>
-                                    <p class="font-bold text-xl">
-                                        {{ activeChatUser ? activeChatUser.name : "Loading..." }}
+                                <div v-if="activeChatUser">
+                                    <p  class="font-bold text-xl">
+                                        {{ activeChatUser.user }}
                                     </p>
-                                    <p class="text-sm text-gray-500">
-                                        {{ activeChatUser ? activeChatUser.status || "Active now" : "" }}
+                                    <p  class="text-lg text-gray-600">
+                                        {{ activeChatUser.degree }}
                                     </p>
                                 </div>
                             </div>
@@ -236,21 +258,22 @@ const activeChatUser = computed(() => {
                                     class="flex w-fit mb-1"
                                 >
                                     <div
-                                        class="flex rounded-lg py-2 px-3 text-white max-w-96 break-all justify-end whitespace-normal h-full text-left"
+                                        class="flex flex-col rounded-lg py-2 px-3 text-white max-w-96 break-all justify-end whitespace-normal h-full text-left"
                                     >
                                         <p>
                                             {{ message.message }}
                                         </p>
+                                        <p 
+                                            class="text-gray-300 text-xs "
+                                            :class="{
+                                                'self-end':
+                                                    message.user_id === currentUserId,
+                                            }"
+                                        >
+                                            {{ message.created_at_IST }}
+                                        </p>
                                     </div>
                                 </div>
-                            </div>
-
-                            <!-- Typing Indicator -->
-                            <div
-                                v-if="isTyping"
-                                class="mb-4 italic text-gray-500"
-                            >
-                                {{ activeChat.name }} is typing...
                             </div>
 
                             <!-- Message Input -->
@@ -263,9 +286,10 @@ const activeChatUser = computed(() => {
                                     @keyup.enter="sendMessage"
                                 />
                                 <PrimaryButton
+                                    class="!p-3"
                                     @click="sendMessage"
                                 >
-                                    <ArrowUpRightIcon class="w-6 font-bold" />
+                                    <PaperAirplaneIcon class="w-6 font-bold" />
                                 </PrimaryButton>
                             </div>
                         </div>

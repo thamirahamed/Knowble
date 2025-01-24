@@ -61,6 +61,7 @@ const closeModal = () => {
                                 <NavLink
                                     :href="route('chatpage')"
                                     :active="route().current('chatpage')"
+                                    id="chatBtn"
                                 >
                                     Chat
                                 </NavLink>

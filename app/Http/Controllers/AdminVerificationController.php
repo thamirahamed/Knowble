@@ -3,15 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Mail\ApproveTutorMail;
+use App\Models\Chat;
 use App\Models\Course;
 use App\Models\CourseLevel;
 use App\Models\DegreeProgram;
 use App\Models\Level;
 use App\Models\Module;
+use App\Models\PeerGroup;
+use App\Models\PeerGroupMember;
 use App\Models\Profile;
 use App\Models\SchoolOfStudy;
 use App\Models\Semester;
 use App\Models\Tutor;
+use App\Models\TutorSession;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -194,6 +198,114 @@ class AdminVerificationController extends Controller
             'approvedModules' => $approvedModules,
             'rejectedModules' => $rejectedModules,
             'rejectedreason' => $rejectedreason
+        ]);
+    }
+
+    public function sessions()
+    {
+        //get all the users with profile data is aviailable
+        $users = User::all();
+
+        foreach ($users as $user) {
+            $profile = Profile::where('user_id', $user->id)->first();
+            if ($profile) {
+                $user->profile = $profile;
+            }
+            //remove admin user from the list
+            if ($user->name == 'Admin') {
+                $users = $users->except($user->id);
+            }
+
+            //is a tutor
+            $tutor = Tutor::where('user_id', $user->id)->exists();
+
+            if ($tutor) {
+                $user->tutor = 'Yes';
+            } else {
+                $user->tutor = 'No';
+            }
+        }
+
+        return Inertia::render('Admin/Sessions', [
+            'users' => $users
+        ]);
+
+    }
+
+    public function userHistory($id)
+    {
+        $user = User::find($id);
+        $profile = Profile::where('user_id', $id)->first();
+
+        $isTutor = Tutor::where('user_id', $id)->exists();
+
+        $tutordetails = [];
+        if ($isTutor) {
+            $tutor = Tutor::where('user_id', $id)->first();
+            $tutorsession = TutorSession::where('tutor_id', $tutor->id)->get();
+            $tuorselectedmodules = $tutor->selectedModules()->get();
+
+            $tutordetails = [
+                'tutor' => $tutor,
+                'tutorsession' => $tutorsession,
+                'tuorselectedmodules' => $tuorselectedmodules
+            ];
+        }
+
+        $sessions = TutorSession::where('user_id', $id)->get();
+        $peerGroups  = [];
+
+        $peerGroup = PeerGroup::where('leader', $id)->get();
+
+        foreach ($peerGroup as $group) {
+            $group->course = Module::where('id', $group->course_id)->first();
+            $group->courseLevel = Level::where('id', $group->course_level_id)->first();
+            $group->leader = 'yes';
+        }
+
+        $peergroupmember = PeerGroupMember::where('user_id', $id)->get();
+
+        foreach ($peergroupmember as $member) {
+            $member->group = PeerGroup::where('id', $member->peer_group_id)->first();
+        }
+
+        $peerGroups = [
+            'peerGroup' => $peerGroup,
+            'peergroupmember' => $peergroupmember
+        ];
+
+
+
+
+        $chat = Chat::where('user_id_1', $id)->orWhere('user_id_2', $id)->get();
+
+        if ($chat) {
+            foreach ($chat as $ch) {
+                //if its user only add the other user
+                if ($ch->user_id_1 == $id) {
+                    $ch->user = User::where('id', $ch->user_id_2)->first();
+                } else {
+                    $ch->user = User::where('id', $ch->user_id_1)->first();
+                }
+            }
+        }
+
+        $degree = DegreeProgram::where('id', $profile->degree_id)->first();
+        $level = Level::where('id', $profile->level_id)->first();
+        $semester = Semester::where('id', $profile->semester_id)->first();
+
+
+        return Inertia::render('Admin/UserHistory', [
+            'user' => $user,
+            'profile' => $profile,
+            'tutor' => $tutordetails,
+            'sessions' => $sessions,
+            'peerGroup' => $peerGroups,
+            'chat' => $chat,
+            'degree' => $degree,
+            'level' => $level,
+            'semester' => $semester,
+            'isTutor' => $isTutor
         ]);
     }
 

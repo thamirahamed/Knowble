@@ -48,6 +48,8 @@ Route::middleware(['auth','studentportal'])->group(function () {
 Route::middleware(['auth','adminportal'])->group(function () {
     Route::prefix('admin')->group(function () {
         Route::get('/dashboard', [AdminVerificationController::class, 'adminDashboard'])->name('admin.dashboard');
+        Route::get('/sessions', [AdminVerificationController::class, 'sessions'])->name('admin.sessions');
+        Route::get('/user/history/{id}', [AdminVerificationController::class, 'userHistory'])->name('admin.user.history');
     });
 });
 

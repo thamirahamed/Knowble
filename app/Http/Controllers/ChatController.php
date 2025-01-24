@@ -37,7 +37,7 @@ class ChatController extends Controller
                     'isTutor' => $isTutor? 'Yes' : 'No',
                     'degree' => $userdegree ? $userdegree->degree_name : 'N/A', // Handle missing degree gracefully
                 ];
-            } 
+            }
         }
 
         return $userid;
@@ -131,7 +131,7 @@ class ChatController extends Controller
     {
         // Fetch messages for the specific chat
         $messages = Message::where('chat_id', $chatId)->get();
-        
+
         // Return the messages as JSON
         return response()->json([
             'messages' => $messages

@@ -22,6 +22,8 @@ export default {
                 secondary: "#042f47",
                 accent: "#1b8f67",
                 accentdark: "#136b4d",
+                accentdarker: "#146e4f", // Darker version of #1b8f67
+                accentdarkest: "#0d523a", // Darker version of #136b4d
             },
             transitionDuration: {
                 '550': '550ms',

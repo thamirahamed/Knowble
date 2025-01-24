@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Events\MessageSent;
 use App\Models\Chat;
 use App\Models\Message;
+use App\Models\Tutor;
+use App\Models\Profile;
+use App\Models\DegreeProgram;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -15,15 +18,29 @@ class ChatController extends Controller
     public function index()
     {
         return Inertia::render('Chat/ChatPage', [
-            'users' => $this->getUsers(),
+            'users' => $this->chatusers(),
             'auth' => Auth::user(),
         ]);
     }
     public function getUsers()
     {
-        return User::where('id', '<>', auth()->id())
-            ->with('profile') // Assuming a Profile relationship exists
-            ->get();
+        $users = User::where('id', '<>', auth()->id())->get();
+        foreach($users as $user){
+            $userprofile = Profile::where('user_id', $user->id)->first();
+            if ($userprofile) {
+                $userdegree = DegreeProgram::where('id', $userprofile->degree_id)->first();
+                $isTutor = Tutor::where('user_id', $user->id)->exists();
+                $userid[] = [
+                    'id' => $user->id,
+                    'user' => $user->name,
+                    'profile_pic' => $userprofile->profile_pic,
+                    'isTutor' => $isTutor? 'Yes' : 'No',
+                    'degree' => $userdegree ? $userdegree->degree_name : 'N/A', // Handle missing degree gracefully
+                ];
+            }
+        }
+
+        return $userid;
     }
 
     public function chatusers()
@@ -33,17 +50,36 @@ class ChatController extends Controller
         $chatusers = Chat::where('user_id_1', $authuser->id)->orWhere('user_id_2', $authuser->id)->get();
 
         $userid = [];
-        foreach($chatusers as $chat){
-            if($chat->user_id_1 == $authuser->id){
+        foreach ($chatusers as $chat) {
+            if ($chat->user_id_1 == $authuser->id) {
                 $user = $chat->user_id_2;
-                $userdetails = User::where('id', $user)->with('profile')->first();
-                $userid[] = $userdetails;
-            }else{
+            } else {
                 $user = $chat->user_id_1;
-                $userdetails = User::where('id', $user)->with('profile')->first();
-                $userid[] = $userdetails;
             }
+
+            $userdetails = User::where('id', $user)->first();
+            $userprofile = Profile::where('user_id', $user)->first();
+            $userdegree = DegreeProgram::where('id', $userprofile->degree_id)->first();
+            $isTutor = Tutor::where('user_id', $user)->exists();
+            $lastMessage = Message::where('chat_id', $chat->id) // Assuming 'chat_id' is the foreign key
+                ->orderBy('created_at', 'desc') // Sort by the latest message
+                ->first(); // Get the latest message
+
+            $userid[] = [
+                'id' => $userdetails->id,
+                'user' => $userdetails->name,
+                'profile_pic' => $userprofile->profile_pic,
+                'degree' => $userdegree->degree_name,
+                'isTutor' => $isTutor ? 'Yes' : 'No',
+                'lastMessage' => $lastMessage !== null ? $lastMessage->message : null,
+                'lastMessageTime' => $lastMessage !== null ? $lastMessage->created_at : null,
+            ];
         }
+
+        // Sort $userid by lastMessageTime in descending order (newest first)
+        usort($userid, function ($a, $b) {
+            return strtotime($b['lastMessageTime']) <=> strtotime($a['lastMessageTime']);
+        });
 
         return $userid;
     }
@@ -53,8 +89,6 @@ class ChatController extends Controller
         $fromUserId = auth()->id();
         $toUserId = $request->user_id;
 
-
-
         //check if chat already exists
         $user1 = Chat::where('user_id_1', $fromUserId)->where('user_id_2', $toUserId)->first();
 
@@ -63,8 +97,8 @@ class ChatController extends Controller
 
         if($user1 || $user2){
             return response()->json([
-                'chat' => $user1,
-                'messages' => $user1->messages()->orderBy('created_at')->get(),
+                'chat' => $user1 ? $user1 : $user2,
+                'messages' => $user1 ? $user1->messages()->orderBy('created_at')->get() : $user2->messages()->orderBy('created_at')->get(),
             ]);
         }
 

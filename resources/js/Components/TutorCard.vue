@@ -13,7 +13,7 @@ const props = defineProps({
 
 const viewProfile = (tutorid) => {
     router.visit(route('tutor.profile', { id: tutorid }));
-}  
+}
 </script>
 
 <template>
@@ -35,11 +35,11 @@ const viewProfile = (tutorid) => {
             <h2 v-else class="text-slate-500 font-light flex items-center"><StarIcon class="w-4 h-4 text-accent mr-1"/>(-)</h2>
         </div>
         <div>
-            <PrimaryButton 
-                :id="'viewProfileBtn-' + tutor_id" 
-                class="!text-sm" 
+            <PrimaryButton
+                :id="'viewProfileBtn-' + tutor_id"
+                class="!text-sm"
                 @click="viewProfile(tutor_id)"
-            >   
+            >
                 View Profile
             </PrimaryButton>
         </div>

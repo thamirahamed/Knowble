@@ -160,8 +160,9 @@ const activeChatUser = computed(() => {
                         <TextInput
                             v-model="searchQuery"
                             type="text"
-                            placeholder="Search users to chat"
+                            placeholder="Search users to chat"  
                             class=" w-full p-2 !text-base"
+                            id="chatSearch"
                         />
                     </div>
                     <div class="flex my-4 px-4">

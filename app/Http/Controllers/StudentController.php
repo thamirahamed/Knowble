@@ -148,7 +148,7 @@ class StudentController extends Controller
         if($sessions->isNotEmpty()){
             foreach ($sessions as $session) {
                 $tutor = Tutor::where('id', $session->tutor_id)->with('user')->first();
-                $profiles = Profile::where('user_id', $session->user_id)->first();
+                $profiles = Profile::where('user_id', $tutor->user_id)->first();
                 $module = Module::where('id', $session->module_id)->first();
                 $studentName = User::where('id', $userid)->first();
                 $sessionDetails[] = [

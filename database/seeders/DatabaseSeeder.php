@@ -22,7 +22,7 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'name' => 'Thamir Ahamed',
-                'email' => 'cb012828@students.apiit.lk',
+                'email' => 'cb012829@students.apiit.lk',
             ],
             [
                 'name' => 'Nuski Ahamed Naleem',
@@ -1185,6 +1185,90 @@ class DatabaseSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+            [
+                'tutor_id' => 3,  // Set tutor ID
+                'session_date' => '2025-01-10',  // Example date, modify as needed
+                'start_time' => '15:00:00',
+                'end_time' => '18:00:00',
+                'status' => 'booked',  // You can change the status as needed
+                'user_id' => 4,  // Set user ID or peer_group_id
+                'peer_group_id' => null,  // Set this if applicable
+                'module_id' => 46,  // Set module ID
+                'notes' => null,
+                'meeting_url' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'tutor_id' => 3,  // Set tutor ID
+                'session_date' => '2025-01-11',  // Example date, modify as needed
+                'start_time' => '15:00:00',
+                'end_time' => '18:00:00',
+                'status' => 'booked',  // You can change the status as needed
+                'user_id' => 5,  // Set user ID or peer_group_id
+                'peer_group_id' => null,  // Set this if applicable
+                'module_id' => 48,  // Set module ID
+                'notes' => null,
+                'meeting_url' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'tutor_id' => 2,  // Set tutor ID
+                'session_date' => '2025-01-10',  // Example date, modify as needed
+                'start_time' => '15:00:00',
+                'end_time' => '18:00:00',
+                'status' => 'booked',  // You can change the status as needed
+                'user_id' => 5,  // Set user ID or peer_group_id
+                'peer_group_id' => null,  // Set this if applicable
+                'module_id' => 14,  // Set module ID
+                'notes' => null,
+                'meeting_url' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'tutor_id' => 2,  // Set tutor ID
+                'session_date' => '2025-01-11',  // Example date, modify as needed
+                'start_time' => '15:00:00',
+                'end_time' => '18:00:00',
+                'status' => 'booked',  // You can change the status as needed
+                'user_id' => 3,  // Set user ID or peer_group_id
+                'peer_group_id' => null,  // Set this if applicable
+                'module_id' => 15,  // Set module ID
+                'notes' => null,
+                'meeting_url' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'tutor_id' => 6,  // Set tutor ID
+                'session_date' => '2025-01-10',  // Example date, modify as needed
+                'start_time' => '15:00:00',
+                'end_time' => '18:00:00',
+                'status' => 'booked',  // You can change the status as needed
+                'user_id' => 4,  // Set user ID or peer_group_id
+                'peer_group_id' => null,  // Set this if applicable
+                'module_id' => 79,  // Set module ID
+                'notes' => null,
+                'meeting_url' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'tutor_id' => 6,  // Set tutor ID
+                'session_date' => '2025-01-11',  // Example date, modify as needed
+                'start_time' => '15:00:00',
+                'end_time' => '18:00:00',
+                'status' => 'booked',  // You can change the status as needed
+                'user_id' => 3,  // Set user ID or peer_group_id
+                'peer_group_id' => null,  // Set this if applicable
+                'module_id' => 82,  // Set module ID
+                'notes' => null,
+                'meeting_url' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
             // Add more sessions as needed
         ];
 
@@ -1204,7 +1288,7 @@ class DatabaseSeeder extends Seeder
             [
                 'user_id' => 4,  // Set the user ID
                 'tutor_id' => 5,  // Set the tutor ID
-                'rating' => 2,  // Rating out of 5
+                'rating' => 3,  // Rating out of 5
                 'feedback' => 'The session was not as helpful as I expected. I had difficulty understanding some of the concepts.',
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -1218,10 +1302,50 @@ class DatabaseSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'user_id' => 3,  // Set the user ID
+                'user_id' => 4,  // Set the user ID
                 'tutor_id' => 3,  // Set the tutor ID
                 'rating' => 4,  // Rating out of 5
                 'feedback' => 'Good session, Very helpful.',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'user_id' => 5,
+                'tutor_id' => 3,
+                'rating' => 5,
+                'feedback' => 'Amazing session! I learned a lot, and the tutor was very engaging.',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'user_id' => 5,
+                'tutor_id' => 2,
+                'rating' => 4,
+                'feedback' => 'The session was informative, but I wish it was a bit longer.',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'user_id' => 3,
+                'tutor_id' => 2,
+                'rating' => 3,
+                'feedback' => 'The tutor was knowledgeable, but the examples could have been more relevant.',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'user_id' => 4,
+                'tutor_id' => 6,
+                'rating' => 5,
+                'feedback' => 'Excellent tutor! The explanations were clear, and the examples were spot-on.',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'user_id' => 3,
+                'tutor_id' => 6,
+                'rating' => 2,
+                'feedback' => 'The session didn’t meet my expectations. The tutor seemed unprepared.',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
